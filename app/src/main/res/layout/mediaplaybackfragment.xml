@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/picture_big"
+    android:background="#FFFF">
+
+    <RelativeLayout
+        android:id="@+id/op"
+        android:layout_width="match_parent"
+        android:layout_alignParentTop="true"
+        android:padding="8sp"
+        android:layout_height="80dp"
+        android:background="#80FFFFFF"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/picture_small"
+            android:layout_width="85dp"
+            android:layout_height="match_parent"
+            app:srcCompat="@drawable/ic_launcher_foreground" />
+
+
+        <TextView
+            android:id="@+id/song1"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@+id/picture_small"
+            android:text="TextView" />
+
+
+        <ImageView
+            android:id="@+id/music_pop"
+            android:layout_width="32dp"
+            android:layout_height="50dp"
+            android:visibility="gone"
+            android:layout_marginVertical="20sp"
+            android:layout_marginLeft="14dp"
+            android:layout_marginEnd="5dp"
+            android:layout_toStartOf="@+id/mnMedia"
+            android:layout_toRightOf="@+id/song1"
+            app:srcCompat="@drawable/ic_queue_dark" />
+
+        <ImageView
+            android:id="@+id/mnMedia"
+            android:layout_width="40sp"
+            android:layout_height="50sp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginVertical="20sp"
+            android:layout_marginEnd="2dp"
+            app:srcCompat="@drawable/ic_more_vert" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="28dp"
+        android:layout_above="@+id/ll_time"
+        android:layout_marginBottom="1dp"
+        android:paddingLeft="15sp"
+        android:paddingRight="15sp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/imageView5"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            app:srcCompat="@drawable/ic_repeat_white" />
+
+        <ImageView
+            android:id="@+id/imageView6"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            app:srcCompat="@drawable/ic_shuffle_white" />
+
+    </RelativeLayout>
+
+
+
+    <RelativeLayout
+        android:id="@+id/ll_time"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_above="@+id/ll_bottom"
+        android:background="#80FFFFFF"
+        android:orientation="horizontal">
+        <SeekBar
+            android:id="@+id/seekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/seekBar"
+            android:layout_marginLeft="8sp"
+            android:text="@string/time_1"></TextView>
+
+        <TextView
+            android:id="@+id/Time2"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginRight="8sp"
+            android:layout_below="@+id/seekBar"
+            android:layout_alignParentRight="true"
+            android:text="@string/time_2">
+        </TextView>
+
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/ll_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        android:background="#80FFFFFF"
+        android:paddingLeft="15sp"
+        android:paddingRight="15sp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/like"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            app:srcCompat="@drawable/ic_thumbs_up_default"
+            android:contentDescription="TODO" />
+
+        <ImageView
+            android:id="@+id/play_return"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:layout_alignStart="@+id/play_pause_media"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="-35dp"
+            android:layout_marginRight="50dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
+            android:layout_toRightOf="@+id/like"
+            app:srcCompat="@drawable/ic_rew_dark" />
+
+        <ImageView
+            android:id="@+id/play_pause_media"
+            android:layout_width="50sp"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="155dp"
+            android:layout_marginEnd="155dp"
+            android:layout_marginBottom="-5dp"
+            app:srcCompat="@drawable/ic_baseline_pause_circle_filled_24" />
+
+        <ImageView
+            android:id="@+id/play_next"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="-2dp"
+            android:layout_marginLeft="-150dp"
+            android:layout_marginBottom="2dp"
+            android:layout_toRightOf="@+id/play_pause_media"
+            app:srcCompat="@drawable/ic_fwd_dark" />
+
+        <ImageView
+            android:id="@+id/dislike"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            app:srcCompat="@drawable/ic_thumbs_down_default" />
+
+    </RelativeLayout>
+
+</RelativeLayout>
