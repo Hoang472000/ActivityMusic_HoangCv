@@ -5,14 +5,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
 
+import android.annotation.SuppressLint;
 import android.content.ComponentName;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 
 import android.media.Image;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PersistableBundle;
@@ -33,6 +37,8 @@ import javax.xml.datatype.Duration;
 import Service.ServiceMediaPlay;
 
 public class MainActivity extends AppCompatActivity implements DisplayMediaFragment,DataFragment{
+    public static IntentFilter Broadcast_PLAY_NEW_AUDIO;
+    String PRIVATE_MODE ="color" ;
     AllSongsFragment allSongsFragment;
     MediaPlaybackFragment mediaPlaybackFragment;
     DataFragment dataFragment;
@@ -43,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
     }
 
     public ServiceMediaPlay player;
+    MediaPlayer mediaPlayer;
     boolean serviceBound = false;
     private Song song;
     private TextView mTitle, mTime2;
@@ -53,6 +60,8 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
     private RelativeLayout mLinearLayout;
     private DisplayMediaFragment displayMediaFragment;
     private ArrayList<Song> mListSong;
+    SharedPreferences sharedPreferences;
+
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
@@ -106,8 +115,8 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
     }
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        if(player!=null)
-        savedInstanceState.putInt("possision", player.getPossision());
+        UpdateUI updateUI=new UpdateUI(getApplicationContext());
+       // updateUI.UpdateSeekbar();
         super.onSaveInstanceState(savedInstanceState);
     }
 
@@ -136,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
 
 
 private Boolean IsBoolean=false;
+    @SuppressLint("WrongConstant")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -145,6 +155,8 @@ private Boolean IsBoolean=false;
         mPictureSmall = findViewById(R.id.picture_small);
         mLinearLayout = findViewById(R.id.bottom);
         mediaPlaybackFragment = new MediaPlaybackFragment();
+
+
         //final ListView list = findViewById(R.id.list_view);
         int orientation = this.getResources().getConfiguration().orientation;
          allSongsFragment = new AllSongsFragment(this, this.mediaPlaybackFragment,this);
@@ -174,12 +186,14 @@ private Boolean IsBoolean=false;
         Intent intent = new Intent(this, ServiceMediaPlay.class);
         startService(intent);
         bindService(intent, serviceConnection, BIND_AUTO_CREATE);
+        mediaPlaybackFragment.setService(player);
 //        if(savedInstanceState!=null) {
 //            savedInstanceState.getInt("possision");
 //            Log.d("HoangCV9", "onCreate: " + savedInstanceState.getInt("possision"));
 //            Log.d("HoangCV9", "onCreate: " + mListSong.get(4));
 //            possision = savedInstanceState.getInt("possision");
 //        }
+        sharedPreferences = getSharedPreferences("login", MODE_PRIVATE);
     }
 
 
@@ -199,10 +213,12 @@ private Boolean IsBoolean=false;
          mediaPlaybackFragment = new MediaPlaybackFragment().newInstance(song);
         FragmentManager manager1 = this.getSupportFragmentManager();
         manager1.beginTransaction()
+                .addToBackStack(null)
                 .replace(R.id.fragmentSongOne, mediaPlaybackFragment)
                 .commit();
         mediaPlaybackFragment.setService(player);
         mediaPlaybackFragment.setListSong(mListSong);
+
 
     }
 

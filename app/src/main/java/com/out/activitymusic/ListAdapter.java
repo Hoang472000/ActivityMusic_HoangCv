@@ -94,11 +94,16 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
 
 //        String mCurrent1=mListSTT.get(position);
         if(position==mPosision) {
-
             holder.mId.setVisibility(View.INVISIBLE);
             holder.mTitle.setTypeface(null, Typeface.BOLD);
             holder.mEqualizer.animateBars();
             holder.mEqualizer.setVisibility(View.VISIBLE);
+        }
+        else {
+            holder.mId.setVisibility(View.VISIBLE);
+            holder.mTitle.setTypeface(null, Typeface.NORMAL);
+       //     holder.mEqualizer.animateBars();
+            holder.mEqualizer.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -136,13 +141,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
         }
     };
 
-    public void setService(ServiceMediaPlay service){
-    }
 
-
-    public interface onClick{
-        void onClick();
-    }
 
     private String getDurationTime(String str) {
         int mili = Integer.parseInt(str) / 1000;
@@ -166,6 +165,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
         public TextView mDuration;
         final ListAdapter mAdapter;
         public TextView mId;
+        private UpdateUI mUpdateUI;
 
 
         public ViewHolder(@NonNull View itemView, ListAdapter adapter) {
@@ -178,13 +178,13 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
             mDuration = itemView.findViewById(R.id.tvTime);
             itemView.setOnClickListener(this);
 
-
         }
 
 
         @Override
         public void onClick(View view) {
             Log.d("HoangCV6", "onClick: ");
+
             mPosision=Integer.parseInt(String.valueOf(mId.getText()))-1;
             itemClickListener.onClick(mListSong.get(mPosision));
             notifyDataSetChanged();

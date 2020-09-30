@@ -1,10 +1,10 @@
 package com.out.activitymusic;
 
 import android.content.ContentUris;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -15,28 +15,18 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageSwitcher;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 
-import androidx.fragment.app.FragmentManager;
-
-import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
@@ -70,6 +60,8 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
     private ImageView mPlayPause;
     private Boolean IsBoolean = false;
     private ImageView mMusicPop;
+    MediaPlayer mediaPlayer;
+
 
     public void setBoolean(Boolean aBoolean) {
         IsBoolean = aBoolean;
@@ -83,10 +75,11 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
         this.serviceMediaPlay = service;
     }
 
-    public AllSongsFragment(DisplayMediaFragment displayMediaFragment, MediaPlaybackFragment mediaPlaybackFragment,DataFragment dataFragment) {
+
+    public AllSongsFragment(DisplayMediaFragment displayMediaFragment, MediaPlaybackFragment mediaPlaybackFragment, DataFragment dataFragment) {
         this.displayMediaFragment = displayMediaFragment;
         this.mediaPlaybackFragment = mediaPlaybackFragment;
-        this.dataFragment= dataFragment;
+        this.dataFragment = dataFragment;
 
     }
 
@@ -94,6 +87,8 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
 
     }
 
+    UpdateUI UpdateUI;
+    int index;
     @Nullable
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -104,7 +99,8 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
         mLinearLayout = mInflater.findViewById(R.id.bottom);
         mPlayPause = mInflater.findViewById(R.id.play_pause);
         Log.d("HoangCV1", "onCreateView: " + mPlayPause);
-
+        UpdateUI = new UpdateUI(getContext());
+        Log.i("HoangCV11", "onCreateView:1 " + UpdateUI.getTitle());
         LoaderManager.getInstance(this).initLoader(1, null, this);
         title = mInflater.findViewById(R.id.title);
         artist = mInflater.findViewById(R.id.artist);
@@ -112,7 +108,7 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
         mTitle = mInflater.findViewById(R.id.song1);
         mTime = mInflater.findViewById(R.id.Time2);
         mImageSmall = mInflater.findViewById(R.id.picture_small);
-        mMusicPop=mInflater.findViewById(R.id.music_pop);
+        mMusicPop = mInflater.findViewById(R.id.music_pop);
         //Bkav Nhungltk: doan nay nghia la sao
         ((MainActivity) getActivity()).setiConnectActivityAndBaseSong(new MainActivity.IConnectActivityAndBaseSong() {
             @Override
@@ -123,18 +119,34 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
                 }
             }
         });
+        title.setText(UpdateUI.getTitle());
+        artist.setText(UpdateUI.getArtist());
+        img.setImageURI(Uri.parse(UpdateUI.getAlbum()));
+        final Song updateSong= new Song(UpdateUI.getIndex(),UpdateUI.getTitle(),UpdateUI.getFile(),UpdateUI.getAlbum(),UpdateUI.getArtist(),String.valueOf(UpdateUI.getDuration()));
+        if(serviceMediaPlay!=null)
+            song=updateSong;
+        Log.d("HoangCV444", "onCreateView: "+updateSong);
 
+
+
+
+        index=UpdateUI.getIndex();
+        Log.d("HoangCV33", "onCreateView: "+UpdateUI.getAlbum());
 
         mLinearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                displayMediaFragment.onclick(song);
-                //mMusicPop.setVisibility(View.VISIBLE);
+                displayMediaFragment.onclick(updateSong);
+
             }
         });
+
         onClickPause();
 
         return mInflater;
+    }
+    private  void clickLinearLayout(){
+
     }
 
     @Override
@@ -195,7 +207,7 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
                 artist = song.getArtist();
                 duration = song.getDuration();
                 songs.add(new Song(id, title, file, album, artist, duration));
-                Log.d("nhungltk1", "onLoadFinished: "+title);
+                Log.d("nhungltk1", "onLoadFinished: " + title);
 
 
                /* if (isCreate == false) {
@@ -232,10 +244,9 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
         this.song = song;
         Log.d("HoangCV", "onClick: 123");
         int orientation = this.getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE)
-        {
-                mediaPlaybackFragment.setListSong(songs);
-                mediaPlaybackFragment.getText(song);
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mediaPlaybackFragment.setListSong(songs);
+            mediaPlaybackFragment.getText(song);
         }
         if (serviceMediaPlay != null) {
             Log.d("nhungltk", "onClick: " + "playMusic");
@@ -248,17 +259,19 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
         title.setText(song.getTitle());
         artist.setText(song.getArtist());
         img.setImageURI(queryAlbumUri(song.getAlbum()));
-        Ischeck=true;
+
+        Ischeck = true;
     }
-private boolean Ischeck;
+
+    private boolean Ischeck;
+
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        if(Ischeck)
-        {
-            outState.putString("Title",song.getTitle());
+        if (Ischeck) {
+            outState.putString("Title", song.getTitle());
         }
-        Ischeck=false;
+        Ischeck = false;
     }
 
 
@@ -294,7 +307,7 @@ private boolean Ischeck;
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("HoangCV10", "onResume: "+serviceMediaPlay);
+        Log.d("HoangCV10", "onResume: " + serviceMediaPlay);
     }
 
 
