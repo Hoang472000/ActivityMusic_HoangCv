@@ -1,7 +1,10 @@
 package com.out.activitymusic;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
 
 
@@ -22,12 +25,18 @@ import android.os.IBinder;
 import android.os.PersistableBundle;
 import android.util.Log;
 
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 
 import android.widget.RelativeLayout;
 
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
+
+
+import com.google.android.material.navigation.NavigationView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -61,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
     private DisplayMediaFragment displayMediaFragment;
     private ArrayList<Song> mListSong;
     SharedPreferences sharedPreferences;
+    private DrawerLayout mDrawerLayout;
 
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
@@ -92,27 +102,6 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
     };
     private int possision;
 
-
- /*   private void playAudio(String media) {
-        //Check is service is active
-        if (!serviceBound) {
-            Intent playerIntent = new Intent(this, ServiceMediaPlay.class);
-            playerIntent.putExtra("media", media);
-            startService(playerIntent);
-            bindService(playerIntent, serviceConnection, Context.BIND_AUTO_CREATE);
-        } else {
-            //Service is active
-            //Send media with BroadcastReceiver
-        }
-    }*/
-
-    // Gọi playAudio()hàm từ phương thức Activitys onCreate()và tham chiếu tệp âm thanh.
-    //   playAudio("https://upload.wikimedia.org/wikipedia/commons/6/6c/Grieg_Lyric_Pieces_Kobold.ogg");
-    private void setSaveInStanceState(){
-        Image img1,img2;
-        TextView tv;
-        int Time;
-    }
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         UpdateUI updateUI=new UpdateUI(getApplicationContext());
@@ -181,30 +170,69 @@ private Boolean IsBoolean=false;
 
                     .commit();
         }
-        /* Log.d("HoangCV", "onCreateView: "+song.getTitle());*/
-
         Intent intent = new Intent(this, ServiceMediaPlay.class);
         startService(intent);
         bindService(intent, serviceConnection, BIND_AUTO_CREATE);
         mediaPlaybackFragment.setService(player);
-//        if(savedInstanceState!=null) {
-//            savedInstanceState.getInt("possision");
-//            Log.d("HoangCV9", "onCreate: " + savedInstanceState.getInt("possision"));
-//            Log.d("HoangCV9", "onCreate: " + mListSong.get(4));
-//            possision = savedInstanceState.getInt("possision");
-//        }
         sharedPreferences = getSharedPreferences("login", MODE_PRIVATE);
+
+
+        mDrawerLayout = findViewById(R.id.drawer_layout);
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        // set item as selected to persist highlight
+                        menuItem.setChecked(true);
+                        // close drawer when item is tapped
+                        mDrawerLayout.closeDrawers();
+                        // Add code here to update the UI based on the item selected
+                        // For example, swap UI fragments here
+                        return true;
+                    }
+                });
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionbar = getSupportActionBar();
+        actionbar.setDisplayHomeAsUpEnabled(true);
+        actionbar.setHomeAsUpIndicator(R.drawable.default_cover_art);
+        mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
+
+            }
+
+            @Override
+            public void onDrawerOpened(@NonNull View drawerView) {
+
+            }
+
+            @Override
+            public void onDrawerClosed(@NonNull View drawerView) {
+
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+
+            }
+        });
     }
 
-
-    /*@Override
-    public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
-
+    private void setSupportActionBar(Toolbar toolbar) {
     }
-*/
 
-
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+   }
 
 
     @Override
@@ -218,8 +246,7 @@ private Boolean IsBoolean=false;
                 .commit();
         mediaPlaybackFragment.setService(player);
         mediaPlaybackFragment.setListSong(mListSong);
-
-
+        player.setMediaPlaybackFragment(mediaPlaybackFragment);
     }
 
     @Override

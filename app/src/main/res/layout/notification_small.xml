@@ -4,24 +4,24 @@
 
     android:id="@+id/relaytive_btn"
     android:layout_width="match_parent"
-    android:layout_height="75dp"
+    android:layout_height="100dp"
     android:layout_below="@+id/relative_song"
     android:layout_toRightOf="@+id/relative_img"
     android:layout_marginTop="1dp">
 
 
         <ImageView
-        android:id="@+id/previous_smallntf"
-        android:layout_width="75dp"
+        android:id="@+id/img_ntf_small"
+        android:layout_width="100dp"
         android:layout_height="match_parent"
-        app:srcCompat="@drawable/ic_fab_pause_btn_normal" />
+        android:src="@drawable/ic_fab_pause_btn_normal" />
         <ImageView
-            android:id="@+id/play_return_ntf_small"
-            android:layout_width="30dp"
+            android:id="@+id/previous_smallntf"
+            android:layout_width="50dp"
             android:layout_height="match_parent"
             android:layout_toLeftOf="@id/play_smallntf"
-
-            app:srcCompat="@drawable/ic_rew_dark" />
+            android:src="@drawable/ic_rew_dark"
+             />
 
     <ImageView
         android:id="@+id/play_smallntf"
@@ -34,10 +34,10 @@
 
     <ImageView
             android:id="@+id/next_smallntf"
-            android:layout_width="30dp"
+            android:layout_width="50dp"
             android:layout_height="match_parent"
             android:layout_marginRight="30dp"
             android:layout_alignParentRight="true"
-            app:srcCompat="@drawable/ic_fwd_dark" />
+        android:src= "@drawable/ic_fwd_dark" />
 
     </RelativeLayout>

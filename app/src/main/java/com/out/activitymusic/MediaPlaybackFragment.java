@@ -60,12 +60,13 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
     String DURATION_KEY = "duration";
 
 
+
     public MediaPlaybackFragment newInstance(Song song) {
-        Log.d("HoangC10V", "newInstance: ");
         MediaPlaybackFragment fragment = new MediaPlaybackFragment();
         Bundle bundle = new Bundle();
         bundle.putSerializable("audio", song);
         bundle.putString("song", song.getTitle());
+
         bundle.putString("song1", getDurationTime1(song.getDuration()));
         bundle.putString("song2", String.valueOf(queryAlbumUri(song.getAlbum())));
         Log.d("HoangC1V", "newInstance: " + bundle);
@@ -163,7 +164,7 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
         }
         Popmenu();
 //        mSeekBar.setMax(serviceMediaPlay.getDuration());
-        mSeekBar.setMax(mUpdateUI.getDuration()/1000);
+        mSeekBar.setMax(mUpdateUI.getDuration());
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -274,7 +275,7 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
     public Uri queryAlbumUri(String imgUri) {
 
         final Uri artworkUri = Uri.parse("content://media/external/audio/albumart");
-        return ContentUris.withAppendedId(artworkUri, Long.parseLong(imgUri));//noi them mSrcImageSong vao artworkUri
+        return ContentUris.withAppendedId(artworkUri, Long.parseLong((imgUri)));//noi them imgUri vao artworkUri
     }
 
     public void Popmenu() {
@@ -361,7 +362,6 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
                     isShuff = true;
                 }
                 serviceMediaPlay.setShuffle();
-                serviceMediaPlay.nextMedia();
                 break;
             }
             case R.id.repeat: {
@@ -377,7 +377,6 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
                     isRepeat = 0;
                 }
                 serviceMediaPlay.setRepeat();
-                serviceMediaPlay.nextMedia();
                 break;
             }
             default:
@@ -396,8 +395,9 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
             public void run() {
                 SimpleDateFormat formatTime = new SimpleDateFormat("mm:ss");
                 time1.setText(formatTime.format(serviceMediaPlay.getCurrentStreamPosition()));
-                Log.d("HoangCV444", "run: "+serviceMediaPlay.getCurrentStreamPosition());
+                Log.d("HoangCV444", "run: "+serviceMediaPlay);
                 mSeekBar.setProgress(serviceMediaPlay.getCurrentStreamPosition());
+                Log.d("HoangCV444", "run: "+serviceMediaPlay.getmMediaPlayer());
                 serviceMediaPlay.getmMediaPlayer().setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mediaPlayer) {

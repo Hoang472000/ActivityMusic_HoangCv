@@ -74,7 +74,7 @@ public class UpdateUI {
     }
     public int getIndex() {
         preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
-        int index = preferences.getInt("possision", -1);
+        int index = preferences.getInt("possision", 0);
         return index;
     }
 

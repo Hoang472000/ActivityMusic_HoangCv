@@ -63,6 +63,7 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
     private MediaPlayer mPlayer;
     private static final String PRIMARY_CHANNEL_ID = "primary_notification_channel";
     private NotificationManager mNotifyManager;
+    MediaPlaybackFragment mediaPlaybackFragment;
 
     public void setListSong(ArrayList<Song> mListSong) {
         this.ListSong = mListSong;
@@ -79,13 +80,16 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
     String mArtistt = "";
     String mPotoMusic = "";
 
+    public void setMediaPlaybackFragment(MediaPlaybackFragment mediaPlaybackFragment) {
+        this.mediaPlaybackFragment = mediaPlaybackFragment;
+    }
 
     @Override
     public void onCreate() {
         // Toast.makeText(this,"onCreate",Toast.LENGTH_SHORT).show();
+        Log.d("nhungltk123", "onCreate: ");
+        mediaPlayer = new MediaPlayer();
 
-        MediaPlayer mMediaPlayer = new MediaPlayer();
-        mMediaPlayer.setOnCompletionListener(this);
 //
         mUpdateUI = new UpdateUI(getApplicationContext());
         mTitle = mUpdateUI.getTitle();
@@ -100,6 +104,7 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         //Bkav Nhungltk: khi nao thi nhay vao ham nay?
+        Log.d("nhungltk123", "onStartCommand: `");
         try {
             //An audio file is passed to the service through putExtra();
             mediaFile = intent.getExtras().getString("media");
@@ -140,22 +145,34 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
 
 
     public void onCompletionSong() throws IOException {
-
+        Log.d("nhungltk123", "onCompletionSong: ");
         mediaPlayer.pause();
-        //   if(mLoopSong ==0){
-        if (possition < ListSong.size() - 1) {
-            possition++;
-            //       }
-        } else {
-            //         if(mLoopSong ==-1){
-            if (possition == ListSong.size() - 1) {
-                possition = 0;
-                //            }else{
-                //                possition++;
+       //mediaPlayer.setOnCompletionListener(this);
+        if(!shuffle) shuffle=mUpdateUI.getShuffle();
+        if(repeat==-1) shuffle=mUpdateUI.getShuffle();
+        int rtpos = possition;
+        if (repeat == 1)
+            possition = rtpos;
+        else if (repeat == 0) {
+            rtpos++;
+            if (rtpos > ListSong.size() - 1)
+                rtpos = 0;
+            possition = rtpos;
+
+        } else if (shuffle) {
+            int newSong = possition;
+            while (newSong == possition) {
+                newSong = rand.nextInt(ListSong.size());
             }
-            //       }
+            possition = newSong;
         }
-        playMedia(ListSong.get(possition));
+        try {
+            playMedia(ListSong.get(possition));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mediaPlaybackFragment.getText(ListSong.get(possition));
     }
 
     @Nullable
@@ -174,6 +191,7 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
     @Override
     public void onDestroy() {
         //   Toast.makeText(this,"onDestroy",Toast.LENGTH_SHORT).show();
+        Log.d("nhungltk123", "onDestroy: ");
         super.onDestroy();
         if (mediaPlayer != null) {
             stopMedia();
@@ -259,14 +277,32 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
 
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
-        Log.d("HoangC1V", "onCompletion: ");
+        Log.d("nhungltk123", "onCompletion: ");
+        if(!shuffle) shuffle=mUpdateUI.getShuffle();
+        if(repeat==-1) shuffle=mUpdateUI.getShuffle();
+        int rtpos = possition;
+        if (repeat == 1)
+            possition = rtpos;
+        else if (repeat == 0) {
+            rtpos++;
+            if (rtpos > ListSong.size() - 1)
+                rtpos = 0;
+            possition = rtpos;
 
-        mediaPlayer.reset();
-        nextMedia();
+        } else if (shuffle) {
+            int newSong = possition;
+            while (newSong == possition) {
+                newSong = rand.nextInt(ListSong.size());
+            }
+            possition = newSong;
+        }
+            try {
+                playMedia(ListSong.get(possition));
 
-//        buildNotification(mediaPlayer.isPlaying());
-//        mOnNotificationListener.onUpdate(possition,mediaPlayer.isPlaying());
-
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+    mediaPlaybackFragment.getText(ListSong.get(possition));
     }
 
     @Override
@@ -376,13 +412,12 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
                 newSong = rand.nextInt(ListSong.size());
             }
             possition = newSong;
-        } else
-            possition++;
-        if ((possition > ListSong.size() - 1) && (!shuffle) && (repeat == -1)) pauseMedia();
+        }
+        else   possition++;
+        if (possition > ListSong.size() - 1)  pauseMedia();
         else
             try {
                 playMedia(ListSong.get(possition));
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -395,18 +430,23 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
 
     public void previousMedia() {
         int rtpos = possition;
-        if (shuffle) possition = rand.nextInt(ListSong.size());
-        else if (!shuffle) {
-            if (possition <= 0) possition = ListSong.size() - 1;
-            else possition--;
-        } else if (repeat == 1) possition = rtpos;
+        if (repeat == 1)
+            possition = rtpos;
         else if (repeat == 0) {
-            rtpos--;
-            if (rtpos < 0)
+            rtpos++;
+            if (rtpos > ListSong.size() - 1)
                 rtpos = 0;
             possition = rtpos;
+
+        } else if (shuffle) {
+            int newSong = possition;
+            while (newSong == possition) {
+                newSong = rand.nextInt(ListSong.size());
+            }
+            possition = newSong;
         }
-        if ((possition < 0) && (!shuffle) && (repeat == -1)) pauseMedia();
+        else   possition--;
+        if (possition < 0) pauseMedia();
         else try {
             playMedia(ListSong.get(possition));
         } catch (IOException e) {
@@ -416,6 +456,7 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
 
     public void playMedia(Song song) throws IOException {
         //Bkav Nhungltk: tai sao lai viet nhu nay
+        Log.d("nhungltk123", "playMedia: ");
 //        if (!mediaPlayer.isPlaying()) {
 //            mediaPlayer.start();
 //        }
@@ -438,28 +479,21 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
         mTitle = song.getTitle();
         mArtistt = song.getArtist();
         mPotoMusic = song.getFile();
-        Log.d("HoangCV333", "onCreate: " + mUpdateUI.getAlbum());
-        Log.d("HoangCV333", "onCreate: " + song.getID());
-        Log.d("HoangCV333", "onCreate: " + song.getArtist());
-        //
         //  buildNotification(PlaybackStatus.PAUSED);
-        Log.d("HoangCV11", "playMedia: " + mCurrentPlay);
-        Log.d("HoangCV11", "playMedia: " + mediaPlayer.getCurrentPosition());
-        Log.d("HoangCV11", "playMedia: " + mediaPlayer.getDuration());
+
         showNotification(mTitle, mArtistt, mPotoMusic);
         mUpdateUI = new UpdateUI(getApplicationContext());
         mUpdateUI.UpdateTitle(song.getTitle());
+        Log.d("HoangCV333", "playMedia: "+possition);
         mUpdateUI.UpdateIndex(possition);
         mUpdateUI.UpdateArtist(song.getArtist());
         mUpdateUI.UpdateFile(song.getFile());
         mUpdateUI.UpdateAlbum(String.valueOf(queryAlbumUri(song.getAlbum())));
-        Log.d("HoangCV333", "onCreate: " + song.getAlbum());
-
         mUpdateUI.UpdateDuration(mediaPlayer.getDuration());
         mUpdateUI.UpdateCurrentPossision(mediaPlayer.getCurrentPosition());
         mUpdateUI.UpdateIsPlaying(mMediaPlayer.isPlaying());
+         mMediaPlayer.setOnCompletionListener(this);
 
-        Log.d("HoangCV33", "playMedia: " + String.valueOf(queryAlbumUri(song.getAlbum())));
 
     }
 
@@ -518,117 +552,7 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
         return mediaPlayer.isPlaying();
     }
 
-    //    private ArrayList<Song> audioList;
-//    private int audioIndex = -1;
-//    private Song activeAudio;
-//    private BroadcastReceiver playNewAudio = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//
-//            //Get the new media index form SharedPreferences
-//            audioIndex = new StorageUtil(getApplicationContext()).loadAudioIndex();
-//            if (audioIndex != -1 && audioIndex < audioList.size()) {
-//                //index is in a valid range
-//                activeAudio = audioList.get(audioIndex);
-//            } else {
-//                stopSelf();
-//            }
-//
-//            //A PLAY_NEW_AUDIO action received
-//            //reset mediaPlayer to play the new Audio
-//            stopMedia();
-//            mediaPlayer.reset();
-//            initMediaPlayer();
-////            updateMetaData();
-////            buildNotification(PlaybackStatus.PLAYING);
-//        }
-//    };
-//
-//    private void register_playNewAudio() {
-//        //Register playNewMedia receiver
-//        IntentFilter filter = new IntentFilter(MainActivity.Broadcast_PLAY_NEW_AUDIO);
-//        registerReceiver(playNewAudio, filter);
-//    }
-//
-//
-//
-//
-//
-//    public enum PlaybackStatus {
-//        PLAYING,
-//        PAUSED
-//    }
-//
-//    private void buildNotification(PlaybackStatus playbackStatus) throws IOException {
-//
-//        int notificationAction = android.R.drawable.ic_media_pause;//needs to be initialized
-//        PendingIntent play_pauseAction = null;
-//
-//        //Build a new notification according to the current state of the MediaPlayer
-//        if (playbackStatus == PlaybackStatus.PLAYING) {
-//            notificationAction = android.R.drawable.ic_media_pause;
-//            //create the pause action
-//            play_pauseAction = playbackAction(1);
-//        } else if (playbackStatus == PlaybackStatus.PAUSED) {
-//            notificationAction = android.R.drawable.ic_media_play;
-//            //create the play action
-//            play_pauseAction = playbackAction(0);
-//        }
-//
-//        Uri largeIcon = Uri.parse(mUpdateUI.getAlbum());
-//        Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), largeIcon);//replace with your own image***************************************************8
-//
-//        // Create a new Notification
-//        NotificationCompat.Builder notificationBuilder = (NotificationCompat.Builder) new NotificationCompat.Builder(this)
-//                .setShowWhen(false)
-//                // Set the Notification style
-//                .setStyle(new NotificationCompat.BigTextStyle()
-//                        .bigText("Much longer text that cannot fit one line..."))
-//                .setColor(getResources().getColor(android.R.color.holo_blue_bright))
-//                // Set the large and small icons
-//                .setLargeIcon(bitmap)
-//                .setSmallIcon(android.R.drawable.stat_sys_headset)
-//                // Set Notification content information
-//                .setContentText(ListSong.get(possition).getArtist())
-//                .setContentTitle(ListSong.get(possition).getAlbum())
-//                .setContentInfo(ListSong.get(possition).getTitle())
-//                // Add playback actions
-//                .addAction(android.R.drawable.ic_media_previous, "previous", playbackAction(3))
-//                .addAction(notificationAction, "pause", play_pauseAction)
-//                .addAction(android.R.drawable.ic_media_next, "next", playbackAction(2));
-//
-//        ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).notify(NOTIFICATION_ID, notificationBuilder.build());
-//    }
-//
-//    private void removeNotification() {
-//        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//        notificationManager.cancel(NOTIFICATION_ID);
-//    }
-//
-//    private PendingIntent playbackAction(int actionNumber) {
-//        Intent playbackAction = new Intent(this, ServiceMediaPlay.class);
-//        switch (actionNumber) {
-//            case 0:
-//                // Play
-//                playbackAction.setAction(ACTION_PLAY);
-//                return PendingIntent.getService(this, actionNumber, playbackAction, 0);
-//            case 1:
-//                // Pause
-//                playbackAction.setAction(ACTION_PAUSE);
-//                return PendingIntent.getService(this, actionNumber, playbackAction, 0);
-//            case 2:
-//                // Next track
-//                playbackAction.setAction(ACTION_NEXT);
-//                return PendingIntent.getService(this, actionNumber, playbackAction, 0);
-//            case 3:
-//                // Previous track
-//                playbackAction.setAction(ACTION_PREVIOUS);
-//                return PendingIntent.getService(this, actionNumber, playbackAction, 0);
-//            default:
-//                break;
-//        }
-//        return null;
-//    }
+
 
     public void showNotification(String nameSong, String nameArtist, String path) {
         createNotificationChanel();
@@ -649,7 +573,7 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
         PendingIntent nextPendingIntent = null;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            previousPendingIntent = PendingIntent.getForegroundService(this, 0, previousIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            previousPendingIntent = PendingIntent.getForegroundService(getApplicationContext(),0, previousIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             playPendingIntent = PendingIntent.getForegroundService(getApplicationContext(), 0, playIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             nextPendingIntent = PendingIntent.getForegroundService(getApplicationContext(), 0, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         }
@@ -680,13 +604,13 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
         mSmallNotification.setOnClickPendingIntent(R.id.play_smallntf, playPendingIntent);
         mSmallNotification.setOnClickPendingIntent(R.id.previous_smallntf, previousPendingIntent);
         mSmallNotification.setOnClickPendingIntent(R.id.next_smallntf, nextPendingIntent);
-        mSmallNotification.setImageViewResource(R.id.previous_ntf,R.drawable.ic_rew_dark);
+        mSmallNotification.setImageViewResource(R.id.previous_ntf, R.drawable.ic_rew_dark);
         mSmallNotification.setImageViewResource(R.id.next_ntf,R.drawable.ic_fwd_dark);
         mSmallNotification.setImageViewResource(R.id.play_smallntf, isPlaying() ? R.drawable.ic_baseline_pause_circle_filled_24 : R.drawable.ic_baseline_play_circle_filled_24);
         if (getAlbumn(path) != null) {
-            mSmallNotification.setImageViewBitmap(R.id.image, getAlbumn(path));
+            mSmallNotification.setImageViewBitmap(R.id.img_ntf_small, getAlbumn(path));
         } else {
-            mSmallNotification.setImageViewResource(R.id.image, R.drawable.default_cover_art);
+            mSmallNotification.setImageViewResource(R.id.img_ntf_small, R.drawable.default_cover_art);
         }
         startForeground(1, builder.build());
     }

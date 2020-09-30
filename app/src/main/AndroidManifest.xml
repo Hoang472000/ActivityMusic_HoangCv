@@ -37,6 +37,7 @@
         </activity>
         <service android:name="Service.ServiceMediaPlay"/>
 
+
     </application>
 
 </manifest>

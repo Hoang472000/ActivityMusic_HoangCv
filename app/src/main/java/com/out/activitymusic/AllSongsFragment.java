@@ -45,7 +45,7 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
     private RecyclerView mRecyclerView;
     private Song song;
 
-    private RelativeLayout mLinearLayout, mBottom;
+    public RelativeLayout mLinearLayout, mBottom;
     TextView title, mTitle, mTime;
     TextView artist;
     ImageView img, mImageSmall;
@@ -61,6 +61,7 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
     private Boolean IsBoolean = false;
     private ImageView mMusicPop;
     MediaPlayer mediaPlayer;
+    private ArrayList<Song> songs1;
 
 
     public void setBoolean(Boolean aBoolean) {
@@ -92,15 +93,12 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
     @Nullable
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d("nhungltk", "onCreateView: ");
+        Log.d("nhungltk12", "onCreateView: ");
         View mInflater = inflater.inflate(R.layout.allsongsfragment, container, false);
         mRecyclerView = mInflater.findViewById(R.id.recycle_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mLinearLayout = mInflater.findViewById(R.id.bottom);
         mPlayPause = mInflater.findViewById(R.id.play_pause);
-        Log.d("HoangCV1", "onCreateView: " + mPlayPause);
-        UpdateUI = new UpdateUI(getContext());
-        Log.i("HoangCV11", "onCreateView:1 " + UpdateUI.getTitle());
         LoaderManager.getInstance(this).initLoader(1, null, this);
         title = mInflater.findViewById(R.id.title);
         artist = mInflater.findViewById(R.id.artist);
@@ -119,27 +117,31 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
                 }
             }
         });
+        UpdateUI = new UpdateUI(getContext());
+        index=UpdateUI.getIndex();
+        Log.d("HoangCV333", "onCreateView: "+index);
         title.setText(UpdateUI.getTitle());
         artist.setText(UpdateUI.getArtist());
         img.setImageURI(Uri.parse(UpdateUI.getAlbum()));
+
         final Song updateSong= new Song(UpdateUI.getIndex(),UpdateUI.getTitle(),UpdateUI.getFile(),UpdateUI.getAlbum(),UpdateUI.getArtist(),String.valueOf(UpdateUI.getDuration()));
-        if(serviceMediaPlay!=null)
-            song=updateSong;
-        Log.d("HoangCV444", "onCreateView: "+updateSong);
-
-
-
-
-        index=UpdateUI.getIndex();
-        Log.d("HoangCV33", "onCreateView: "+UpdateUI.getAlbum());
 
         mLinearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                displayMediaFragment.onclick(updateSong);
+                displayMediaFragment.onclick(songs.get(UpdateUI.getIndex()));
 
             }
         });
+     //   Log.d("HoangCV444", "onCreateView: "+updateSong);
+
+
+
+
+
+        Log.d("HoangCV33", "onCreateView: "+UpdateUI.getFile());
+
+
 
         onClickPause();
 
@@ -151,14 +153,14 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        Log.d("nhungltk", "onActivityCreated: ");
+        Log.d("nhungltk12", "onActivityCreated: ");
         super.onActivityCreated(savedInstanceState);
     }
 
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
-        Log.d("nhungltk", "onCreateLoader: ");
+        Log.d("nhungltk12", "onCreateLoader: ");
         String[] projection = {MediaStore.Audio.Media._ID,
                 MediaStore.Audio.Media.ARTIST,
                 MediaStore.Audio.Media.TITLE,
@@ -174,12 +176,13 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("nhungltk12", "onCreate: ");
         setHasOptionsMenu(true);
     }
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-        Log.d("nhungltk", "onLoadFinished: ");
+        Log.d("nhungltk12", "onLoadFinished: ");
         mSharePreferences = getActivity().getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
 
         songs = new ArrayList<>();
@@ -207,7 +210,7 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
                 artist = song.getArtist();
                 duration = song.getDuration();
                 songs.add(new Song(id, title, file, album, artist, duration));
-                Log.d("nhungltk1", "onLoadFinished: " + title);
+            //    Log.d("nhungltk12", "onLoadFinished: " + title);
 
 
                /* if (isCreate == false) {
@@ -221,17 +224,30 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
                     editor.putBoolean("create_db", true);
                     editor.commit();
                 }*/
+
             } while (data.moveToNext());
         }
         mListAdapter = new ListAdapter(getContext(), songs, this);
         mRecyclerView.setAdapter(mListAdapter);
         dataFragment.onclickData(songs);
+
         int orientation = this.getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE)
             if (mLinearLayout.getVisibility() == View.VISIBLE)
                 mLinearLayout.setVisibility(View.INVISIBLE);
-
-
+        UpdateUI = new UpdateUI(getContext());
+        index=UpdateUI.getIndex();
+        Log.d("HoangCV33333", "onCreateView: "+songs.get(index));
+        Log.d("HoangCV333", "onCreateView: "+index);
+//        if(song==null){
+//            mLinearLayout.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    displayMediaFragment.onclick(songs1.get(index));
+//
+//                }
+//            });
+//        }
     }
 
     @Override
