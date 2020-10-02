@@ -154,5 +154,18 @@ public class UpdateUI {
         int possision=preferences.getInt("current",0);
         return possision;
     }
+    public void UpdateTime1(String time1) {
+        preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("time1", time1);
+        editor.apply();
+    }
+
+    public String getTime1() {
+        preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
+        String time1 = preferences.getString("time1", null);
+
+        return time1;
+    }
 
 }

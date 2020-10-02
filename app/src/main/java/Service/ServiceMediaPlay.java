@@ -96,7 +96,7 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
         mArtistt = mUpdateUI.getArtist();
 
         mPotoMusic = mUpdateUI.getAlbum();
-        rand= new Random();
+        rand = new Random();
 
         super.onCreate();
     }
@@ -147,18 +147,20 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
     public void onCompletionSong() throws IOException {
         Log.d("nhungltk123", "onCompletionSong: ");
         mediaPlayer.pause();
-       //mediaPlayer.setOnCompletionListener(this);
-        if(!shuffle) shuffle=mUpdateUI.getShuffle();
-        if(repeat==-1) shuffle=mUpdateUI.getShuffle();
+        //mediaPlayer.setOnCompletionListener(this);
+        if (!shuffle) shuffle = mUpdateUI.getShuffle();
+        if (repeat == -1) shuffle = mUpdateUI.getShuffle();
         int rtpos = possition;
-        if (repeat == 1)
-            possition = rtpos;
-        else if (repeat == 0) {
-            rtpos++;
-            if (rtpos > ListSong.size() - 1)
-                rtpos = 0;
-            possition = rtpos;
+        if (repeat != -1) {
+            if (repeat == 1)
+                possition = rtpos;
+            else if (repeat == 0) {
+                rtpos++;
+                if (rtpos > ListSong.size() - 1)
+                    rtpos = 0;
+                possition = rtpos;
 
+            }
         } else if (shuffle) {
             int newSong = possition;
             while (newSong == possition) {
@@ -278,31 +280,33 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
         Log.d("nhungltk123", "onCompletion: ");
-        if(!shuffle) shuffle=mUpdateUI.getShuffle();
-        if(repeat==-1) shuffle=mUpdateUI.getShuffle();
+        shuffle = mUpdateUI.getShuffle();
+        repeat = mUpdateUI.getRepeat();
         int rtpos = possition;
-        if (repeat == 1)
-            possition = rtpos;
-        else if (repeat == 0) {
-            rtpos++;
-            if (rtpos > ListSong.size() - 1)
-                rtpos = 0;
-            possition = rtpos;
-
+        if (repeat != -1) {
+            if (repeat == 1)
+                possition = rtpos;
+            else if (repeat == 0) {
+                rtpos++;
+                if (rtpos > ListSong.size() - 1)
+                    rtpos = 0;
+                possition = rtpos;
+            }
         } else if (shuffle) {
             int newSong = possition;
             while (newSong == possition) {
                 newSong = rand.nextInt(ListSong.size());
             }
             possition = newSong;
-        }
-            try {
-                playMedia(ListSong.get(possition));
+        } else possition++;
+        if ((possition > ListSong.size() - 1) && (repeat == -1)) pauseMedia();
+        else try {
+            playMedia(ListSong.get(possition));
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-    mediaPlaybackFragment.getText(ListSong.get(possition));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mediaPlaybackFragment.getText(ListSong.get(possition));
     }
 
     @Override
@@ -398,23 +402,23 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
 
     public void nextMedia() {
         int rtpos = possition;
-        if (repeat == 1)
-            possition = rtpos;
-        else if (repeat == 0) {
-            rtpos++;
-            if (rtpos > ListSong.size() - 1)
-                rtpos = 0;
-            possition = rtpos;
-
+        if (repeat != -1) {
+            if (repeat == 1)
+                possition = rtpos;
+            else if (repeat == 0) {
+                rtpos++;
+                if (rtpos > ListSong.size() - 1)
+                    rtpos = 0;
+                possition = rtpos;
+            }
         } else if (shuffle) {
             int newSong = possition;
             while (newSong == possition) {
                 newSong = rand.nextInt(ListSong.size());
             }
             possition = newSong;
-        }
-        else   possition++;
-        if (possition > ListSong.size() - 1)  pauseMedia();
+        } else possition++;
+        if ((possition > ListSong.size() - 1) && ((repeat == -1) || (!shuffle))) pauseMedia();
         else
             try {
                 playMedia(ListSong.get(possition));
@@ -430,23 +434,23 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
 
     public void previousMedia() {
         int rtpos = possition;
-        if (repeat == 1)
-            possition = rtpos;
-        else if (repeat == 0) {
-            rtpos++;
-            if (rtpos > ListSong.size() - 1)
-                rtpos = 0;
-            possition = rtpos;
-
+        if (repeat != -1) {
+            if (repeat == 1)
+                possition = rtpos;
+            else if (repeat == 0) {
+                rtpos++;
+                if (rtpos > ListSong.size() - 1)
+                    rtpos = 0;
+                possition = rtpos;
+            }
         } else if (shuffle) {
             int newSong = possition;
             while (newSong == possition) {
                 newSong = rand.nextInt(ListSong.size());
             }
             possition = newSong;
-        }
-        else   possition--;
-        if (possition < 0) pauseMedia();
+        } else possition--;
+        if ((possition < 0) && ((!shuffle) || (repeat != -1))) pauseMedia();
         else try {
             playMedia(ListSong.get(possition));
         } catch (IOException e) {
@@ -484,7 +488,7 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
         showNotification(mTitle, mArtistt, mPotoMusic);
         mUpdateUI = new UpdateUI(getApplicationContext());
         mUpdateUI.UpdateTitle(song.getTitle());
-        Log.d("HoangCV333", "playMedia: "+possition);
+        Log.d("HoangCV333", "playMedia: " + possition);
         mUpdateUI.UpdateIndex(possition);
         mUpdateUI.UpdateArtist(song.getArtist());
         mUpdateUI.UpdateFile(song.getFile());
@@ -492,7 +496,7 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
         mUpdateUI.UpdateDuration(mediaPlayer.getDuration());
         mUpdateUI.UpdateCurrentPossision(mediaPlayer.getCurrentPosition());
         mUpdateUI.UpdateIsPlaying(mMediaPlayer.isPlaying());
-         mMediaPlayer.setOnCompletionListener(this);
+        mMediaPlayer.setOnCompletionListener(this);
 
 
     }
@@ -553,7 +557,6 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
     }
 
 
-
     public void showNotification(String nameSong, String nameArtist, String path) {
         createNotificationChanel();
 
@@ -573,7 +576,7 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
         PendingIntent nextPendingIntent = null;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            previousPendingIntent = PendingIntent.getForegroundService(getApplicationContext(),0, previousIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            previousPendingIntent = PendingIntent.getForegroundService(getApplicationContext(), 0, previousIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             playPendingIntent = PendingIntent.getForegroundService(getApplicationContext(), 0, playIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             nextPendingIntent = PendingIntent.getForegroundService(getApplicationContext(), 0, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         }
@@ -593,8 +596,8 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
         mNotification.setOnClickPendingIntent(R.id.previous_ntf, previousPendingIntent);
         mNotification.setOnClickPendingIntent(R.id.next_ntf, nextPendingIntent);
         mNotification.setOnClickPendingIntent(R.id.play_ntf, playPendingIntent);
-        mNotification.setImageViewResource(R.id.previous_ntf,R.drawable.ic_rew_dark);
-        mNotification.setImageViewResource(R.id.next_ntf,R.drawable.ic_fwd_dark);
+        mNotification.setImageViewResource(R.id.previous_ntf, R.drawable.ic_rew_dark);
+        mNotification.setImageViewResource(R.id.next_ntf, R.drawable.ic_fwd_dark);
         mNotification.setImageViewResource(R.id.play_ntf, isPlaying() ? R.drawable.ic_baseline_pause_circle_filled_24 : R.drawable.ic_baseline_play_circle_filled_24);
         if (getAlbumn(path) != null) {
             mNotification.setImageViewBitmap(R.id.img_ntf, getAlbumn(path));
@@ -605,7 +608,7 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
         mSmallNotification.setOnClickPendingIntent(R.id.previous_smallntf, previousPendingIntent);
         mSmallNotification.setOnClickPendingIntent(R.id.next_smallntf, nextPendingIntent);
         mSmallNotification.setImageViewResource(R.id.previous_ntf, R.drawable.ic_rew_dark);
-        mSmallNotification.setImageViewResource(R.id.next_ntf,R.drawable.ic_fwd_dark);
+        mSmallNotification.setImageViewResource(R.id.next_ntf, R.drawable.ic_fwd_dark);
         mSmallNotification.setImageViewResource(R.id.play_smallntf, isPlaying() ? R.drawable.ic_baseline_pause_circle_filled_24 : R.drawable.ic_baseline_play_circle_filled_24);
         if (getAlbumn(path) != null) {
             mSmallNotification.setImageViewBitmap(R.id.img_ntf_small, getAlbumn(path));

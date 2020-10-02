@@ -51,13 +51,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
     AllSongsFragment allSongsFragment;
     private Context mContext;
     private ItemClickListener itemClickListener;
-    private ListAdapter mListAdapter;
-    ArrayList<Song> songs;
     private ImageView image;
     private ImageView mPlayPause;
-    DataFragment dataFragment;
-    private  Boolean aBoolean;
     private int mPosision;
+    UpdateUI mUpdateUI;
 
     public ListAdapter(Context context, ArrayList<Song> ListView,ItemClickListener itemClickListener) {
         mInflater = LayoutInflater.from(context);

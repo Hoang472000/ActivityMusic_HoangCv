@@ -111,15 +111,15 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
         ((MainActivity) getActivity()).setiConnectActivityAndBaseSong(new MainActivity.IConnectActivityAndBaseSong() {
             @Override
             public void connectActivityAndBaseSong() {
-                if (((MainActivity) getActivity()).player != null) {
+                if (((MainActivity) getActivity()).serviceMediaPlay != null) {
                     Log.d("nhungltk", "onCreateView: " + "not null");
-                    setService((((MainActivity) getActivity()).player));
+                    setService((((MainActivity) getActivity()).serviceMediaPlay));
                 }
             }
         });
         UpdateUI = new UpdateUI(getContext());
         index=UpdateUI.getIndex();
-        Log.d("HoangCV333", "onCreateView: "+index);
+        Log.d("HoangCV333", "onCreateView: index="+index);
         title.setText(UpdateUI.getTitle());
         artist.setText(UpdateUI.getArtist());
         img.setImageURI(Uri.parse(UpdateUI.getAlbum()));
@@ -129,7 +129,7 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
         mLinearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                displayMediaFragment.onclick(songs.get(UpdateUI.getIndex()));
+                displayMediaFragment.onclick(songs.get(index));
 
             }
         });
@@ -230,13 +230,25 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
         mListAdapter = new ListAdapter(getContext(), songs, this);
         mRecyclerView.setAdapter(mListAdapter);
         dataFragment.onclickData(songs);
+        Log.d("HoangCV444", "onLoadFinished:+ songs "+songs);
 
-        int orientation = this.getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE)
-            if (mLinearLayout.getVisibility() == View.VISIBLE)
-                mLinearLayout.setVisibility(View.INVISIBLE);
         UpdateUI = new UpdateUI(getContext());
         index=UpdateUI.getIndex();
+
+        int orientation = this.getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE){
+            if (mLinearLayout.getVisibility() == View.VISIBLE)
+                mLinearLayout.setVisibility(View.INVISIBLE);
+                mediaPlaybackFragment.setListSong(songs);
+                mediaPlaybackFragment.updateTime();
+
+               if(serviceMediaPlay!=null){
+                  // mediaPlaybackFragment.setService(serviceMediaPlay);
+                   serviceMediaPlay.setListSong(songs);
+                   /* mediaPlaybackFragment.getText(songs.get(serviceMediaPlay.getPossision()));
+                else*/ mediaPlaybackFragment.getText(songs.get(UpdateUI.getIndex()));}
+        }
+
         Log.d("HoangCV33333", "onCreateView: "+songs.get(index));
         Log.d("HoangCV333", "onCreateView: "+index);
 //        if(song==null){
@@ -263,6 +275,7 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
             mediaPlaybackFragment.setListSong(songs);
             mediaPlaybackFragment.getText(song);
+            mediaPlaybackFragment.updateTime();
         }
         if (serviceMediaPlay != null) {
             Log.d("nhungltk", "onClick: " + "playMusic");

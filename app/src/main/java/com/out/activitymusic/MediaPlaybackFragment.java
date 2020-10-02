@@ -66,13 +66,10 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
         Bundle bundle = new Bundle();
         bundle.putSerializable("audio", song);
         bundle.putString("song", song.getTitle());
-
         bundle.putString("song1", getDurationTime1(song.getDuration()));
         bundle.putString("song2", String.valueOf(queryAlbumUri(song.getAlbum())));
         Log.d("HoangC1V", "newInstance: " + bundle);
         fragment.setArguments(bundle);
-
-
         return fragment;
     }
 
@@ -126,9 +123,9 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
         ((MainActivity) getActivity()).setiConnectActivityAndBaseSong(new MainActivity.IConnectActivityAndBaseSong() {
             @Override
             public void connectActivityAndBaseSong() {
-                if (((MainActivity) getActivity()).player != null) {
+                if (((MainActivity) getActivity()).serviceMediaPlay != null) {
                     Log.d("nhungltk", "onCreateView: " + "not null");
-                    setService((((MainActivity) getActivity()).player));
+                    setService((((MainActivity) getActivity()).serviceMediaPlay));
                 }
             }
         });
@@ -185,7 +182,6 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
             }
         });
         if(serviceMediaPlay!=null ) {
-           // mSeekBar.setProgress(serviceMediaPlay.getCurrentStreamPosition() / 1000);//////////////////////////******************************************************8
             updateTime();
         }
 
@@ -193,7 +189,8 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
     }
 
     public void getText(Song song) {
-
+        if(serviceMediaPlay!=null)
+            time1.setText(getDurationTime1(String.valueOf(mUpdateUI.getCurrentPossision())));
         this.song = song;
         tv.setText(song.getTitle());
         time2.setText(getDurationTime1(song.getDuration()));
@@ -216,6 +213,7 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
         mDisLike.setOnClickListener(this);
         mShuffle.setOnClickListener(this);
         mRepeat.setOnClickListener(this);
+
         //      mSeekBar.setMax(serviceMediaPlay.getDuration());
     }
 
@@ -369,22 +367,19 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
                 if (isRepeat == 1) {
                     mRepeat.setImageResource(R.drawable.ic_repeat_white);
                     isRepeat = -1;
-                } else if (isRepeat == 0) {
+                } else if (isRepeat == -1) {
                     mRepeat.setImageResource(R.drawable.ic_repeat_dark_selected);
-                    isRepeat = 1;
+                    isRepeat = 0;
                 } else {
                     mRepeat.setImageResource(R.drawable.ic_repeat_one_song_dark);
-                    isRepeat = 0;
+                    isRepeat = 1;
                 }
                 serviceMediaPlay.setRepeat();
                 break;
             }
             default:
                 break;
-
         }
-
-
     }
 
     public void updateTime() {
@@ -403,6 +398,7 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
                     public void onCompletion(MediaPlayer mediaPlayer) {
                         try {
                             serviceMediaPlay.onCompletionSong();
+                            mSeekBar.setMax(serviceMediaPlay.getDuration());
             //                updateUI();
                         } catch (IOException e) {
                             e.printStackTrace();
