@@ -1,31 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
+
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/list_now"
+            android:id="@+id/nav_camera"
             android:icon="@drawable/default_cover_art"
             android:title="@string/listnow" />
         <item
-            android:id="@+id/recents"
+            android:id="@+id/nav_gallery"
             android:icon="@drawable/default_cover_art"
             android:title="@string/recents" />
         <item
-            android:id="@+id/music_library"
+            android:id="@+id/nav_slideshow"
             android:icon="@drawable/default_cover_art"
             android:title="@string/music_library" />
-        <item
-            android:id="@+id/setting"
-            android:icon="@drawable/default_cover_art"
-            android:title="@string/setting" />
-        <item
-            android:id="@+id/help_feedback"
-            android:icon="@drawable/default_cover_art"
-            android:title="@string/help_feedback" />
+
     </group>
+
+    <item android:title="communicate">
+        <menu>
+            <item
+                android:id="@+id/nav_share"
+                android:icon="@drawable/default_cover_art"
+                android:title="@string/setting" />
+            <item
+                android:id="@+id/nav_send"
+                android:icon="@drawable/default_cover_art"
+                android:title="@string/help_feedback" />
+        </menu>
+
+    </item>
 </menu>
-<!--
-Bạn có thể tạo nhóm với các item riêng biệt bằng cách sử dụng
-android:checkableBehavior="single"
-được thiết lập ở nhóm. Nó cho phép bạn hiển thị danh sách các item-->

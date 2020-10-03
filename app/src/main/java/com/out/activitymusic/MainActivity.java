@@ -2,6 +2,7 @@ package com.out.activitymusic;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
@@ -22,9 +23,11 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
+import android.view.Menu;
 import android.view.MenuItem;
 
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 
@@ -34,7 +37,7 @@ import java.util.ArrayList;
 
 import Service.ServiceMediaPlay;
 
-public class MainActivity extends AppCompatActivity implements DisplayMediaFragment,DataFragment{
+public class MainActivity extends AppCompatActivity implements DisplayMediaFragment,DataFragment,NavigationView.OnNavigationItemSelectedListener{
     public static IntentFilter Broadcast_PLAY_NEW_AUDIO;
     String PRIVATE_MODE ="color" ;
     AllSongsFragment allSongsFragment;
@@ -48,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
     private ArrayList<Song> mListSong;
     SharedPreferences sharedPreferences;
     private DrawerLayout mDrawerLayout;
-
+    private LinearLayout mLinearLayout;
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
@@ -115,10 +118,22 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        DrawerLayout drawer =findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close);
+        if (drawer != null) {
+            drawer.addDrawerListener(toggle);
+        }
+        toggle.syncState();
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        if (navigationView != null) {
+            navigationView.setNavigationItemSelectedListener(this);
+        }
         mediaPlaybackFragment = new MediaPlaybackFragment();
-
-
-        //final ListView list = findViewById(R.id.list_view);
         int orientation = this.getResources().getConfiguration().orientation;
         allSongsFragment = new AllSongsFragment(this, this.mediaPlaybackFragment, this);
         if (orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -148,63 +163,54 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
         mediaPlaybackFragment.setService(serviceMediaPlay);
         sharedPreferences = getSharedPreferences("login", MODE_PRIVATE);
 
-      /*  mDrawerLayout = findViewById(R.id.drawer_layout);
-
-        NavigationView navigationView = findViewById(R.id.navigation_view);
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        // set item as selected to persist highlight
-                        menuItem.setChecked(true);
-                        // close drawer when item is tapped
-                        mDrawerLayout.closeDrawers();
-                        // Add code here to update the UI based on the item selected
-                        // For example, swap UI fragments here
-                        return true;
-                    }
-                });
-    *//*    Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar actionbar = getSupportActionBar();
-        actionbar.setDisplayHomeAsUpEnabled(true);
-        actionbar.setHomeAsUpIndicator(R.drawable.default_cover_art);*//*
-        mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
-            @Override
-            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
-
-            }
-
-            @Override
-            public void onDrawerOpened(@NonNull View drawerView) {
-
-            }
-
-            @Override
-            public void onDrawerClosed(@NonNull View drawerView) {
-
-            }
-
-            @Override
-            public void onDrawerStateChanged(int newState) {
-
-            }
-        });
-   }
-
-//    private void setSupportActionBar(Toolbar toolbar) {
-//    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                mDrawerLayout.openDrawer(GravityCompat.START);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-   }*/
     }
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer != null) {
+            if (drawer.isDrawerOpen(GravityCompat.START)) {
+                drawer.closeDrawer(GravityCompat.START);
+            } else {
+                super.onBackPressed();
+            }
+        }
+    }
+
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        // Handle navigation view item clicks here.
+        switch (item.getItemId()) {
+            case R.id.nav_camera:
+                drawer.closeDrawer(GravityCompat.START);
+                displayToast(getString(R.string.listnow));
+                return true;
+            case R.id.nav_gallery:
+                drawer.closeDrawer(GravityCompat.START);
+                return true;
+            case R.id.nav_slideshow:
+                drawer.closeDrawer(GravityCompat.START);
+                return true;
+
+            case R.id.nav_share:
+                drawer.closeDrawer(GravityCompat.START);
+
+                return true;
+            case R.id.nav_send:
+                drawer.closeDrawer(GravityCompat.START);
+
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public void displayToast(String message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+    }
+
 
 
     @Override
@@ -229,6 +235,11 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
     public void setService(ServiceMediaPlay service){
         this.serviceMediaPlay =service;
     }
+
+   /* @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        return false;
+    }*/
 
     //Bkav Nhungltk
     interface IConnectActivityAndBaseSong {

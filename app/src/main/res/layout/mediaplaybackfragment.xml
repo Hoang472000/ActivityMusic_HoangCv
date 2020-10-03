@@ -90,6 +90,8 @@
             android:id="@+id/seekBar"
             android:layout_width="match_parent"
             android:layout_height="10dp"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
             android:progressDrawable="@drawable/progress"
             android:thumb="@drawable/thumb"
             />

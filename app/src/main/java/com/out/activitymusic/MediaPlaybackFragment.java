@@ -321,12 +321,10 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
                 mLike.setImageResource(R.drawable.ic_thumbs_up_selected);
                 break;
             case R.id.play_return: {
-                Toast.makeText(getActivity(), "return", Toast.LENGTH_SHORT).show();
                 serviceMediaPlay.previousMedia();
                 getText(mListSong.get(serviceMediaPlay.getPossision()));
                 time1.setText(getDurationTime1("0"));
                 break;
-
             }
             case R.id.play_pause_media: {
                 if (serviceMediaPlay.isPlaying()) {
@@ -340,7 +338,6 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
             }
 
             case R.id.play_next: {
-                Toast.makeText(getActivity(), "next", Toast.LENGTH_SHORT).show();
                 serviceMediaPlay.nextMedia();
                 getText(mListSong.get(serviceMediaPlay.getPossision()));
                 time1.setText(getDurationTime1("0"));
