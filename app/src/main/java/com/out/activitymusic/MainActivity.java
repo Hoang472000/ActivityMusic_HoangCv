@@ -37,14 +37,16 @@ import java.util.ArrayList;
 
 import Service.ServiceMediaPlay;
 
-public class MainActivity extends AppCompatActivity implements DisplayMediaFragment,DataFragment,NavigationView.OnNavigationItemSelectedListener{
+public class MainActivity extends AppCompatActivity implements DisplayMediaFragment, DataFragment, NavigationView.OnNavigationItemSelectedListener {
     public static IntentFilter Broadcast_PLAY_NEW_AUDIO;
-    String PRIVATE_MODE ="color" ;
+    String PRIVATE_MODE = "color";
     AllSongsFragment allSongsFragment;
     MediaPlaybackFragment mediaPlaybackFragment;
+
     public ServiceMediaPlay getPlayer() {
         return serviceMediaPlay;
     }
+
     public ServiceMediaPlay serviceMediaPlay;
     boolean serviceBound = false;
     private Song song;
@@ -61,15 +63,14 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
             serviceMediaPlay = binder.getService();
 //            mListSong= new ArrayList<>();
             serviceMediaPlay.setListSong(mListSong);
-            Log.d("HoangCV7", "onSaveInstanceState: "+ serviceMediaPlay);
+            Log.d("HoangCV7", "onSaveInstanceState: " + serviceMediaPlay);
 
-            Log.d("nhungltk", "onServiceConnected: "+ serviceMediaPlay);
+            Log.d("nhungltk", "onServiceConnected: " + serviceMediaPlay);
             //Bkav Nhungltk: tai sao lai thuc hien connect o day
             iConnectActivityAndBaseSong.connectActivityAndBaseSong();
             serviceBound = true;
 
-                allSongsFragment.setService(serviceMediaPlay);
-
+            allSongsFragment.setService(serviceMediaPlay);
 
 
             Toast.makeText(MainActivity.this, "Service Bound", Toast.LENGTH_SHORT).show();
@@ -84,8 +85,8 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        UpdateUI updateUI=new UpdateUI(getApplicationContext());
-       // updateUI.UpdateSeekbar();
+        UpdateUI updateUI = new UpdateUI(getApplicationContext());
+        // updateUI.UpdateSeekbar();
         super.onSaveInstanceState(savedInstanceState);
     }
 
@@ -104,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
             //player.stopSelf();
         }
     }
+
     public void setSong(Song songs) {
         this.song = songs;
     }
@@ -120,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        DrawerLayout drawer =findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open,
                 R.string.navigation_drawer_close);
@@ -164,6 +166,7 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
         sharedPreferences = getSharedPreferences("login", MODE_PRIVATE);
 
     }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -212,11 +215,10 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
     }
 
 
-
     @Override
     public void onclick(Song song) {
-        Log.d("HoangCV7", "onSaveInstanceState: "+ serviceMediaPlay);
-         mediaPlaybackFragment = new MediaPlaybackFragment().newInstance(song);
+        Log.d("HoangCV7", "onSaveInstanceState: " + serviceMediaPlay);
+        mediaPlaybackFragment = new MediaPlaybackFragment().newInstance(song);
         FragmentManager manager1 = this.getSupportFragmentManager();
         manager1.beginTransaction()
                 .addToBackStack(null)
@@ -229,11 +231,12 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
 
     @Override
     public void onclickData(ArrayList ListSong) {
-        this.mListSong=ListSong;
+        this.mListSong = ListSong;
 
     }
-    public void setService(ServiceMediaPlay service){
-        this.serviceMediaPlay =service;
+
+    public void setService(ServiceMediaPlay service) {
+        this.serviceMediaPlay = service;
     }
 
    /* @Override
@@ -245,21 +248,23 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
     interface IConnectActivityAndBaseSong {
         void connectActivityAndBaseSong();
     }
+
     private IConnectActivityAndBaseSong iConnectActivityAndBaseSong;
+
     public void setiConnectActivityAndBaseSong(IConnectActivityAndBaseSong iConnectActivityAndBaseSong) {
         this.iConnectActivityAndBaseSong = iConnectActivityAndBaseSong;
     }
 
     @Override
     protected void onResume() {
-        Log.d("HoangCV7", "onResume: "+getPlayer());
+        Log.d("HoangCV7", "onResume: " + getPlayer());
         super.onResume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d("HoangCV7", "onPause: "+ serviceMediaPlay);
+        Log.d("HoangCV7", "onPause: " + serviceMediaPlay);
         setService(serviceMediaPlay);
     }
 }
