@@ -4,6 +4,7 @@ import android.content.ContentUris;
 import android.content.Context;
 
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -45,7 +46,7 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
     private ImageView mPlayPauseMedia;
     private ServiceMediaPlay serviceMediaPlay;
     private Song song;
-    private ImageView mLike, mDisLike;
+    private ImageView mLike, mDisLike,mQueue;
     private ImageView mPlayReturn, mPlayNext, mShuffle, mRepeat;
     private SeekBar mSeekBar;
 
@@ -110,6 +111,7 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
         img = view.findViewById(R.id.picture_small);
         imgBig = view.findViewById(R.id.picture_big);
         image = view.findViewById(R.id.mnMedia);
+        mQueue=view.findViewById(R.id.queue_music);
         mPlayPauseMedia = view.findViewById(R.id.play_pause_media);
         mLike = view.findViewById(R.id.like);
         mPlayReturn = view.findViewById(R.id.play_return);
@@ -129,18 +131,22 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
                 }
             }
         });
+        int orientation = this.getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            if(mQueue.getVisibility()==View.VISIBLE)
+                mQueue.setVisibility(View.INVISIBLE);
+
+        }
         mUpdateUI = new UpdateUI(getContext());
         shuffler = mUpdateUI.getShuffle();
         repeat = mUpdateUI.getRepeat();
  //       if(!serviceMediaPlay.isPlaying())
-        if(song==null)
-            mPlayPauseMedia.setImageResource((R.drawable.ic_baseline_play_circle_filled_24));
-            tv.setText(mUpdateUI.getTitle());
-            img.setImageURI(Uri.parse(mUpdateUI.getAlbum()));
-            imgBig.setBackground(setImgBig(mUpdateUI.getAlbum()));
-            time2.setText(getDurationTime1(String.valueOf(mUpdateUI.getDuration())));
+        tv.setText(mUpdateUI.getTitle());
+        img.setImageURI(Uri.parse(mUpdateUI.getAlbum()));
+        imgBig.setBackground(setImgBig(mUpdateUI.getAlbum()));
+        time2.setText(getDurationTime1(String.valueOf(mUpdateUI.getDuration())));
 
-
+        Log.d("HoangCV1234567", "onCreateView: "+song);
         if (shuffler) {
             mShuffle.setImageResource(R.drawable.ic_play_shuffle_orange);
             isShuff = false;
@@ -205,7 +211,7 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
             InputStream inputStream = getContext().getContentResolver().openInputStream(uri);
             yourDrawable = Drawable.createFromStream(inputStream, pathName);
         } catch (IOException e) {
-            yourDrawable = getResources().getDrawable(R.drawable.ic_launcher_background);
+            yourDrawable = getResources().getDrawable(R.drawable.default_cover_art);
             e.printStackTrace();
         }
         imgBig.setBackground(yourDrawable);
@@ -233,7 +239,7 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
             InputStream inputStream = getContext().getContentResolver().openInputStream(uri);
             yourDrawable = Drawable.createFromStream(inputStream, pathName);
         } catch (IOException e) {
-            yourDrawable = getResources().getDrawable(R.drawable.ic_launcher_background);
+            yourDrawable = getResources().getDrawable(R.drawable.default_cover_art);
             e.printStackTrace();
         }
         imgBig.setBackground(yourDrawable);

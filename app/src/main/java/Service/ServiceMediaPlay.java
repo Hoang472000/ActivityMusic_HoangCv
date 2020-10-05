@@ -64,12 +64,16 @@ public class ServiceMediaPlay extends Service implements
     private static final String PRIMARY_CHANNEL_ID = "primary_notification_channel";
     private NotificationManager mNotifyManager;
     MediaPlaybackFragment mediaPlaybackFragment;
+    private Song song;
 
     public void setListSong(ArrayList<Song> mListSong) {
         this.ListSong = mListSong;
     }
 
     private ArrayList<Song> ListSong;
+    public  void setSong(Song song){
+        this.song= song;
+    }
 
     public int getCurrentPlay() {
         return mCurrentPlay;
@@ -431,19 +435,14 @@ public class ServiceMediaPlay extends Service implements
     }
 
     public void playMedia(Song song) throws IOException {
-        //Bkav Nhungltk: tai sao lai viet nhu nay
-        Log.d("nhungltk123", "playMedia: ");
-//        if (!mediaPlayer.isPlaying()) {
-//            mediaPlayer.start();
-//        }
-        //Bkav Nhungltk: day la kich ban choi nhac nhe.
+        Log.d("HoangCV333", "playMedia: "+song.getID());
         possition = song.getID() - 1;
         if (mediaPlayer != null)
             mediaPlayer.reset();
 
         MediaPlayer mMediaPlayer = new MediaPlayer();
         Uri uri = Uri.parse(song.getFile());
-        Log.d("nhungltk", "playSong: " + uri);
+
         mMediaPlayer.setDataSource(getApplicationContext(), uri);
         mMediaPlayer.prepare();
         mMediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);

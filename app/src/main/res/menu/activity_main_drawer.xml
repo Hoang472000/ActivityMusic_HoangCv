@@ -1,18 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:showIn="navigation_view">
-
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_favorite"
-            android:icon="@drawable/ic_favorite_black_24dp"
-            android:title="Favorrite" />
+            android:id="@+id/nav_listen_now"
+            android:icon="@drawable/ic_list_music_foreground"
+            android:checkable="true"
+            android:checked="true"
+            android:title="@string/listen_now" />
         <item
-            android:id="@+id/nav_playlist"
-            android:icon="@drawable/ic_playlist_play_black_24dp"
-            android:title="List Music" />
-
+            android:id="@+id/nav_recents"
+            android:icon="@drawable/ic_recents_foreground"
+            android:checkable="true"
+            android:checked="false"
+            android:title="@string/recents" />
+        <item
+            android:id="@+id/nav_favorite_songs"
+            android:icon="@drawable/ic_music_library_foreground"
+            android:checkable="true"
+            android:checked="false"
+            android:title="@string/music_library" />
     </group>
+
+    <item android:title="comunicate">
+        <menu>
+            <item
+                android:id="@+id/nav_setting"
+                android:title="Settings" />
+            <item
+                android:id="@+id/nav_help"
+                android:title="@string/help_feedback"/>
+        </menu>
+    </item>
 
 </menu>

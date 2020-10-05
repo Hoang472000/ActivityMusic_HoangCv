@@ -43,7 +43,7 @@ import java.util.ArrayList;
 
 import Service.ServiceMediaPlay;
 
-public class MainActivity extends AppCompatActivity implements DisplayMediaFragment, DataFragment {
+public class MainActivity extends AppCompatActivity implements DisplayMediaFragment, DataFragment, NavigationView.OnNavigationItemSelectedListener {
     public static IntentFilter Broadcast_PLAY_NEW_AUDIO;
     String PRIVATE_MODE = "color";
     AllSongsFragment allSongsFragment;
@@ -134,38 +134,26 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open,
                 R.string.navigation_drawer_close);
-        if (drawer != null) {
+        if (drawer != null)
             drawer.addDrawerListener(toggle);
-        }
         toggle.syncState();
-
         NavigationView navigationView = findViewById(R.id.nav_view);
-        if (navigationView != null) {
+        if (navigationView != null)
             navigationView.setNavigationItemSelectedListener(this);
-        }
+
         mediaPlaybackFragment = new MediaPlaybackFragment();
         int orientation = this.getResources().getConfiguration().orientation;
         allSongsFragment = new AllSongsFragment(this, this.mediaPlaybackFragment, this);
         if (orientation == Configuration.ORIENTATION_PORTRAIT) {
             FragmentManager manager = this.getSupportFragmentManager();
             allSongsFragment.setBoolean(true);
-            manager.beginTransaction()
-                    .replace(R.id.fragmentSongOne, allSongsFragment)
-                    .commit();
+            manager.beginTransaction().replace(R.id.fragmentSongOne, allSongsFragment).commit();
         } else {
             allSongsFragment.setBoolean(false);
             FragmentManager manager = this.getSupportFragmentManager();
-
-            manager.beginTransaction()
-                    .replace(R.id.fragmentSongOne, allSongsFragment)
-                    .commit();
-
+            manager.beginTransaction().replace(R.id.fragmentSongOne, allSongsFragment).commit();
             FragmentManager manager1 = this.getSupportFragmentManager();
-
-            manager1.beginTransaction()
-                    .replace(R.id.fragmentMediaTwo, mediaPlaybackFragment)
-
-                    .commit();
+            manager1.beginTransaction().replace(R.id.fragmentMediaTwo, mediaPlaybackFragment).commit();
         }
         Intent intent = new Intent(this, ServiceMediaPlay.class);
         startService(intent);
@@ -193,8 +181,6 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
-
-
 */
     }
 /*    @Override
@@ -208,7 +194,6 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
             }
         }
     }*/
-
 
     @SuppressWarnings("StatementWithEmptyBody")
  /*   @Override
@@ -240,6 +225,7 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
     @Override
     public void onclick(Song song) {
         Log.d("HoangCV7", "onSaveInstanceState: " + serviceMediaPlay);
+        Log.d("HoangCV333", "onclick: "+(song.getID()-1));
         mediaPlaybackFragment = new MediaPlaybackFragment().newInstance(song);
         FragmentManager manager1 = this.getSupportFragmentManager();
         manager1.beginTransaction()
@@ -261,10 +247,10 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
         this.serviceMediaPlay = service;
     }
 
-   /* @Override
+    @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         return false;
-    }*/
+    }
 
     //Bkav Nhungltk
     interface IConnectActivityAndBaseSong {

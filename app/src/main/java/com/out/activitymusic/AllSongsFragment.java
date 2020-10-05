@@ -54,7 +54,7 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
     ServiceMediaPlay serviceMediaPlay;
     MediaPlaybackFragment mediaPlaybackFragment;
     DataFragment dataFragment;
-
+    private boolean Ischeck = false;
 
     private DisplayMediaFragment displayMediaFragment;
     private ImageView mPlayPause;
@@ -90,6 +90,7 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
 
     UpdateUI UpdateUI;
     int index;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -118,44 +119,39 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
             }
         });
         UpdateUI = new UpdateUI(getContext());
-        index=UpdateUI.getIndex();
-        Log.d("HoangCV333", "onCreateView: index="+index);
+        index = UpdateUI.getIndex();
+        Log.d("HoangCV333", "onCreateView: index=" + index);
         title.setText(UpdateUI.getTitle());
         artist.setText(UpdateUI.getArtist());
         img.setImageURI(Uri.parse(UpdateUI.getAlbum()));
 
-        final Song updateSong= new Song(UpdateUI.getIndex(),UpdateUI.getTitle(),UpdateUI.getFile(),UpdateUI.getAlbum(),UpdateUI.getArtist(),String.valueOf(UpdateUI.getDuration()));
-    if(song==null)
-        mLinearLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                displayMediaFragment.onclick(songs.get(index));
-
-            }
-        });
-    else
-        mLinearLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                displayMediaFragment.onclick(song);
-
-            }
-        });
-     //   Log.d("HoangCV444", "onCreateView: "+updateSong);
-
-
-
-
-
-        Log.d("HoangCV33", "onCreateView: "+UpdateUI.getFile());
-
-
-
+        final Song updateSong = new Song(UpdateUI.getIndex(), UpdateUI.getTitle(), UpdateUI.getFile(), UpdateUI.getAlbum(), UpdateUI.getArtist(), String.valueOf(UpdateUI.getDuration()));
+        Log.d("Hoang123CV", "onCreateView: " + songs);
+        if(Ischeck)
+            mLinearLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    displayMediaFragment.onclick(song);
+                }
+            });
+        else
+            mLinearLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    displayMediaFragment.onclick(songs.get(index));
+                }
+            });
         onClickPause();
 
+        if(serviceMediaPlay!=null)
+            if(serviceMediaPlay.isPlaying())
+                mPlayPause.setImageResource(R.drawable.ic_pause_black_large);
+            else
+                mPlayPause.setImageResource(R.drawable.ic_media_play_light);
         return mInflater;
     }
-    private  void clickLinearLayout(){
+
+    private void clickLinearLayout() {
 
     }
 
@@ -218,7 +214,7 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
                 artist = song.getArtist();
                 duration = song.getDuration();
                 songs.add(new Song(id, title, file, album, artist, duration));
-            //    Log.d("nhungltk12", "onLoadFinished: " + title);
+                //    Log.d("nhungltk12", "onLoadFinished: " + title);
 
 
                /* if (isCreate == false) {
@@ -238,36 +234,43 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
         mListAdapter = new ListAdapter(getContext(), songs, this);
         mRecyclerView.setAdapter(mListAdapter);
         dataFragment.onclickData(songs);
-        Log.d("HoangCV4444", "onLoadFinished:+ songs "+songs);
+        Log.d("HoangCV4444", "onLoadFinished:+ songs " + songs);
 
         UpdateUI = new UpdateUI(getContext());
-        index=UpdateUI.getIndex();
+        index = UpdateUI.getIndex();
 
         int orientation = this.getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE){
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
             if (mLinearLayout.getVisibility() == View.VISIBLE)
                 mLinearLayout.setVisibility(View.INVISIBLE);
-                mediaPlaybackFragment.setListSong(songs);
-                mediaPlaybackFragment.updateTime();
-
-               if(serviceMediaPlay!=null){
-                  // mediaPlaybackFragment.setService(serviceMediaPlay);
-                   serviceMediaPlay.setListSong(songs);
-                   /* mediaPlaybackFragment.getText(songs.get(serviceMediaPlay.getPossision()));
-                else*/ mediaPlaybackFragment.getText(songs.get(UpdateUI.getIndex()));}
+            mediaPlaybackFragment.setListSong(songs);
+            mediaPlaybackFragment.updateTime();
+            if (serviceMediaPlay != null) {
+                serviceMediaPlay.setListSong(songs);
+                mediaPlaybackFragment.getText(songs.get(UpdateUI.getIndex()));
+            }
         }
-
-        Log.d("HoangCV33333", "onCreateView: "+songs.get(index));
-        Log.d("HoangCV333", "onCreateView: "+index);
-//        if(song==null){
-//            mLinearLayout.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    displayMediaFragment.onclick(songs1.get(index));
-//
-//                }
-//            });
-//        }
+        else {
+            mediaPlaybackFragment.setListSong(songs);
+            mediaPlaybackFragment.updateTime();
+            if (serviceMediaPlay != null) {
+                serviceMediaPlay.setListSong(songs);
+            }
+        }
+      /*  if(song==null){
+        mLinearLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                displayMediaFragment.onclick(songs.get(index));
+            }
+        });
+            mediaPlaybackFragment.setListSong(songs);
+            mediaPlaybackFragment.getText(songs.get(index));
+            mediaPlaybackFragment.updateTime();
+        }*/
+        Log.d("HoangCV33333", "onCreateView: " + songs.get(index));
+        Log.d("HoangCV3333333", "onCreateView: " + index);
+        Log.d("Hoang123CV", "onLoadFinished: "+serviceMediaPlay);
     }
 
     @Override
@@ -296,20 +299,18 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
         title.setText(song.getTitle());
         artist.setText(song.getArtist());
         img.setImageURI(queryAlbumUri(song.getAlbum()));
-
+        Log.d("Hoang1111CV", "onClick: " + queryAlbumUri(song.getAlbum()));
         Ischeck = true;
     }
 
-    private boolean Ischeck;
-
-    @Override
+   /* @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         if (Ischeck) {
             outState.putString("Title", song.getTitle());
         }
         Ischeck = false;
-    }
+    }*/
 
 
     public Uri queryAlbumUri(String imgUri) {
@@ -317,23 +318,34 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
         final Uri artworkUri = Uri.parse("content://media/external/audio/albumart");
         return ContentUris.withAppendedId(artworkUri, Long.parseLong(imgUri));//noi them mSrcImageSong vao artworkUri
     }
-
-
     public void onClickPause() {
 
         mPlayPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (serviceMediaPlay == null) {
+
+                }
                 if (serviceMediaPlay.isPlaying()) {
                     serviceMediaPlay.pauseMedia();
                     mPlayPause.setImageResource(R.drawable.ic_media_play_light);
                     Log.d("HoangCV2", "onClick: " + serviceMediaPlay.isPlaying());
                 } else {
-                    try {
-                        serviceMediaPlay.playMedia(song);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    if(!Ischeck) {
+                        try {
+                            serviceMediaPlay.playMedia(songs.get(index));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
+                    else {
+                        try {
+                            serviceMediaPlay.playMedia(song);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
                     mPlayPause.setImageResource(R.drawable.ic_pause_black_large);
                     Log.d("HoangCV2", "onClick: " + serviceMediaPlay.isPlaying());
                 }

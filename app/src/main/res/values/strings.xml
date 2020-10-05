@@ -8,7 +8,6 @@
     <string name="time_1">0:00</string>
     <string name="time_2">0:00</string>
     <string name="favourite">" Favourite List"</string>
-    <string name="listnow" >List Now</string>
     <string name="recents">Recents</string>
     <string name="music_library">Music Library</string>
     <string name="setting">Settings</string>
@@ -22,4 +21,5 @@
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">SlideShow</string>
+    <string name="listen_now">List Now</string>
 </resources>
