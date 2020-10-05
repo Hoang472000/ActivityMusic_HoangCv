@@ -39,7 +39,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 
-public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletionListener,
+public class ServiceMediaPlay extends Service implements
         MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener,
         MediaPlayer.OnInfoListener, MediaPlayer.OnBufferingUpdateListener,
 
@@ -82,6 +82,9 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
 
     public void setMediaPlaybackFragment(MediaPlaybackFragment mediaPlaybackFragment) {
         this.mediaPlaybackFragment = mediaPlaybackFragment;
+    }
+    public String getNameSong(){
+        return mTitle;
     }
 
     @Override
@@ -277,37 +280,7 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
         return mediaPlayer;
     }
 
-    @Override
-    public void onCompletion(MediaPlayer mediaPlayer) {
-        Log.d("nhungltk123", "onCompletion: ");
-        shuffle = mUpdateUI.getShuffle();
-        repeat = mUpdateUI.getRepeat();
-        int rtpos = possition;
-        if (repeat != -1) {
-            if (repeat == 1)
-                possition = rtpos;
-            else if (repeat == 0) {
-                rtpos++;
-                if (rtpos > ListSong.size() - 1)
-                    rtpos = 0;
-                possition = rtpos;
-            }
-        } else if (shuffle) {
-            int newSong = possition;
-            while (newSong == possition) {
-                newSong = rand.nextInt(ListSong.size());
-            }
-            possition = newSong;
-        } else possition++;
-        if ((possition > ListSong.size() - 1) && (repeat == -1)) pauseMedia();
-        else try {
-            playMedia(ListSong.get(possition));
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        mediaPlaybackFragment.getText(ListSong.get(possition));
-    }
 
     @Override
     public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
@@ -370,7 +343,6 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
     private void initMediaPlayer() {
         mediaPlayer = new MediaPlayer();
         //Set up MediaPlayer event listeners
-        mediaPlayer.setOnCompletionListener(this);
         mediaPlayer.setOnErrorListener(this);
         mediaPlayer.setOnPreparedListener(this);
         mediaPlayer.setOnBufferingUpdateListener(this);
@@ -495,8 +467,8 @@ public class ServiceMediaPlay extends Service implements MediaPlayer.OnCompletio
         mUpdateUI.UpdateAlbum(String.valueOf(queryAlbumUri(song.getAlbum())));
         mUpdateUI.UpdateDuration(mediaPlayer.getDuration());
         mUpdateUI.UpdateCurrentPossision(mediaPlayer.getCurrentPosition());
-        mUpdateUI.UpdateIsPlaying(mMediaPlayer.isPlaying());
-        mMediaPlayer.setOnCompletionListener(this);
+        mUpdateUI.UpdateIsPlaying(mediaPlayer.isPlaying());
+        Log.d("HoangCV3333", "playMedia: isplaying"+mediaPlayer.isPlaying());
 
 
     }

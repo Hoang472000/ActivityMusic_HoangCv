@@ -132,12 +132,14 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
         mUpdateUI = new UpdateUI(getContext());
         shuffler = mUpdateUI.getShuffle();
         repeat = mUpdateUI.getRepeat();
-        if(mUpdateUI.getIsPlaying()){
+ //       if(!serviceMediaPlay.isPlaying())
+        if(song==null)
+            mPlayPauseMedia.setImageResource((R.drawable.ic_baseline_play_circle_filled_24));
             tv.setText(mUpdateUI.getTitle());
             img.setImageURI(Uri.parse(mUpdateUI.getAlbum()));
             imgBig.setBackground(setImgBig(mUpdateUI.getAlbum()));
             time2.setText(getDurationTime1(String.valueOf(mUpdateUI.getDuration())));
-        }
+
 
         if (shuffler) {
             mShuffle.setImageResource(R.drawable.ic_play_shuffle_orange);
@@ -153,6 +155,7 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
                 isRepeat = 1;
             }
         }
+
 
 //        if (!serviceMediaPlay.isPlaying())
 //            mPlayPauseMedia.setImageResource(R.drawable.ic_baseline_play_circle_filled_24);
@@ -381,6 +384,7 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
 
     public void updateTime() {
         final Handler handler = new Handler();
+        if(song!=null)
         handler.postDelayed(new Runnable() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
@@ -407,65 +411,4 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
         }, 100);
     }
 
-//
-//    public class UpdateSeekBarThread extends Thread {
-//        private Handler handler;
-//
-//        @Override
-//        public void run() {
-//            super.run();
-//            Looper.prepare();
-//            handler = new Handler();
-//            Looper.loop();
-//        }
-//
-//        public void updateSeekBar() {
-//            Log.d("HoangCV7", "updateSeekBar: ");
-//            if (serviceMediaPlay != null) {
-//                handler.post(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        Log.d("TAG", "runis: " + serviceMediaPlay.isPlaying());
-//                        if (serviceMediaPlay.isPlaying()) {
-//                            while (serviceMediaPlay.getPlayer() != null) {
-//                                try {
-//                                    long current = -1;
-//                                    try {
-//                                        current = serviceMediaPlay.getCurrentStreamPosition();
-//                                    } catch (IllegalStateException e) {
-//                                        e.printStackTrace();
-//                                    }
-//                                    if (getActivity() != null) {
-//                                        final long finalCurrent = current;
-//                                        getActivity().runOnUiThread(new Runnable() {
-//                                            @Override
-//                                            public void run() {
-//                                                mSeekBar.setMax((int) (serviceMediaPlay.getDuration() / 1000));
-//                                                mSeekBar.setProgress((int) (finalCurrent / 1000));
-//
-//                                            }
-//                                        });
-//                                    }
-//                                    Thread.sleep(1000);
-//                                } catch (InterruptedException e) {
-//                                    e.printStackTrace();
-//                                }
-//                            }
-//                        }
-//                    }
-//                });
-//            }
-//        }
-//
-//        public void exit() {
-//            handler.getLooper().quit();
-//        }
-//    }
-
-
-   /* @Override
-    public void DataList(ArrayList arrayList) {
-        this.mListSong=arrayList;
-
-    }*/
 }

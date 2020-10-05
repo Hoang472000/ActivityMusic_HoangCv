@@ -125,11 +125,19 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
         img.setImageURI(Uri.parse(UpdateUI.getAlbum()));
 
         final Song updateSong= new Song(UpdateUI.getIndex(),UpdateUI.getTitle(),UpdateUI.getFile(),UpdateUI.getAlbum(),UpdateUI.getArtist(),String.valueOf(UpdateUI.getDuration()));
-
+    if(song==null)
         mLinearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 displayMediaFragment.onclick(songs.get(index));
+
+            }
+        });
+    else
+        mLinearLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                displayMediaFragment.onclick(song);
 
             }
         });
@@ -230,7 +238,7 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
         mListAdapter = new ListAdapter(getContext(), songs, this);
         mRecyclerView.setAdapter(mListAdapter);
         dataFragment.onclickData(songs);
-        Log.d("HoangCV444", "onLoadFinished:+ songs "+songs);
+        Log.d("HoangCV4444", "onLoadFinished:+ songs "+songs);
 
         UpdateUI = new UpdateUI(getContext());
         index=UpdateUI.getIndex();

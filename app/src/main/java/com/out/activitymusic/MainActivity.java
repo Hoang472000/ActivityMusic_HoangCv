@@ -8,6 +8,10 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 
 
 import android.annotation.SuppressLint;
@@ -31,17 +35,20 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 
 import Service.ServiceMediaPlay;
 
-public class MainActivity extends AppCompatActivity implements DisplayMediaFragment, DataFragment, NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements DisplayMediaFragment, DataFragment {
     public static IntentFilter Broadcast_PLAY_NEW_AUDIO;
     String PRIVATE_MODE = "color";
     AllSongsFragment allSongsFragment;
     MediaPlaybackFragment mediaPlaybackFragment;
+    private AppBarConfiguration mAppBarConfiguration;
 
     public ServiceMediaPlay getPlayer() {
         return serviceMediaPlay;
@@ -54,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
     SharedPreferences sharedPreferences;
     private DrawerLayout mDrawerLayout;
     private LinearLayout mLinearLayout;
-
+    private ListAdapter listAdapter= new ListAdapter();
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -71,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
             serviceBound = true;
 
             allSongsFragment.setService(serviceMediaPlay);
+            listAdapter.setService(serviceMediaPlay);
 
 
             Toast.makeText(MainActivity.this, "Service Bound", Toast.LENGTH_SHORT).show();
@@ -164,10 +172,32 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
         bindService(intent, serviceConnection, BIND_AUTO_CREATE);
         mediaPlaybackFragment.setService(serviceMediaPlay);
         sharedPreferences = getSharedPreferences("login", MODE_PRIVATE);
-
+        /*Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        mAppBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow)
+                .setDrawerLayout(drawer)
+                .build();
+        NavController navController = Navigation.findNavController(this, R.id.fragmentSongOne);
+        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+        NavigationUI.setupWithNavController(navigationView, navController);
     }
 
     @Override
+    public boolean onSupportNavigateUp() {
+        NavController navController = Navigation.findNavController(this, R.id.fragmentSongOne);
+        return NavigationUI.navigateUp(navController, mAppBarConfiguration)
+                || super.onSupportNavigateUp();
+    }
+
+
+*/
+    }
+/*    @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer != null) {
@@ -177,16 +207,16 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
                 super.onBackPressed();
             }
         }
-    }
+    }*/
 
 
     @SuppressWarnings("StatementWithEmptyBody")
-    @Override
+ /*   @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         // Handle navigation view item clicks here.
         switch (item.getItemId()) {
-            case R.id.nav_camera:
+            case R.id.nav_home:
                 drawer.closeDrawer(GravityCompat.START);
                 displayToast(getString(R.string.listnow));
                 return true;
@@ -197,14 +227,6 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
                 drawer.closeDrawer(GravityCompat.START);
                 return true;
 
-            case R.id.nav_share:
-                drawer.closeDrawer(GravityCompat.START);
-
-                return true;
-            case R.id.nav_send:
-                drawer.closeDrawer(GravityCompat.START);
-
-                return true;
             default:
                 return false;
         }
@@ -212,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
 
     public void displayToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-    }
+    }*/
 
 
     @Override
@@ -267,4 +289,5 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
         Log.d("HoangCV7", "onPause: " + serviceMediaPlay);
         setService(serviceMediaPlay);
     }
+
 }

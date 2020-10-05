@@ -1,42 +1,25 @@
 package com.out.activitymusic;
 
-import android.app.Activity;
-import android.app.Service;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Typeface;
-import android.media.MediaPlayer;
 import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
-import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import javax.xml.datatype.Duration;
 
 import Service.ServiceMediaPlay;
 import es.claucookie.miniequalizerlibrary.EqualizerView;
@@ -53,9 +36,15 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
     private ItemClickListener itemClickListener;
     private ImageView image;
     private ImageView mPlayPause;
-    private int mPosision;
+    private int mPosision,mPos;
     UpdateUI mUpdateUI;
+    private ServiceMediaPlay serviceMediaPlay;
 
+
+    public void setService(ServiceMediaPlay serviceMediaPlay){
+        this.serviceMediaPlay= serviceMediaPlay;
+    }
+    public ListAdapter(){}
     public ListAdapter(Context context, ArrayList<Song> ListView,ItemClickListener itemClickListener) {
         mInflater = LayoutInflater.from(context);
         this.itemClickListener = itemClickListener;
@@ -73,6 +62,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
         mPlayPause=playMediaSong.findViewById(R.id.play_pause);
         allSongsFragment = new AllSongsFragment();
         image= (ImageView) mItemView.findViewById(R.id.menu_pop);
+        mUpdateUI= new UpdateUI(mContext);
+        mPos=mUpdateUI.getCurrentPossision();
         Popmenu();
         Log.d("HoangCV6", "onCreateViewHolder: ");
         return new ViewHolder(mItemView, this);
@@ -81,8 +72,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
-        Log.d("HoangCV6", "onBindViewHolder: "+position);
-        Log.d("HoangCV6", "onBindViewHolder: "+mPosision);
+        Log.d("HoangCV6", "onBindViewHolder: position"+position);
+        Log.d("HoangCV6", "onBindViewHolder: mPosision"+mPosision);
         final Song mCurrent = mListSong.get(position);
 
         holder.mId.setText((position + 1) + "");
@@ -90,7 +81,9 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
         holder.mDuration.setText(getDurationTime(mCurrent.getDuration()));
 
 //        String mCurrent1=mListSTT.get(position);
+
         if(position==mPosision) {
+            Log.d("HoangCV12345", "onBindViewHolder: holder: "+holder);
             holder.mId.setVisibility(View.INVISIBLE);
             holder.mTitle.setTypeface(null, Typeface.BOLD);
             holder.mEqualizer.animateBars();
@@ -203,22 +196,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
     public boolean onMenuItemClick(MenuItem menuItem) {
         Toast.makeText(mContext,"Hoang"+menuItem.getTitle(), Toast.LENGTH_SHORT).show();
         switch (menuItem.getItemId()) {
-            case R.id.search_item:
+            case R.id.add_song_favorite:
                 // do your code
                 return true;
-            case R.id.upload_item:
-                // do your code
-                return true;
-            case R.id.copy_item:
-                // do your code
-                return true;
-            case R.id.print_item:
-                // do your code
-                return true;
-            case R.id.share_item:
-                // do your code
-                return true;
-            case R.id.bookmark_item:
+            case R.id.remove_song_favorite:
                 // do your code
                 return true;
             default:
