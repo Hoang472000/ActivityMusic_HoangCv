@@ -1,10 +1,11 @@
 package com.out.activitymusic;
 
 
+import android.net.Uri;
 
 public class FavoriteSongsProvider {
-    /*public static final String ID_PROVIDER = "hoang1";
-    public static final String FAVORITE ="hoang2" ;
-    public static final String COUNT ="honang3";
-    public static final String CONTENT_URI ="hoang4" ;*/
+    public static final Integer ID_PROVIDER = 1;
+    public static final Integer IS_FAVORITE = 1 ;
+    public static final Integer COUNT_OF_PLAY =1 ;
+/*    public static final Uri CONTENT_URI ="hoang4" ;*/
 }

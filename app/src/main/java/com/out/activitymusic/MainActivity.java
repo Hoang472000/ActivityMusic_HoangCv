@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
     public static IntentFilter Broadcast_PLAY_NEW_AUDIO;
     String PRIVATE_MODE = "color";
     AllSongsFragment allSongsFragment;
+    BaseSongListFragment baseSongListFragment;
     MediaPlaybackFragment mediaPlaybackFragment;
     private AppBarConfiguration mAppBarConfiguration;
 
@@ -68,17 +69,10 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             ServiceMediaPlay.LocalBinder binder = (ServiceMediaPlay.LocalBinder) service;
             serviceMediaPlay = binder.getService();
-//            mListSong= new ArrayList<>();
             serviceMediaPlay.setListSong(mListSong);
-            Log.d("HoangCV7", "onSaveInstanceState: " + serviceMediaPlay);
-
-            Log.d("nhungltk", "onServiceConnected: " + serviceMediaPlay);
-            //Bkav Nhungltk: tai sao lai thuc hien connect o day
             iConnectActivityAndBaseSong.connectActivityAndBaseSong();
             serviceBound = true;
-
             allSongsFragment.setService(serviceMediaPlay);
-            listAdapter.setService(serviceMediaPlay);
 
 
             Toast.makeText(MainActivity.this, "Service Bound", Toast.LENGTH_SHORT).show();
@@ -91,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
     };
     private int possision;
 
-    @Override
+  /*  @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         UpdateUI updateUI = new UpdateUI(getApplicationContext());
         // updateUI.UpdateSeekbar();
@@ -102,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         possision = savedInstanceState.getInt("possision");
-    }
+    }*/
 
     @Override
     protected void onDestroy() {
@@ -142,8 +136,10 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
             navigationView.setNavigationItemSelectedListener(this);
 
         mediaPlaybackFragment = new MediaPlaybackFragment();
+        //baseSongListFragment= new BaseSongListFragment(this,this.mediaPlaybackFragment);
+        Log.d("HoangCV12ff", "clickLinearLayout: ");
+        allSongsFragment = new AllSongsFragment(this,this,this.mediaPlaybackFragment);
         int orientation = this.getResources().getConfiguration().orientation;
-        allSongsFragment = new AllSongsFragment(this, this.mediaPlaybackFragment, this);
         if (orientation == Configuration.ORIENTATION_PORTRAIT) {
             FragmentManager manager = this.getSupportFragmentManager();
             allSongsFragment.setBoolean(true);

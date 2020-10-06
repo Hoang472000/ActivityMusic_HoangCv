@@ -38,31 +38,16 @@ import Service.ServiceMediaPlay;
 import static android.content.Context.MODE_PRIVATE;
 
 
-public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, ItemClickListener, SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener {
+public class AllSongsFragment extends BaseSongListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String SHARED_PREFERENCES_NAME = "1";
     private ListAdapter mListAdapter;
-
-    private RecyclerView mRecyclerView;
-    private Song song;
-
-    public RelativeLayout mLinearLayout, mBottom;
-    TextView title, mTitle, mTime;
-    TextView artist;
-    ImageView img, mImageSmall;
     private SharedPreferences mSharePreferences;
     ArrayList<Song> songs;
     ServiceMediaPlay serviceMediaPlay;
-    MediaPlaybackFragment mediaPlaybackFragment;
     DataFragment dataFragment;
-    private boolean Ischeck = false;
-
-    private DisplayMediaFragment displayMediaFragment;
-    private ImageView mPlayPause;
+    DisplayMediaFragment displayMediaFragment;
+    MediaPlaybackFragment mediaPlaybackFragment;
     private Boolean IsBoolean = false;
-    private ImageView mMusicPop;
-    MediaPlayer mediaPlayer;
-    private ArrayList<Song> songs1;
-
 
     public void setBoolean(Boolean aBoolean) {
         IsBoolean = aBoolean;
@@ -76,89 +61,33 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
         this.serviceMediaPlay = service;
     }
 
-
-    public AllSongsFragment(DisplayMediaFragment displayMediaFragment, MediaPlaybackFragment mediaPlaybackFragment, DataFragment dataFragment) {
-        this.displayMediaFragment = displayMediaFragment;
-        this.mediaPlaybackFragment = mediaPlaybackFragment;
+    public AllSongsFragment(DataFragment dataFragment,DisplayMediaFragment displayMediaFragment,MediaPlaybackFragment mediaPlaybackFragment) {
+        super(displayMediaFragment, mediaPlaybackFragment);
         this.dataFragment = dataFragment;
-
+        this.displayMediaFragment=displayMediaFragment;
     }
 
     public AllSongsFragment() {
-
     }
+
 
     UpdateUI UpdateUI;
     int index;
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d("nhungltk12", "onCreateView: ");
-        View mInflater = inflater.inflate(R.layout.allsongsfragment, container, false);
-        mRecyclerView = mInflater.findViewById(R.id.recycle_view);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mLinearLayout = mInflater.findViewById(R.id.bottom);
-        mPlayPause = mInflater.findViewById(R.id.play_pause);
-        LoaderManager.getInstance(this).initLoader(1, null, this);
-        title = mInflater.findViewById(R.id.title);
-        artist = mInflater.findViewById(R.id.artist);
-        img = mInflater.findViewById(R.id.picture);
-        mTitle = mInflater.findViewById(R.id.song1);
-        mTime = mInflater.findViewById(R.id.Time2);
-        mImageSmall = mInflater.findViewById(R.id.picture_small);
-        mMusicPop = mInflater.findViewById(R.id.music_pop);
-        //Bkav Nhungltk: doan nay nghia la sao
-        ((MainActivity) getActivity()).setiConnectActivityAndBaseSong(new MainActivity.IConnectActivityAndBaseSong() {
-            @Override
-            public void connectActivityAndBaseSong() {
-                if (((MainActivity) getActivity()).serviceMediaPlay != null) {
-                    Log.d("nhungltk", "onCreateView: " + "not null");
-                    setService((((MainActivity) getActivity()).serviceMediaPlay));
-                }
-            }
-        });
-        UpdateUI = new UpdateUI(getContext());
-        index = UpdateUI.getIndex();
-        Log.d("HoangCV333", "onCreateView: index=" + index);
-        title.setText(UpdateUI.getTitle());
-        artist.setText(UpdateUI.getArtist());
-        img.setImageURI(Uri.parse(UpdateUI.getAlbum()));
-
-        final Song updateSong = new Song(UpdateUI.getIndex(), UpdateUI.getTitle(), UpdateUI.getFile(), UpdateUI.getAlbum(), UpdateUI.getArtist(), String.valueOf(UpdateUI.getDuration()));
-        Log.d("Hoang123CV", "onCreateView: " + songs);
-        if(Ischeck)
-            mLinearLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    displayMediaFragment.onclick(song);
-                }
-            });
-        else
-            mLinearLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    displayMediaFragment.onclick(songs.get(index));
-                }
-            });
-        onClickPause();
-
-        if(serviceMediaPlay!=null)
-            if(serviceMediaPlay.isPlaying())
-                mPlayPause.setImageResource(R.drawable.ic_pause_black_large);
-            else
-                mPlayPause.setImageResource(R.drawable.ic_media_play_light);
-        return mInflater;
-    }
-
-    private void clickLinearLayout() {
-
-    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         Log.d("nhungltk12", "onActivityCreated: ");
         super.onActivityCreated(savedInstanceState);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        LoaderManager.getInstance(this).initLoader(1, null, this);
+      //  clickLinearLayout(displayMediaFragment);
+        return super.onCreateView(inflater, container, savedInstanceState);
+
     }
 
     @NonNull
@@ -181,7 +110,7 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d("nhungltk12", "onCreate: ");
-        setHasOptionsMenu(true);
+        //dataFragment.onclickData(songs);
     }
 
     @Override
@@ -231,46 +160,20 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
 
             } while (data.moveToNext());
         }
-        mListAdapter = new ListAdapter(getContext(), songs, this);
-        mRecyclerView.setAdapter(mListAdapter);
+        int orientation = this.getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE)
+            setListSongs(songs);
+        else   setListSongs(songs);
         dataFragment.onclickData(songs);
+        mListAdapter=new ListAdapter(getContext(),songs,this);
+        mListAdapter.setmListSong(songs);
+        setAdapter(mListAdapter);
+        setListAdapter(mListAdapter);
+        setService(serviceMediaPlay);
+
         Log.d("HoangCV4444", "onLoadFinished:+ songs " + songs);
 
-        UpdateUI = new UpdateUI(getContext());
-        index = UpdateUI.getIndex();
 
-        int orientation = this.getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if (mLinearLayout.getVisibility() == View.VISIBLE)
-                mLinearLayout.setVisibility(View.INVISIBLE);
-            mediaPlaybackFragment.setListSong(songs);
-            mediaPlaybackFragment.updateTime();
-            if (serviceMediaPlay != null) {
-                serviceMediaPlay.setListSong(songs);
-                mediaPlaybackFragment.getText(songs.get(UpdateUI.getIndex()));
-            }
-        }
-        else {
-            mediaPlaybackFragment.setListSong(songs);
-            mediaPlaybackFragment.updateTime();
-            if (serviceMediaPlay != null) {
-                serviceMediaPlay.setListSong(songs);
-            }
-        }
-      /*  if(song==null){
-        mLinearLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                displayMediaFragment.onclick(songs.get(index));
-            }
-        });
-            mediaPlaybackFragment.setListSong(songs);
-            mediaPlaybackFragment.getText(songs.get(index));
-            mediaPlaybackFragment.updateTime();
-        }*/
-        Log.d("HoangCV33333", "onCreateView: " + songs.get(index));
-        Log.d("HoangCV3333333", "onCreateView: " + index);
-        Log.d("Hoang123CV", "onLoadFinished: "+serviceMediaPlay);
     }
 
     @Override
@@ -278,127 +181,7 @@ public class AllSongsFragment extends Fragment implements LoaderManager.LoaderCa
 
     }
 
-    @Override
-    public void onClick(Song song) {
-        this.song = song;
-        Log.d("HoangCV", "onClick: 123");
-        int orientation = this.getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mediaPlaybackFragment.setListSong(songs);
-            mediaPlaybackFragment.getText(song);
-            mediaPlaybackFragment.updateTime();
-        }
-        if (serviceMediaPlay != null) {
-            Log.d("nhungltk", "onClick: " + "playMusic");
-            try {
-                serviceMediaPlay.playMedia(song);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        title.setText(song.getTitle());
-        artist.setText(song.getArtist());
-        img.setImageURI(queryAlbumUri(song.getAlbum()));
-        Log.d("Hoang1111CV", "onClick: " + queryAlbumUri(song.getAlbum()));
-        Ischeck = true;
-    }
-
-   /* @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (Ischeck) {
-            outState.putString("Title", song.getTitle());
-        }
-        Ischeck = false;
-    }*/
-
-
-    public Uri queryAlbumUri(String imgUri) {
-
-        final Uri artworkUri = Uri.parse("content://media/external/audio/albumart");
-        return ContentUris.withAppendedId(artworkUri, Long.parseLong(imgUri));//noi them mSrcImageSong vao artworkUri
-    }
-    public void onClickPause() {
-
-        mPlayPause.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (serviceMediaPlay == null) {
-
-                }
-                if (serviceMediaPlay.isPlaying()) {
-                    serviceMediaPlay.pauseMedia();
-                    mPlayPause.setImageResource(R.drawable.ic_media_play_light);
-                    Log.d("HoangCV2", "onClick: " + serviceMediaPlay.isPlaying());
-                } else {
-                    if(!Ischeck) {
-                        try {
-                            serviceMediaPlay.playMedia(songs.get(index));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    else {
-                        try {
-                            serviceMediaPlay.playMedia(song);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    mPlayPause.setImageResource(R.drawable.ic_pause_black_large);
-                    Log.d("HoangCV2", "onClick: " + serviceMediaPlay.isPlaying());
-                }
-            }
-        });
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d("HoangCV10", "onResume: " + serviceMediaPlay);
-    }
-
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_bar, menu);
-        MenuItem searchItem = menu.findItem(R.id.menuSearch);
-        Log.d("HoangCV3", "onCreateOptionsMenu: " + searchItem);
-        SearchView searchView = (SearchView) searchItem.getActionView();
-        searchView.setOnQueryTextListener(this);
-        Log.d("HoangCV3", "onCreateOptionsMenu: " + searchView);
-    }
-
-    @Override
-    public boolean onMenuItemActionExpand(MenuItem menuItem) {
-        return false;
-    }
-
-    @Override
-    public boolean onMenuItemActionCollapse(MenuItem menuItem) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String s) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String s) {
-        mListAdapter.getFilter().filter(s);
-        return false;
-    }
-
-
-}
-
-
-
-
-
+   }
 
 
 
