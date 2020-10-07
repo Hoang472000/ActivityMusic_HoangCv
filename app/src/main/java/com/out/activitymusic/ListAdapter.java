@@ -44,10 +44,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
     public void setService(ServiceMediaPlay serviceMediaPlay){
         this.serviceMediaPlay= serviceMediaPlay;
     }
-   public void setmListSong(ArrayList<Song> mListSong){
-        this.mListSong=mListSong;
-       Log.d("HoangCVff", "setmListSong: "+mListSong);
-   }
 
     public ListAdapter(){}
     public ListAdapter(Context context, ArrayList<Song> ListView,ItemClickListener itemClickListener) {
@@ -177,9 +173,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
 
         @Override
         public void onClick(View view) {
-            Log.d("HoangCV6", "onClick: "+mListSong);
+            Log.d("HoangCV62", "onClick: "+mListSong);
 
             mPosision=Integer.parseInt(String.valueOf(mId.getText()))-1;
+            Log.d("HoangCV62", "onClick: "+mListSong.get(mPosision));
             itemClickListener.onClick(mListSong.get(mPosision));
             notifyDataSetChanged();
         }

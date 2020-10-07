@@ -69,12 +69,14 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             ServiceMediaPlay.LocalBinder binder = (ServiceMediaPlay.LocalBinder) service;
             serviceMediaPlay = binder.getService();
+            Log.d("nhungltkk", "onServiceConnected: "+serviceMediaPlay);
             serviceMediaPlay.setListSong(mListSong);
             iConnectActivityAndBaseSong.connectActivityAndBaseSong();
             serviceBound = true;
-            allSongsFragment.setService(serviceMediaPlay);
-
-
+            if(serviceMediaPlay!=null){
+                allSongsFragment.setService(serviceMediaPlay);
+                mediaPlaybackFragment.setService(serviceMediaPlay);
+            }
             Toast.makeText(MainActivity.this, "Service Bound", Toast.LENGTH_SHORT).show();
         }
 
@@ -135,9 +137,10 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
         if (navigationView != null)
             navigationView.setNavigationItemSelectedListener(this);
 
-        mediaPlaybackFragment = new MediaPlaybackFragment();
         //baseSongListFragment= new BaseSongListFragment(this,this.mediaPlaybackFragment);
         Log.d("HoangCV12ff", "clickLinearLayout: ");
+
+        mediaPlaybackFragment = new MediaPlaybackFragment();
         allSongsFragment = new AllSongsFragment(this,this,this.mediaPlaybackFragment);
         int orientation = this.getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -154,7 +157,6 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
         Intent intent = new Intent(this, ServiceMediaPlay.class);
         startService(intent);
         bindService(intent, serviceConnection, BIND_AUTO_CREATE);
-        mediaPlaybackFragment.setService(serviceMediaPlay);
         sharedPreferences = getSharedPreferences("login", MODE_PRIVATE);
         /*Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -228,7 +230,6 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
                 .addToBackStack(null)
                 .replace(R.id.fragmentSongOne, mediaPlaybackFragment)
                 .commit();
-        mediaPlaybackFragment.setService(serviceMediaPlay);
         mediaPlaybackFragment.setListSong(mListSong);
         serviceMediaPlay.setMediaPlaybackFragment(mediaPlaybackFragment);
     }

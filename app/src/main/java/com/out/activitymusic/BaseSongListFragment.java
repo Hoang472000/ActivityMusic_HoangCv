@@ -32,8 +32,7 @@ import java.util.ArrayList;
 import Service.ServiceMediaPlay;
 
 
-
-public class BaseSongListFragment extends Fragment implements  ItemClickListener, SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener {
+public class BaseSongListFragment extends Fragment implements ItemClickListener, SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener{
     private static final String SHARED_PREFERENCES_NAME = "1";
     private ListAdapter mListAdapter;
 
@@ -56,15 +55,16 @@ public class BaseSongListFragment extends Fragment implements  ItemClickListener
     private ImageView mMusicPop;
 
 
-
-    public void setListAdapter(ListAdapter adapter){
-        this.mListAdapter=adapter;
+    public void setListAdapter(ListAdapter adapter) {
+        this.mListAdapter = adapter;
     }
-    public void setListSongs(ArrayList<Song> listSongs){
 
-        this.songs=listSongs;
-        Log.d("HoangCVff", "setListSongs: "+songs);
+    public void setListSongs(ArrayList<Song> listSongs) {
+
+        this.songs = listSongs;
+        Log.d("HoangCVf1f", "setListSongs: " + songs);
     }
+
     public void setBoolean(Boolean aBoolean) {
         IsBoolean = aBoolean;
     }
@@ -81,7 +81,9 @@ public class BaseSongListFragment extends Fragment implements  ItemClickListener
     public BaseSongListFragment(DisplayMediaFragment displayMediaFragment, MediaPlaybackFragment mediaPlaybackFragment) {
         this.displayMediaFragment = displayMediaFragment;
         this.mediaPlaybackFragment = mediaPlaybackFragment;
+
     }
+
     public BaseSongListFragment() {
 
     }
@@ -89,12 +91,14 @@ public class BaseSongListFragment extends Fragment implements  ItemClickListener
     UpdateUI UpdateUI;
     int index;
 
-    public void setAdapter(ListAdapter adapter){
+    public void setAdapter(ListAdapter adapter) {
         mRecyclerView.setAdapter(adapter);
     }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         Log.d("nhungltk12", "onCreateView: ");
         View mInflater = inflater.inflate(R.layout.allsongsfragment, container, false);
         mRecyclerView = mInflater.findViewById(R.id.recycle_view);
@@ -110,17 +114,16 @@ public class BaseSongListFragment extends Fragment implements  ItemClickListener
         mMusicPop = mInflater.findViewById(R.id.music_pop);
         mRecyclerView.setHasFixedSize(true);
 
-
-        Log.d("HoangCVff", "onCreateView: "+songs);
         //Bkav Nhungltk: doan nay nghia la sao
         ((MainActivity) getActivity()).setiConnectActivityAndBaseSong(new MainActivity.IConnectActivityAndBaseSong() {
             @Override
             public void connectActivityAndBaseSong() {
                 if (((MainActivity) getActivity()).serviceMediaPlay != null) {
-                    Log.d("nhungltk", "onCreateView: " + "not null");
-                    setService((((MainActivity) getActivity()).serviceMediaPlay));
-                    mListAdapter.setService(serviceMediaPlay);
-
+                    Log.d("nhungltkk", "onCreateView: " + "not null");
+                    serviceMediaPlay = ((MainActivity) getActivity()).serviceMediaPlay;
+         //           mListAdapter.setService(serviceMediaPlay);
+                     mediaPlaybackFragment.setService(serviceMediaPlay);
+                    Log.d("nhungltkk", "connectActivityAndBaseSong: " + serviceMediaPlay);
                 }
             }
         });
@@ -131,43 +134,45 @@ public class BaseSongListFragment extends Fragment implements  ItemClickListener
         title.setText(UpdateUI.getTitle());
         artist.setText(UpdateUI.getArtist());
         img.setImageURI(Uri.parse(UpdateUI.getAlbum()));
-
-        final Song updateSong = new Song(UpdateUI.getIndex(), UpdateUI.getTitle(), UpdateUI.getFile(), UpdateUI.getAlbum(), UpdateUI.getArtist(), String.valueOf(UpdateUI.getDuration()));
-        Log.d("Hoang123CV", "onCreateView: " + songs);
-      //  if(!Ischeck)
-
-    /*   else
+        Log.d("HoangffwCV", "onCreateView: "+serviceMediaPlay);
+        if(isPortraint()){
+            mLinearLayout.setVisibility(View.GONE);
+        }
+        else{
+            mLinearLayout.setVisibility(View.VISIBLE);
             mLinearLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View view) {
-                    displayMediaFragment.onclick(songs.get(index));
+                public void onClick(View v) {
+                    serviceMediaPlay.setListSong(songs);
+                    mediaPlaybackFragment.setService(serviceMediaPlay);
+                    displayMediaFragment.onclick(song);
                 }
-            });*/
+            });
+        }
+        Log.d("Hoang123gCV", "onCreateView: " + songs);
 
         onClickPause();
-        clickLinearLayout();
+  //      clickLinearLayout();
 
-        if(serviceMediaPlay!=null)
-            if(serviceMediaPlay.isPlaying())
+        if (serviceMediaPlay!=null) {
+            if (serviceMediaPlay.isPlaying())
                 mPlayPause.setImageResource(R.drawable.ic_pause_black_large);
             else
                 mPlayPause.setImageResource(R.drawable.ic_media_play_light);
+        }
+       // else   mPlayPause.setImageResource(R.drawable.ic_media_play_light);
         return mInflater;
     }
-
+/*
     private void clickLinearLayout() {
-        Log.d("HoangCV", "clickLinearLayout: "+displayMediaFragment);
-       mLinearLayout.setOnClickListener(new View.OnClickListener() {
-           @Override
-          public void onClick(View view) {
-               Log.d("HoangCV12ff", "clickLinearLayout: "+song);
-
-                Log.d("HoangCV", "onClick: "+song);
+        mLinearLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 displayMediaFragment.onclick(song);
-        }
-      });
+            }
+        });
 
-    }
+    }*/
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -185,16 +190,23 @@ public class BaseSongListFragment extends Fragment implements  ItemClickListener
     @Override
     public void onClick(Song song) {
         this.song = song;
-        Log.d("HoangCVfd", "onClick: "+songs);
+
+        Log.d("HoangCVfd", "onClick: " + songs);
         Log.d("HoangCV", "onClick: 123");
-        int orientation = this.getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (isPortraint()){
+            mediaPlaybackFragment.setService(serviceMediaPlay);
             mediaPlaybackFragment.setListSong(songs);
             mediaPlaybackFragment.getText(song);
             mediaPlaybackFragment.updateTime();
         }
-        if (serviceMediaPlay != null) {
-            Log.d("nhungltk", "onClick: " + "playMusic");
+        if (serviceMediaPlay.isPlaying()) {
+            serviceMediaPlay.pauseMedia();
+            try {
+                serviceMediaPlay.playMedia(song);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
             try {
                 serviceMediaPlay.playMedia(song);
             } catch (IOException e) {
@@ -204,16 +216,22 @@ public class BaseSongListFragment extends Fragment implements  ItemClickListener
         title.setText(song.getTitle());
         artist.setText(song.getArtist());
         img.setImageURI(queryAlbumUri(song.getAlbum()));
-        Log.d("Hoang1111CV", "onClick: " + queryAlbumUri(song.getAlbum()));
+        mediaPlaybackFragment.updateTime();
         Ischeck = true;
     }
-
+public boolean isPortraint(){
+    int orientation = this.getResources().getConfiguration().orientation;
+    if (orientation == Configuration.ORIENTATION_LANDSCAPE)
+        return true;
+    else return false;
+}
 
     public Uri queryAlbumUri(String imgUri) {
 
         final Uri artworkUri = Uri.parse("content://media/external/audio/albumart");
         return ContentUris.withAppendedId(artworkUri, Long.parseLong(imgUri));//noi them mSrcImageSong vao artworkUri
     }
+
     public void onClickPause() {
 
         mPlayPause.setOnClickListener(new View.OnClickListener() {
@@ -222,18 +240,17 @@ public class BaseSongListFragment extends Fragment implements  ItemClickListener
                 if (serviceMediaPlay != null) {
                     Log.d("HoangCV2", "onClick: " + serviceMediaPlay.isPlaying());
                 }
-                if (serviceMediaPlay!= null) {
+                if (serviceMediaPlay.isPlaying()) {
                     serviceMediaPlay.pauseMedia();
                     mPlayPause.setImageResource(R.drawable.ic_media_play_light);
                 } else {
-                    if(!Ischeck) {
+                    if (!Ischeck) {
                         try {
                             serviceMediaPlay.playMedia(songs.get(index));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                    }
-                    else {
+                    } else {
                         try {
                             serviceMediaPlay.playMedia(song);
                         } catch (IOException e) {
@@ -289,6 +306,16 @@ public class BaseSongListFragment extends Fragment implements  ItemClickListener
     }
 
 
+
+    public void LinearSmall(final ArrayList<Song> arrayList) {
+        if(!Ischeck)
+            mLinearLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    displayMediaFragment.onclick(arrayList.get(index));
+                }
+            });
+    }
 }
 
 

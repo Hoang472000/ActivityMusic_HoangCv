@@ -1,37 +1,22 @@
 package com.out.activitymusic;
 
-import android.content.ContentUris;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.database.Cursor;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 
-import android.widget.TextView;
-
-import java.io.IOException;
 import java.util.ArrayList;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SearchView;
-import androidx.fragment.app.Fragment;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+
 
 import Service.ServiceMediaPlay;
 
@@ -43,11 +28,13 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
     private ListAdapter mListAdapter;
     private SharedPreferences mSharePreferences;
     ArrayList<Song> songs;
-    ServiceMediaPlay serviceMediaPlay;
     DataFragment dataFragment;
     DisplayMediaFragment displayMediaFragment;
     MediaPlaybackFragment mediaPlaybackFragment;
+    ServiceMediaPlay serviceMediaPlay;
+
     private Boolean IsBoolean = false;
+    private static final int LOADER_UI_EVENT = 1;
 
     public void setBoolean(Boolean aBoolean) {
         IsBoolean = aBoolean;
@@ -65,27 +52,18 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
         super(displayMediaFragment, mediaPlaybackFragment);
         this.dataFragment = dataFragment;
         this.displayMediaFragment=displayMediaFragment;
+        this.mediaPlaybackFragment=mediaPlaybackFragment;
     }
 
     public AllSongsFragment() {
     }
 
 
-    UpdateUI UpdateUI;
-    int index;
-
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        Log.d("nhungltk12", "onActivityCreated: ");
-        super.onActivityCreated(savedInstanceState);
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        LoaderManager.getInstance(this).initLoader(1, null, this);
-      //  clickLinearLayout(displayMediaFragment);
+        LoaderManager.getInstance(this).initLoader(LOADER_UI_EVENT, null, this);
+        Log.d("HoangCVfg", "onCreateView: +");
         return super.onCreateView(inflater, container, savedInstanceState);
 
     }
@@ -93,7 +71,7 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
-        Log.d("nhungltk12", "onCreateLoader: ");
+        Log.d("HoangCVfg", "onCreateLoader: ");
         String[] projection = {MediaStore.Audio.Media._ID,
                 MediaStore.Audio.Media.ARTIST,
                 MediaStore.Audio.Media.TITLE,
@@ -109,13 +87,13 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("nhungltk12", "onCreate: ");
+        Log.d("HoangCVfg", "onCreate: ");
         //dataFragment.onclickData(songs);
     }
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-        Log.d("nhungltk12", "onLoadFinished: ");
+        Log.d("HoangCVfg", "onLoadFinished: ");
         mSharePreferences = getActivity().getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
 
         songs = new ArrayList<>();
@@ -160,16 +138,17 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
 
             } while (data.moveToNext());
         }
-        int orientation = this.getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE)
-            setListSongs(songs);
-        else   setListSongs(songs);
+        setListSongs(songs);
+        Log.d("Hoang123gCV", "onLoadFinished: "+songs);
+        LinearSmall(songs);
+      if(serviceMediaPlay!=null)  serviceMediaPlay.setListSong(songs);
+        mediaPlaybackFragment.setListSong(songs);
         dataFragment.onclickData(songs);
         mListAdapter=new ListAdapter(getContext(),songs,this);
-        mListAdapter.setmListSong(songs);
         setAdapter(mListAdapter);
         setListAdapter(mListAdapter);
-        setService(serviceMediaPlay);
+        Log.d("HoangCVfg", "onLoadFinished: "+mListAdapter);
+       // setService(serviceMediaPlay);
 
         Log.d("HoangCV4444", "onLoadFinished:+ songs " + songs);
 

@@ -103,7 +103,7 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d("HoangC10V", "onCreateView: " + "oncreate");
+        Log.d("nhungltkk", "onCreateView: " + "oncreate");
         View view = inflater.inflate(R.layout.mediaplaybackfragment, container, false);
         tv = view.findViewById(R.id.song1);
         time2 = view.findViewById(R.id.Time2);
@@ -126,11 +126,12 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
             @Override
             public void connectActivityAndBaseSong() {
                 if (((MainActivity) getActivity()).serviceMediaPlay != null) {
-                    Log.d("nhungltk", "onCreateView: " + "not null");
-                    setService((((MainActivity) getActivity()).serviceMediaPlay));
+                    serviceMediaPlay=((MainActivity) getActivity()).serviceMediaPlay;
+                    Log.d("nhungltkk", "onCreateView:+media "+serviceMediaPlay);//khong chay vao day
                 }
             }
         });
+        Log.d("nhungltkk", "onCreateView:+media "+serviceMediaPlay);
         int orientation = this.getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
             if(mQueue.getVisibility()==View.VISIBLE)
