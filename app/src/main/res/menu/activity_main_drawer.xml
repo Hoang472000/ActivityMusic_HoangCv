@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:menuCategory="container">
+        <item
+            android:id="@+id/favorite"
+            android:icon="@drawable/favorite_foreground"
+            android:title="Favorite"
+            ></item>
+        <item
+            android:id="@+id/List_music"
+            android:title="List Music"
+            android:icon="@drawable/ic_music_library_foreground"></item>
+
+    </group>
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_listen_now"

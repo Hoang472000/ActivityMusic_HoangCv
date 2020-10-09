@@ -78,7 +78,7 @@ public class UpdateUI {
         return index;
     }
 
-    public void UpdateShuffle(Boolean shuffle){
+/*    public void UpdateShuffle(Boolean shuffle){
         preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
 
         SharedPreferences.Editor editor= preferences.edit();
@@ -101,7 +101,7 @@ public class UpdateUI {
         preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
         int repeat = preferences.getInt("repeat", 2);
         return repeat;
-    }
+    }*/
     public void UpdateIsPlaying(Boolean isplaying){
         preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor= preferences.edit();

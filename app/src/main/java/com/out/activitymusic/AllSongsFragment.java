@@ -1,6 +1,7 @@
 package com.out.activitymusic;
 
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -8,7 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 import androidx.annotation.NonNull;
@@ -18,7 +18,7 @@ import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 
 
-import Service.ServiceMediaPlay;
+import Service.MediaPlaybackService;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -31,7 +31,7 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
     DataFragment dataFragment;
     DisplayMediaFragment displayMediaFragment;
     MediaPlaybackFragment mediaPlaybackFragment;
-    ServiceMediaPlay serviceMediaPlay;
+    MediaPlaybackService mediaPlaybackService;
 
     private Boolean IsBoolean = false;
     private static final int LOADER_UI_EVENT = 1;
@@ -44,8 +44,8 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
         return IsBoolean;
     }
 
-    public void setService(ServiceMediaPlay service) {
-        this.serviceMediaPlay = service;
+    public void setService(MediaPlaybackService service) {
+        this.mediaPlaybackService = service;
     }
 
     public AllSongsFragment(DataFragment dataFragment,DisplayMediaFragment displayMediaFragment,MediaPlaybackFragment mediaPlaybackFragment) {
@@ -141,12 +141,17 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
         setListSongs(songs);
         Log.d("Hoang123gCV", "onLoadFinished: "+songs);
         LinearSmall(songs);
-      if(serviceMediaPlay!=null)  serviceMediaPlay.setListSong(songs);
+      if(mediaPlaybackService !=null)  mediaPlaybackService.setListSong(songs);
         mediaPlaybackFragment.setListSong(songs);
         dataFragment.onclickData(songs);
         mListAdapter=new ListAdapter(getContext(),songs,this);
         setAdapter(mListAdapter);
         setListAdapter(mListAdapter);
+        if (isPortraint()){
+          //  mediaPlaybackService.setListSong(songs);
+           // mediaPlaybackFragment.setListSong(songs);
+            setListSongs(songs);
+        }
         Log.d("HoangCVfg", "onLoadFinished: "+mListAdapter);
        // setService(serviceMediaPlay);
 
@@ -158,7 +163,13 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
 
+    }public boolean isPortraint(){
+        int orientation = this.getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE)
+            return true;
+        else return false;
     }
+
 
    }
 

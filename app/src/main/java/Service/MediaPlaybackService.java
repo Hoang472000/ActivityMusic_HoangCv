@@ -19,11 +19,9 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.SeekBar;
-import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -39,7 +37,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 
-public class ServiceMediaPlay extends Service implements
+public class MediaPlaybackService extends Service implements
         MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener,
         MediaPlayer.OnInfoListener, MediaPlayer.OnBufferingUpdateListener,
 
@@ -66,6 +64,7 @@ public class ServiceMediaPlay extends Service implements
     MediaPlaybackFragment mediaPlaybackFragment;
     private Song song;
 
+
     public void setListSong(ArrayList<Song> mListSong) {
         this.ListSong = mListSong;
     }
@@ -83,6 +82,7 @@ public class ServiceMediaPlay extends Service implements
     String mTitle = "";
     String mArtistt = "";
     String mPotoMusic = "";
+    String mFile="";
 
     public void setMediaPlaybackFragment(MediaPlaybackFragment mediaPlaybackFragment) {
         this.mediaPlaybackFragment = mediaPlaybackFragment;
@@ -90,6 +90,15 @@ public class ServiceMediaPlay extends Service implements
     public String getNameSong(){
         return mTitle;
     }
+    public String getArtist(){return mArtistt; }
+    public String getPotoMusic(){
+        return mPotoMusic;
+    }
+
+    public String getFile() {
+        return mFile;
+    }
+
 
     @Override
     public void onCreate() {
@@ -155,8 +164,8 @@ public class ServiceMediaPlay extends Service implements
         Log.d("nhungltk123", "onCompletionSong: ");
         mediaPlayer.pause();
         //mediaPlayer.setOnCompletionListener(this);
-        if (!shuffle) shuffle = mUpdateUI.getShuffle();
-        if (repeat == -1) shuffle = mUpdateUI.getShuffle();
+  /*      if (!shuffle) shuffle = mUpdateUI.getShuffle();
+        if (repeat == -1) shuffle = mUpdateUI.getShuffle();*/
         int rtpos = possition;
         if (repeat != -1) {
             if (repeat == 1)
@@ -337,8 +346,8 @@ public class ServiceMediaPlay extends Service implements
 
 
     public class LocalBinder extends Binder {
-        public ServiceMediaPlay getService() {
-            return ServiceMediaPlay.this;
+        public MediaPlaybackService getService() {
+            return MediaPlaybackService.this;
         }
 
 
@@ -454,6 +463,7 @@ public class ServiceMediaPlay extends Service implements
         mTitle = song.getTitle();
         mArtistt = song.getArtist();
         mPotoMusic = song.getFile();
+        mFile=song.getFile();
         //  buildNotification(PlaybackStatus.PAUSED);
 
         showNotification(mTitle, mArtistt, mPotoMusic);
@@ -508,18 +518,19 @@ public class ServiceMediaPlay extends Service implements
     private boolean shuffle = false;
     private int repeat = -1;
     private Random rand;
-
-    public void setShuffle() {
-        if (shuffle) shuffle = false;
-        else shuffle = true;
-        mUpdateUI.UpdateShuffle(shuffle);
+public  boolean getShuffle(){
+    return shuffle;
+}
+    public void setShuffle(boolean shuffle) {
+        this.shuffle=shuffle;
+ //       mUpdateUI.UpdateShuffle(shuffle);
     }
-
-    public void setRepeat() {
-        if (repeat == -1) repeat = 0;
-        else if (repeat == 0) repeat = 1;
-        else repeat = -1;
-        mUpdateUI.UpdateRepeat(repeat);
+public int getRepeat(){
+    return repeat;
+}
+    public void setRepeat(int repeat) {
+        this.repeat=repeat;
+      //  mUpdateUI.UpdateRepeat(repeat);
 
     }
 
@@ -534,15 +545,15 @@ public class ServiceMediaPlay extends Service implements
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
-        Intent previousIntent = new Intent(this, ServiceMediaPlay.class);
+        Intent previousIntent = new Intent(this, MediaPlaybackService.class);
         previousIntent.setAction(ACTION_PERVIOUS);
         PendingIntent previousPendingIntent = null;
 
-        Intent playIntent = new Intent(this, ServiceMediaPlay.class);
+        Intent playIntent = new Intent(this, MediaPlaybackService.class);
         playIntent.setAction(ACTION_PLAY);
         PendingIntent playPendingIntent = null;
 
-        Intent nextIntent = new Intent(this, ServiceMediaPlay.class);
+        Intent nextIntent = new Intent(this, MediaPlaybackService.class);
         nextIntent.setAction(ACTION_NEXT);
         PendingIntent nextPendingIntent = null;
 

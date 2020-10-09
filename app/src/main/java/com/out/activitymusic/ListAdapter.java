@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import Service.ServiceMediaPlay;
+import Service.MediaPlaybackService;
 import es.claucookie.miniequalizerlibrary.EqualizerView;
 
 
@@ -38,11 +38,11 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
     private ImageView mPlayPause;
     private int mPosision,mPos;
     UpdateUI mUpdateUI;
-    private ServiceMediaPlay serviceMediaPlay;
+    private MediaPlaybackService mediaPlaybackService;
 
 
-    public void setService(ServiceMediaPlay serviceMediaPlay){
-        this.serviceMediaPlay= serviceMediaPlay;
+    public void setService(MediaPlaybackService mediaPlaybackService){
+        this.mediaPlaybackService = mediaPlaybackService;
     }
 
     public ListAdapter(){}

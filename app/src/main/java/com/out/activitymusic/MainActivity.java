@@ -1,17 +1,12 @@
 package com.out.activitymusic;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
 
 import android.annotation.SuppressLint;
@@ -27,21 +22,17 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
-import android.view.Menu;
 import android.view.MenuItem;
 
-import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 
-import Service.ServiceMediaPlay;
+import Service.MediaPlaybackService;
 
 public class MainActivity extends AppCompatActivity implements DisplayMediaFragment, DataFragment, NavigationView.OnNavigationItemSelectedListener {
     public static IntentFilter Broadcast_PLAY_NEW_AUDIO;
@@ -51,11 +42,11 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
     MediaPlaybackFragment mediaPlaybackFragment;
     private AppBarConfiguration mAppBarConfiguration;
 
-    public ServiceMediaPlay getPlayer() {
-        return serviceMediaPlay;
+    public MediaPlaybackService getPlayer() {
+        return mediaPlaybackService;
     }
 
-    public ServiceMediaPlay serviceMediaPlay;
+    public MediaPlaybackService mediaPlaybackService;
     boolean serviceBound = false;
     private Song song;
     private ArrayList<Song> mListSong;
@@ -67,15 +58,15 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
-            ServiceMediaPlay.LocalBinder binder = (ServiceMediaPlay.LocalBinder) service;
-            serviceMediaPlay = binder.getService();
-            Log.d("nhungltkk", "onServiceConnected: "+serviceMediaPlay);
-            serviceMediaPlay.setListSong(mListSong);
+            MediaPlaybackService.LocalBinder binder = (MediaPlaybackService.LocalBinder) service;
+            mediaPlaybackService = binder.getService();
+            Log.d("nhungltkk", "onServiceConnected: "+ mediaPlaybackService);
+            mediaPlaybackService.setListSong(mListSong);
             iConnectActivityAndBaseSong.connectActivityAndBaseSong();
             serviceBound = true;
-            if(serviceMediaPlay!=null){
-                allSongsFragment.setService(serviceMediaPlay);
-                mediaPlaybackFragment.setService(serviceMediaPlay);
+            if(mediaPlaybackService !=null){
+                allSongsFragment.setService(mediaPlaybackService);
+                mediaPlaybackFragment.setService(mediaPlaybackService);
             }
             Toast.makeText(MainActivity.this, "Service Bound", Toast.LENGTH_SHORT).show();
         }
@@ -154,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
             FragmentManager manager1 = this.getSupportFragmentManager();
             manager1.beginTransaction().replace(R.id.fragmentMediaTwo, mediaPlaybackFragment).commit();
         }
-        Intent intent = new Intent(this, ServiceMediaPlay.class);
+        Intent intent = new Intent(this, MediaPlaybackService.class);
         startService(intent);
         bindService(intent, serviceConnection, BIND_AUTO_CREATE);
         sharedPreferences = getSharedPreferences("login", MODE_PRIVATE);
@@ -222,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
 
     @Override
     public void onclick(Song song) {
-        Log.d("HoangCV7", "onSaveInstanceState: " + serviceMediaPlay);
+        Log.d("HoangCV7", "onSaveInstanceState: " + mediaPlaybackService);
         Log.d("HoangCV333", "onclick: "+(song.getID()-1));
         mediaPlaybackFragment = new MediaPlaybackFragment().newInstance(song);
         FragmentManager manager1 = this.getSupportFragmentManager();
@@ -231,7 +222,8 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
                 .replace(R.id.fragmentSongOne, mediaPlaybackFragment)
                 .commit();
         mediaPlaybackFragment.setListSong(mListSong);
-        serviceMediaPlay.setMediaPlaybackFragment(mediaPlaybackFragment);
+        mediaPlaybackFragment.setService(mediaPlaybackService);
+        mediaPlaybackService.setMediaPlaybackFragment(mediaPlaybackFragment);
     }
 
     @Override
@@ -240,8 +232,8 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
 
     }
 
-    public void setService(ServiceMediaPlay service) {
-        this.serviceMediaPlay = service;
+    public void setService(MediaPlaybackService service) {
+        this.mediaPlaybackService = service;
     }
 
     @Override
@@ -269,8 +261,8 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d("HoangCV7", "onPause: " + serviceMediaPlay);
-        setService(serviceMediaPlay);
+        Log.d("HoangCV7", "onPause: " + mediaPlaybackService);
+        setService(mediaPlaybackService);
     }
 
 }

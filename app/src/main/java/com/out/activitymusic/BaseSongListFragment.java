@@ -3,11 +3,8 @@ package com.out.activitymusic;
 import android.content.ContentUris;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.database.Cursor;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -29,7 +26,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import Service.ServiceMediaPlay;
+import Service.MediaPlaybackService;
 
 
 public class BaseSongListFragment extends Fragment implements ItemClickListener, SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener{
@@ -45,7 +42,7 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
     ImageView img, mImageSmall;
     private SharedPreferences mSharePreferences;
     ArrayList<Song> songs;
-    ServiceMediaPlay serviceMediaPlay;
+    MediaPlaybackService mediaPlaybackService;
     MediaPlaybackFragment mediaPlaybackFragment;
     private boolean Ischeck = false;
 
@@ -73,8 +70,8 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
         return IsBoolean;
     }
 
-    public void setService(ServiceMediaPlay service) {
-        this.serviceMediaPlay = service;
+    public void setService(MediaPlaybackService service) {
+        this.mediaPlaybackService = service;
     }
 
 
@@ -118,12 +115,12 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
         ((MainActivity) getActivity()).setiConnectActivityAndBaseSong(new MainActivity.IConnectActivityAndBaseSong() {
             @Override
             public void connectActivityAndBaseSong() {
-                if (((MainActivity) getActivity()).serviceMediaPlay != null) {
+                if (((MainActivity) getActivity()).mediaPlaybackService != null) {
                     Log.d("nhungltkk", "onCreateView: " + "not null");
-                    serviceMediaPlay = ((MainActivity) getActivity()).serviceMediaPlay;
+                    mediaPlaybackService = ((MainActivity) getActivity()).mediaPlaybackService;
          //           mListAdapter.setService(serviceMediaPlay);
-                     mediaPlaybackFragment.setService(serviceMediaPlay);
-                    Log.d("nhungltkk", "connectActivityAndBaseSong: " + serviceMediaPlay);
+                     mediaPlaybackFragment.setService(mediaPlaybackService);
+                    Log.d("nhungltkk", "connectActivityAndBaseSong: " + mediaPlaybackService);
                 }
             }
         });
@@ -134,18 +131,24 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
         title.setText(UpdateUI.getTitle());
         artist.setText(UpdateUI.getArtist());
         img.setImageURI(Uri.parse(UpdateUI.getAlbum()));
-        Log.d("HoangffwCV", "onCreateView: "+serviceMediaPlay);
+        Log.d("HoangCV7f", "onCreateView: "+song);
+        Log.d("HoangffwCV", "onCreateView: "+ mediaPlaybackService);
         if(isPortraint()){
             mLinearLayout.setVisibility(View.GONE);
+        //    mediaPlaybackFragment.setService(mediaPlaybackService);
+//            mediaPlaybackService.setListSong(songs);
+            mediaPlaybackFragment.updateTime();
+//            mediaPlaybackFragment.getText(songs.get(index));
         }
         else{
             mLinearLayout.setVisibility(View.VISIBLE);
             mLinearLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    serviceMediaPlay.setListSong(songs);
-                    mediaPlaybackFragment.setService(serviceMediaPlay);
+                    mediaPlaybackService.setListSong(songs);
+                    mediaPlaybackFragment.setService(mediaPlaybackService);
                     displayMediaFragment.onclick(song);
+                    mediaPlaybackFragment.updateUI();
                 }
             });
         }
@@ -154,8 +157,8 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
         onClickPause();
   //      clickLinearLayout();
 
-        if (serviceMediaPlay!=null) {
-            if (serviceMediaPlay.isPlaying())
+        if (mediaPlaybackService !=null) {
+            if (mediaPlaybackService.isPlaying())
                 mPlayPause.setImageResource(R.drawable.ic_pause_black_large);
             else
                 mPlayPause.setImageResource(R.drawable.ic_media_play_light);
@@ -192,23 +195,23 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
         this.song = song;
 
         Log.d("HoangCVfd", "onClick: " + songs);
-        Log.d("HoangCV", "onClick: 123");
+        Log.d("HoangCVfd", "onClick: 123"+ mediaPlaybackService);
         if (isPortraint()){
-            mediaPlaybackFragment.setService(serviceMediaPlay);
+            mediaPlaybackFragment.setService(mediaPlaybackService);
             mediaPlaybackFragment.setListSong(songs);
             mediaPlaybackFragment.getText(song);
             mediaPlaybackFragment.updateTime();
         }
-        if (serviceMediaPlay.isPlaying()) {
-            serviceMediaPlay.pauseMedia();
+        if (mediaPlaybackService.isPlaying()) {
+            mediaPlaybackService.pauseMedia();
             try {
-                serviceMediaPlay.playMedia(song);
+                mediaPlaybackService.playMedia(song);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else {
             try {
-                serviceMediaPlay.playMedia(song);
+                mediaPlaybackService.playMedia(song);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -218,6 +221,7 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
         img.setImageURI(queryAlbumUri(song.getAlbum()));
         mediaPlaybackFragment.updateTime();
         Ischeck = true;
+        updateUI();
     }
 public boolean isPortraint(){
     int orientation = this.getResources().getConfiguration().orientation;
@@ -237,29 +241,29 @@ public boolean isPortraint(){
         mPlayPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (serviceMediaPlay != null) {
-                    Log.d("HoangCV2", "onClick: " + serviceMediaPlay.isPlaying());
+                if (mediaPlaybackService != null) {
+                    Log.d("HoangCV2", "onClick: " + mediaPlaybackService.isPlaying());
                 }
-                if (serviceMediaPlay.isPlaying()) {
-                    serviceMediaPlay.pauseMedia();
+                if (mediaPlaybackService.isPlaying()) {
+                    mediaPlaybackService.pauseMedia();
                     mPlayPause.setImageResource(R.drawable.ic_media_play_light);
                 } else {
                     if (!Ischeck) {
                         try {
-                            serviceMediaPlay.playMedia(songs.get(index));
+                            mediaPlaybackService.playMedia(songs.get(index));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     } else {
                         try {
-                            serviceMediaPlay.playMedia(song);
+                            mediaPlaybackService.playMedia(song);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
 
                     mPlayPause.setImageResource(R.drawable.ic_pause_black_large);
-                    Log.d("HoangCV2", "onClick: " + serviceMediaPlay.isPlaying());
+                    Log.d("HoangCV2", "onClick: " + mediaPlaybackService.isPlaying());
 
                 }
             }
@@ -269,7 +273,7 @@ public boolean isPortraint(){
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("HoangCV10", "onResume: " + serviceMediaPlay);
+        Log.d("HoangCV10", "onResume: " + mediaPlaybackService);
     }
 
 
@@ -315,6 +319,20 @@ public boolean isPortraint(){
                     displayMediaFragment.onclick(arrayList.get(index));
                 }
             });
+    }
+    public void updateUI(){
+
+        if(mediaPlaybackService.getmMediaPlayer()!=null){
+            img.setImageURI(Uri.parse(UpdateUI.getAlbum()));
+            title.setText(mediaPlaybackService.getNameSong());
+            artist.setText(mediaPlaybackService.getArtist());
+            if(mediaPlaybackService.isPlaying()){
+                mPlayPause.setImageResource(R.drawable.ic_pause_black_large);
+            }else
+                mPlayPause.setImageResource(R.drawable.ic_media_play_light);
+            mListAdapter.notifyDataSetChanged();
+
+        }
     }
 }
 
