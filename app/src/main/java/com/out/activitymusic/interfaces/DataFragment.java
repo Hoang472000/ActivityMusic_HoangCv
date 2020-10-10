@@ -1,4 +1,4 @@
-package com.out.activitymusic;
+package com.out.activitymusic.interfaces;
 
 import android.widget.Adapter;
 

@@ -68,7 +68,10 @@ public class MediaPlaybackService extends Service implements
     public void setListSong(ArrayList<Song> mListSong) {
         this.ListSong = mListSong;
     }
-
+    private ArrayList<Song> listsong = new ArrayList<>();
+    public ArrayList<Song> getListsong() {
+        return listsong;
+    }
     private ArrayList<Song> ListSong;
     public  void setSong(Song song){
         this.song= song;

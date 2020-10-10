@@ -4,34 +4,27 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
 import androidx.navigation.ui.AppBarConfiguration;
-
-
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
-
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-
 import android.view.MenuItem;
-
 import android.widget.LinearLayout;
 import android.widget.Toast;
-
-
 import com.google.android.material.navigation.NavigationView;
-
+import com.out.activitymusic.interfaces.DataFragment;
+import com.out.activitymusic.interfaces.DisplayMediaFragment;
 import java.util.ArrayList;
-
 import Service.MediaPlaybackService;
 
 public class MainActivity extends AppCompatActivity implements DisplayMediaFragment, DataFragment, NavigationView.OnNavigationItemSelectedListener {
@@ -41,11 +34,15 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
     BaseSongListFragment baseSongListFragment;
     MediaPlaybackFragment mediaPlaybackFragment;
     private AppBarConfiguration mAppBarConfiguration;
+    private FavoriteSongsFragment mFavoriteSongsFragment;
+    private boolean mStatus=false;
 
     public MediaPlaybackService getPlayer() {
         return mediaPlaybackService;
     }
-
+    public MediaPlaybackService getMediaPlaybackService() {
+        return mediaPlaybackService;
+    }
     public MediaPlaybackService mediaPlaybackService;
     boolean serviceBound = false;
     private Song song;
@@ -54,20 +51,26 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
     private DrawerLayout mDrawerLayout;
     private LinearLayout mLinearLayout;
     private ListAdapter listAdapter= new ListAdapter();
+    private int possision;
+
+
+
+
+
+
+
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             MediaPlaybackService.LocalBinder binder = (MediaPlaybackService.LocalBinder) service;
             mediaPlaybackService = binder.getService();
-            Log.d("nhungltkk", "onServiceConnected: "+ mediaPlaybackService);
+
+            Log.d("onServiceConnected", "onServiceConnected: "+ mediaPlaybackService);
             mediaPlaybackService.setListSong(mListSong);
             iConnectActivityAndBaseSong.connectActivityAndBaseSong();
             serviceBound = true;
-            if(mediaPlaybackService !=null){
-                allSongsFragment.setService(mediaPlaybackService);
-                mediaPlaybackFragment.setService(mediaPlaybackService);
-            }
+            allSongsFragment.setService(mediaPlaybackService);
             Toast.makeText(MainActivity.this, "Service Bound", Toast.LENGTH_SHORT).show();
         }
 
@@ -76,7 +79,6 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
             serviceBound = false;
         }
     };
-    private int possision;
 
   /*  @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -96,8 +98,7 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
         super.onDestroy();
         if (serviceBound) {
             unbindService(serviceConnection);
-            //service is active
-            //player.stopSelf();
+
         }
     }
 
@@ -109,6 +110,11 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
         song.getFile();
     }
 
+    @Override
+    protected void onStart() {
+        startService();
+        super.onStart();
+    }
 
     @SuppressLint("WrongConstant")
     @Override
@@ -145,9 +151,7 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
             FragmentManager manager1 = this.getSupportFragmentManager();
             manager1.beginTransaction().replace(R.id.fragmentMediaTwo, mediaPlaybackFragment).commit();
         }
-        Intent intent = new Intent(this, MediaPlaybackService.class);
-        startService(intent);
-        bindService(intent, serviceConnection, BIND_AUTO_CREATE);
+
         sharedPreferences = getSharedPreferences("login", MODE_PRIVATE);
         /*Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -209,7 +213,11 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
     public void displayToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }*/
-
+public void startService(){
+        Intent intent = new Intent(this, MediaPlaybackService.class);
+        startService(intent);
+        bindService(intent, serviceConnection, BIND_AUTO_CREATE);
+    }
 
     @Override
     public void onclick(Song song) {
@@ -237,8 +245,23 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
     }
 
     @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        return false;
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        int id = menuItem.getItemId();
+        if (id == R.id.favorite) {
+            Toast.makeText(this, "favorite", Toast.LENGTH_SHORT).show();
+            mStatus=true;
+            mFavoriteSongsFragment = new FavoriteSongsFragment( mediaPlaybackService.getListsong(), mediaPlaybackService);
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragmentSongOne, mFavoriteSongsFragment).commit();
+            mDrawerLayout= findViewById(R.id.drawer_layout);
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+
+        } else if (id == R.id.List_music) {
+            mStatus=false;
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragmentSongOne, allSongsFragment).commit();
+            mDrawerLayout= findViewById(R.id.drawer_layout);
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+        }
+        return true;
     }
 
     //Bkav Nhungltk

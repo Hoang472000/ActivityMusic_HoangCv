@@ -1,8 +1,10 @@
 package com.out.activitymusic;
 
+import android.content.ContentValues;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -17,6 +19,10 @@ import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 
+
+import com.out.activitymusic.database.FavoriteSongsProvider;
+import com.out.activitymusic.interfaces.DataFragment;
+import com.out.activitymusic.interfaces.DisplayMediaFragment;
 
 import Service.MediaPlaybackService;
 
@@ -48,7 +54,7 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
         this.mediaPlaybackService = service;
     }
 
-    public AllSongsFragment(DataFragment dataFragment,DisplayMediaFragment displayMediaFragment,MediaPlaybackFragment mediaPlaybackFragment) {
+    public AllSongsFragment(DataFragment dataFragment, DisplayMediaFragment displayMediaFragment, MediaPlaybackFragment mediaPlaybackFragment) {
         super(displayMediaFragment, mediaPlaybackFragment);
         this.dataFragment = dataFragment;
         this.displayMediaFragment=displayMediaFragment;
@@ -121,20 +127,19 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
                 artist = song.getArtist();
                 duration = song.getDuration();
                 songs.add(new Song(id, title, file, album, artist, duration));
-                //    Log.d("nhungltk12", "onLoadFinished: " + title);
 
 
-               /* if (isCreate == false) {
+                if (isCreate == true) {
                     ContentValues values = new ContentValues();
                     values.put(FavoriteSongsProvider.ID_PROVIDER, id);
                     values.put(FavoriteSongsProvider.FAVORITE, 0);
                     values.put(FavoriteSongsProvider.COUNT, 0);
-                    Uri uri = getActivity().getContentResolver().insert(Uri.parse(FavoriteSongsProvider.CONTENT_URI), values);
+                    Uri uri = getActivity().getContentResolver().insert(FavoriteSongsProvider.CONTENT_URI, values);
                     mSharePreferences = getActivity().getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
                     SharedPreferences.Editor editor = mSharePreferences.edit();
-                    editor.putBoolean("create_db", true);
+                    editor.putBoolean("create_db", false);
                     editor.commit();
-                }*/
+                }
 
             } while (data.moveToNext());
         }

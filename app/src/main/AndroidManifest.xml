@@ -38,7 +38,9 @@
 
         </activity>
         <service android:name="Service.MediaPlaybackService"/>
-
+        <provider
+            android:name=".database.FavoriteSongsProvider"
+            android:authorities="com.out.activitymusic.database.FavoriteSongsProvider" />
 
     </application>
 

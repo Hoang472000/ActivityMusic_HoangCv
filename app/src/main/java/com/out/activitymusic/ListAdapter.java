@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.out.activitymusic.interfaces.ItemClickListener;
+
 import Service.MediaPlaybackService;
 import es.claucookie.miniequalizerlibrary.EqualizerView;
 
@@ -46,7 +48,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
     }
 
     public ListAdapter(){}
-    public ListAdapter(Context context, ArrayList<Song> ListView,ItemClickListener itemClickListener) {
+    public ListAdapter(Context context, ArrayList<Song> ListView, ItemClickListener itemClickListener) {
         mInflater = LayoutInflater.from(context);
         this.itemClickListener = itemClickListener;
         this.mListSong = ListView;

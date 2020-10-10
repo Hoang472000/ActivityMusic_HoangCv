@@ -23,6 +23,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.out.activitymusic.interfaces.DisplayMediaFragment;
+import com.out.activitymusic.interfaces.ItemClickListener;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -137,7 +140,7 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
             mLinearLayout.setVisibility(View.GONE);
         //    mediaPlaybackFragment.setService(mediaPlaybackService);
 //            mediaPlaybackService.setListSong(songs);
-            mediaPlaybackFragment.updateTime();
+//            mediaPlaybackFragment.updateTime();
 //            mediaPlaybackFragment.getText(songs.get(index));
         }
         else{

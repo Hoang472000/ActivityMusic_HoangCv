@@ -1,4 +1,4 @@
-package com.out.activitymusic;
+package com.out.activitymusic.notification;
 
 import android.app.Application;
 import android.app.NotificationChannel;
