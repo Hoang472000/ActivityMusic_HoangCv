@@ -113,25 +113,6 @@ public class UpdateUI {
         Boolean isplaying = preferences.getBoolean("isplaying", false);
         return isplaying;
     }
-//    public void UpdateSeekbar(Song song){
-//        preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
-//
-//        SharedPreferences.Editor editor= preferences.edit();
-//        editor.putLong("seekbar",0);
-////        editor.putString("duration",song.getDuration());
-//        editor.apply();
-//    }
-//    public Song getSeekbar(){
-//        preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
-//
-//        long seekbar = preferences.getLong("seekbar", 0);
-//        Song song=new Song();
-//        song.setTitle(preferences.getString("duration",null));
-//
-//        return song;
-//    }
-//
-//
     public void UpdateDuration(int Duration){
         preferences= context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();

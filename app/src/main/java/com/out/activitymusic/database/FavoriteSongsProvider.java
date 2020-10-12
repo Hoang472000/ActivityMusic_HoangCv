@@ -18,22 +18,22 @@ import java.util.HashMap;
 
 public class FavoriteSongsProvider extends ContentProvider {
 
-    private static final String DB_SONGS = "db_songs1";
-    private static final String AUTHORITY = "com.out.activitymusic.database.FavoriteSongsProvider";
+    private static final String DB_SONGS = "db_songs";
+    public static final String AUTHORITY = "com.out.activitymusic.database.FavoriteSongsProvider";
     private static final int DB_VESION = 1;
     static final String CONTENT_PATH = "favoritesongs";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + CONTENT_PATH);
 
     private static final String TABLE_FAVORITESONGS = "favoritesongs";
-    static final String ID_FAVORITE = "id";
+    static final String ID = "id";
     public static final String ID_PROVIDER ="id_provider";
-    public static final String FAVORITE = "is_favorite";
-    public static final String COUNT = "count_of_play";
+    public static final String IS_FAVORITE = "is_favorite";
+    public static final String COUNT_OF_PLAY = "count_of_play";
     static final String CREATE_TABLE_FAVORITESONGS =
-            "create table " + TABLE_FAVORITESONGS + "( "+ID_FAVORITE+" integer primary key autoincrement," +
+            "create table " + TABLE_FAVORITESONGS + "( "+ ID +" integer primary key autoincrement," +
                     ID_PROVIDER + " integer ,"+
-                    FAVORITE + " integer default 0, " + //  0 : not like // 1 : stop like // 2 : like
-                    COUNT + " integer default 0  );"; // number click // if count =3 => is_favorite=1 expect  is_favorite=1
+                    IS_FAVORITE + " integer default 0, " + //  0 : not like // 1 : stop like // 2 : like
+                    COUNT_OF_PLAY + " integer default 0  );"; // number click // if count =3 => is_favorite=1 expect  is_favorite=1
 
     private static HashMap<String, String> HASMAP;
     private static UriMatcher sUriMatcher;
@@ -86,14 +86,13 @@ public class FavoriteSongsProvider extends ContentProvider {
                 queryBuilder.setProjectionMap(HASMAP);
                 break;
             case URI_ONE_ITEM_CODE:
-                queryBuilder.appendWhere(ID_FAVORITE+"="+uri.getPathSegments().get(1));
+                queryBuilder.appendWhere(ID +"="+uri.getPathSegments().get(1));
                 break;
             default:
-
-
+       //         throw new IllegalArgumentException("Unknown URI " + uri);
         }
         if (orderBy == null || orderBy == "") {
-            orderBy = ID_FAVORITE;
+            orderBy = ID;
         }
         Cursor cursor = queryBuilder.query(database, projection, seclection, seclectionArg, null, null, orderBy);
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
@@ -104,11 +103,11 @@ public class FavoriteSongsProvider extends ContentProvider {
     public String getType(Uri uri) {
         switch (sUriMatcher.match(uri)) {
             case URI_ALL_ITEM_CODE:
-                return "vnd.android.cursor.dir/vnd.com.out.activitymusic.database.FavoriteSongsProvider." + CONTENT_PATH;
+                return "vnd.android.cursor.dir/vnd.com.out.activitymusic.database." + CONTENT_PATH;
             case URI_ONE_ITEM_CODE:
-                return "vnd.android.cursor.item/vnd.com.out.activitymusic.database.FavoriteSongsProvider." + CONTENT_PATH;
+                return "vnd.android.cursor.item/vnd.com.out.activitymusic.database." + CONTENT_PATH;
             default:
-                throw new IllegalArgumentException("Unsupported" + uri);
+                throw new IllegalArgumentException("Unsupported URI: " + uri);
         }
     }
 
@@ -127,8 +126,26 @@ public class FavoriteSongsProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] slectionArg) {
-        // return mFavoriteSongsDatabase.delete(selection, slectionArg);
-        return 0;
+        int count = 0;
+        switch (sUriMatcher.match(uri)){
+            case URI_ALL_ITEM_CODE:
+                // Truong hop xoa toan bo notes
+                count = database.delete(TABLE_FAVORITESONGS, selection, slectionArg);
+                break;
+
+            case URI_ONE_ITEM_CODE:
+                // Truong hop xoa 1 note
+                String id = uri.getPathSegments().get(1);
+                count = database.delete( TABLE_FAVORITESONGS, ID +  " = " + id +
+                        (!TextUtils.isEmpty(selection) ? " AND (" + selection + ')' : ""), slectionArg);
+                break;
+
+            default:
+                throw new IllegalArgumentException("Unknown URI " + uri);
+        }
+        // Notify cho cac thanh phan lang nghe
+        getContext().getContentResolver().notifyChange(uri, null);
+        return count;
     }
 
     @Override
@@ -141,10 +158,10 @@ public class FavoriteSongsProvider extends ContentProvider {
                 break;
             case URI_ONE_ITEM_CODE:
                 count= database.update(TABLE_FAVORITESONGS,contentValues,
-                        ID_FAVORITE +" = "+uri.getPathSegments().get(1)+(!TextUtils.isEmpty(selection)?"AND ("+selection +')':""),selectionArg);
+                        ID +" = "+uri.getPathSegments().get(1)+(!TextUtils.isEmpty(selection)?"AND ("+selection +')':""),selectionArg);
                 break;
             default:
-                //throw new IllegalAccessException("Unknow URI "+uri);
+                throw new IllegalArgumentException("Unknown URI " + uri );
         }
         getContext().getContentResolver().notifyChange(uri,null);
         return count;

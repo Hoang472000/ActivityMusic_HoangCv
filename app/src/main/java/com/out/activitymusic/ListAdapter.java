@@ -1,5 +1,6 @@
 package com.out.activitymusic;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.util.Log;
@@ -15,19 +16,19 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.out.activitymusic.database.FavoriteSongsProvider;
 import com.out.activitymusic.interfaces.ItemClickListener;
+
+import java.util.ArrayList;
 
 import Service.MediaPlaybackService;
 import es.claucookie.miniequalizerlibrary.EqualizerView;
 
 
-public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> implements Filterable,PopupMenu.OnMenuItemClickListener {
+public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> implements Filterable {
     private ArrayList<Song> mListSong;
     private ArrayList<Song> listSongFull;
     private LayoutInflater mInflater;
@@ -38,21 +39,22 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
     private ItemClickListener itemClickListener;
     private ImageView image;
     private ImageView mPlayPause;
-    private int mPosision,mPos;
+    private int mPosision, mPos;
     UpdateUI mUpdateUI;
-    private MediaPlaybackService mediaPlaybackService;
+    public MediaPlaybackService mediaPlaybackService;
 
-
-    public void setService(MediaPlaybackService mediaPlaybackService){
+    public void setService(MediaPlaybackService mediaPlaybackService) {
         this.mediaPlaybackService = mediaPlaybackService;
     }
 
-    public ListAdapter(){}
+    public ListAdapter() {
+    }
+
     public ListAdapter(Context context, ArrayList<Song> ListView, ItemClickListener itemClickListener) {
         mInflater = LayoutInflater.from(context);
         this.itemClickListener = itemClickListener;
         this.mListSong = ListView;
-        listSongFull=new ArrayList<>(ListView);
+        listSongFull = new ArrayList<>(ListView);
         mContext = context;
     }
 
@@ -62,67 +64,90 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
         View mItemView = mInflater.inflate(R.layout.list_view, parent, false);
         playMediaSong = mInflater.inflate(R.layout.allsongsfragment, parent, false);
         mLinearLayout = playMediaSong.findViewById(R.id.bottom);
-        mPlayPause=playMediaSong.findViewById(R.id.play_pause);
+        mPlayPause = playMediaSong.findViewById(R.id.play_pause);
         allSongsFragment = new AllSongsFragment();
-        image= (ImageView) mItemView.findViewById(R.id.menu_pop);
-        mUpdateUI= new UpdateUI(mContext);
-        mPos=mUpdateUI.getCurrentPossision();
-        Popmenu();
+        image = (ImageView) mItemView.findViewById(R.id.menu_pop);
+        mUpdateUI = new UpdateUI(mContext);
+        mPos = mUpdateUI.getCurrentPossision();
         Log.d("HoangCV6", "onCreateViewHolder: ");
         return new ViewHolder(mItemView, this);
-
     }
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
-        Log.d("HoangCV6", "onBindViewHolder: position"+position);
-        Log.d("HoangCV6", "onBindViewHolder: mPosision"+mPosision);
         final Song mCurrent = mListSong.get(position);
-
         holder.mId.setText((position + 1) + "");
         holder.mTitle.setText(mCurrent.getTitle());
         holder.mDuration.setText(getDurationTime(mCurrent.getDuration()));
-
-//        String mCurrent1=mListSTT.get(position);
-
-        if(position==mPosision) {
-            Log.d("HoangCV12345", "onBindViewHolder: holder: "+holder);
+        holder.image.setImageResource(R.drawable.ic_more_vert);
+        Log.d("HoangCV555", "onBindViewHolder: "+mediaPlaybackService);
+        if (mediaPlaybackService!=null)
+            if((mediaPlaybackService.getNameSong()).equals(mListSong.get(position).getTitle())==true){
+            Log.d("HoangCV12345", "onBindViewHolder: holder: " + holder);
             holder.mId.setVisibility(View.INVISIBLE);
             holder.mTitle.setTypeface(null, Typeface.BOLD);
             holder.mEqualizer.animateBars();
             holder.mEqualizer.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             holder.mId.setVisibility(View.VISIBLE);
             holder.mTitle.setTypeface(null, Typeface.NORMAL);
-       //     holder.mEqualizer.animateBars();
+            //     holder.mEqualizer.animateBars();
             holder.mEqualizer.setVisibility(View.INVISIBLE);
         }
+        holder.image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PopupMenu popupMenu = new PopupMenu(mContext, holder.image);
+                popupMenu.inflate(R.menu.poupup_menu);
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        switch (menuItem.getItemId()) {
+                            case R.id.add_song_favorite:
+                                ContentValues values = new ContentValues();
+                                values.put(FavoriteSongsProvider.IS_FAVORITE, 2);
+                                mContext.getContentResolver().update(FavoriteSongsProvider.CONTENT_URI, values, FavoriteSongsProvider.ID_PROVIDER + "= " + mListSong.get(mPosision).getID(), null);
+                                Toast.makeText(mContext, "addFavorite song //" + mListSong.get(mPosision).getTitle(), Toast.LENGTH_SHORT).show();
+                                return true;
+                            case R.id.remove_song_favorite:
+                                ContentValues values1 = new ContentValues();
+                                values1.put(FavoriteSongsProvider.IS_FAVORITE, 1);
+                                values1.put(FavoriteSongsProvider.COUNT_OF_PLAY, 0);
+                                mContext.getContentResolver().update(FavoriteSongsProvider.CONTENT_URI, values1, FavoriteSongsProvider.ID_PROVIDER + "= " + mListSong.get(mPosision).getID(), null);
+                                Toast.makeText(mContext, "removeFavorite song //" + mListSong.get(mPosision).getTitle(), Toast.LENGTH_SHORT).show();
+                                return true;
+                            default:
+                                return false;
+                        }
+                    }
+
+                });
+                popupMenu.show();
+            }
+        });
     }
 
     @Override
     public Filter getFilter() {
-
         return exampleFilter;
     }
+
     private Filter exampleFilter = new Filter() {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             ArrayList<Song> filterdList = new ArrayList<>();
-            if (constraint== null || constraint.length()==0){
+            if (constraint == null || constraint.length() == 0) {
                 filterdList.addAll(listSongFull);
-            }else {
+            } else {
                 String filterPattern = constraint.toString().toLowerCase().trim();
-
-                for (Song item: listSongFull){
-                    if (item.getTitle().toLowerCase().contains(filterPattern)){
+                for (Song item : listSongFull) {
+                    if (item.getTitle().toLowerCase().contains(filterPattern)) {
                         filterdList.add(item);
                     }
                 }
             }
             FilterResults results = new FilterResults();
-            results.values= filterdList;
-
+            results.values = filterdList;
             return results;
         }
 
@@ -134,20 +159,18 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
         }
     };
 
-
-
     private String getDurationTime(String str) {
         int mili = Integer.parseInt(str) / 1000;
         int phut = mili / 60;
         int giay = mili % 60;
-        if (giay<10)
+        if (giay < 10)
             return String.valueOf(phut) + ":0" + String.valueOf(giay);
         else return String.valueOf(phut) + ":" + String.valueOf(giay);
     }
 
     @Override
     public int getItemCount() {
-        Log.d("HoangCVff", "getItemCount: "+mListSong);
+        Log.d("HoangC1Vff", "getItemCount: " + mListSong.size());
         return mListSong.size();
     }
 
@@ -159,6 +182,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
         public TextView mDuration;
         final ListAdapter mAdapter;
         public TextView mId;
+        public ImageView image;
         private UpdateUI mUpdateUI;
 
         public ViewHolder(@NonNull View itemView, ListAdapter adapter) {
@@ -166,51 +190,24 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
             Log.d("HoangCV6", "ViewHolder: ");
             this.mAdapter = adapter;
             mEqualizer = itemView.findViewById(R.id.equalizer);
-            mId=itemView.findViewById(R.id.STT);
+            mId = itemView.findViewById(R.id.STT);
             mTitle = itemView.findViewById(R.id.music);
             mDuration = itemView.findViewById(R.id.tvTime);
+            image = itemView.findViewById(R.id.menu_pop);
             itemView.setOnClickListener(this);
 
         }
 
         @Override
         public void onClick(View view) {
-            Log.d("HoangCV62", "onClick: "+mListSong);
+            Log.d("HoangCV62", "onClick: " + mListSong);
 
-            mPosision=Integer.parseInt(String.valueOf(mId.getText()))-1;
-            Log.d("HoangCV62", "onClick: "+mListSong.get(mPosision));
+            mPosision = Integer.parseInt(String.valueOf(mId.getText())) - 1;
+            Log.d("HoangCV62", "onClick: " + mListSong.get(mPosision));
             itemClickListener.onClick(mListSong.get(mPosision));
             notifyDataSetChanged();
         }
     }
-
-    public void Popmenu(){
-        image.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                PopupMenu popup = new PopupMenu(mContext,view);
-                popup.setOnMenuItemClickListener(ListAdapter.this );
-                popup.inflate(R.menu.poupup_menu);
-                popup.show();
-            }
-        });
-    }
-    @Override
-    public boolean onMenuItemClick(MenuItem menuItem) {
-        Toast.makeText(mContext,"Hoang"+menuItem.getTitle(), Toast.LENGTH_SHORT).show();
-        switch (menuItem.getItemId()) {
-            case R.id.add_song_favorite:
-                // do your code
-                return true;
-            case R.id.remove_song_favorite:
-                // do your code
-                return true;
-            default:
-                return false;
-        }
-    }
-
-
 
 }
 

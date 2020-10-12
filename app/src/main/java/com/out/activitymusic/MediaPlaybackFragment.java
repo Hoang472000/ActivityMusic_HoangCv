@@ -4,10 +4,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
-import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -15,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -22,16 +20,18 @@ import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
-import android.view.MenuItem;
-import android.widget.Toast;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+
 import Service.MediaPlaybackService;
 
 public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuItemClickListener, View.OnClickListener {
@@ -59,13 +59,15 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
 
 
     public MediaPlaybackFragment newInstance(Song song) {
+        SimpleDateFormat formatTime = new SimpleDateFormat("mm:ss");
         MediaPlaybackFragment fragment = new MediaPlaybackFragment();
         Bundle bundle = new Bundle();
         bundle.putSerializable("audio", song);
         bundle.putString("song", song.getTitle());
-        bundle.putString("song1", getDurationTime1(song.getDuration()));
+        bundle.putString("artist1", song.getArtist());
+        bundle.putString("song1", formatTime.format(Integer.valueOf(song.getDuration())));
         bundle.putString("song2", String.valueOf(queryAlbumUri(song.getAlbum())));
-        Log.d("HoangC1V", "newInstance: " + bundle);
+        Log.d("HoangC1Vv", "newInstance: " + bundle);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -97,7 +99,6 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
         if (mediaPlaybackService != null) {
             mediaPlaybackService = getActivityMusic().getMediaPlaybackService();
         }
-
     }
 
     @Override
@@ -106,10 +107,6 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
     }
 
     UpdateUI mUpdateUI;
-    boolean shuffler;
-    boolean isShuff = true;
-    int repeat = 1;
-    int isRepeat = -1;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -125,6 +122,7 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
 
         View view = inflater.inflate(R.layout.mediaplaybackfragment, container, false);
         mNameSong = view.findViewById(R.id.song1);
+        mArtist = view.findViewById(R.id.artist1);
         time2 = view.findViewById(R.id.Time2);
         time1 = view.findViewById(R.id.Time1);
         img = view.findViewById(R.id.picture_small);
@@ -148,44 +146,23 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
         mShuffle.setOnClickListener(this);
         mRepeat.setOnClickListener(this);
 
-
-        updateUI();
-
         if (isPortraint()) {
             if (mQueue.getVisibility() == View.VISIBLE)
                 mQueue.setVisibility(View.INVISIBLE);
+            updateUI();
         }
+        SimpleDateFormat formatTime = new SimpleDateFormat("mm:ss");
         mUpdateUI = new UpdateUI(getContext());
-/*        shuffler = mUpdateUI.getShuffle();
-        repeat = mUpdateUI.getRepeat();*/
-        //       if(!serviceMediaPlay.isPlaying())
         mNameSong.setText(mUpdateUI.getTitle());
+        mArtist.setText(mUpdateUI.getArtist());
         img.setImageURI(Uri.parse(mUpdateUI.getAlbum()));
         imgBig.setBackground(setImgBig(mUpdateUI.getAlbum()));
-        time2.setText(getDurationTime1(String.valueOf(mUpdateUI.getDuration())));
+        time2.setText(formatTime.format(mUpdateUI.getDuration()));
 
-        Log.d("HoangCV1234567", "onCreateView: " + song);
-        if (mediaPlaybackService != null) {
-            if (mediaPlaybackService.getShuffle() == true) {
-                mShuffle.setImageResource(R.drawable.ic_play_shuffle_orange);
-            } else mShuffle.setImageResource(R.drawable.ic_shuffle_white);
-            if (mediaPlaybackService.getRepeat() == 1) {
-                mRepeat.setImageResource(R.drawable.ic_repeat_one_song_dark);
-            } else if (mediaPlaybackService.getRepeat() == 0) {
-                mRepeat.setImageResource(R.drawable.ic_repeat_dark_selected);
-            } else {
-                mRepeat.setImageResource(R.drawable.ic_repeat_white);
-            }
-        }
-/*
-        if (!serviceMediaPlay.isPlaying())
-           mPlayPauseMedia.setImageResource(R.drawable.ic_baseline_play_circle_filled_24);
-        else  mPlayPauseMedia.setImageResource(R.drawable.ic_baseline_pause_circle_filled_24);*/
         if (getArguments() != null) {
             setText(getArguments());
         }
         Popmenu();
-//        mSeekBar.setMax(serviceMediaPlay.getDuration());
         mSeekBar.setMax(mUpdateUI.getDuration());
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -195,52 +172,44 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
                 }
                 time1.setText(getDurationTime1(String.valueOf(progress)));
             }
-
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
             }
-
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 mediaPlaybackService.getmMediaPlayer().seekTo(seekBar.getProgress());
             }
         });
-        if(isPortraint()){
-            //updateTime();/////////////////////////////////////////
-            }
 
         if (mediaPlaybackService != null) {
             mSeekBar.setMax(mUpdateUI.getDuration());
-            updateTime();
             updateUI();
+            updateTime();
         }
         return view;
     }
 
     public void getText(Song song) {
-        if (mediaPlaybackService != null)
-            time1.setText(getDurationTime1(String.valueOf(mUpdateUI.getCurrentPossision())));
+        SimpleDateFormat formatTime = new SimpleDateFormat("mm:ss");
         this.song = song;
         mNameSong.setText(song.getTitle());
-        time2.setText(getDurationTime1(song.getDuration()));
+        mArtist.setText(song.getArtist());
+        time2.setText(formatTime.format(Integer.valueOf(song.getDuration())));
         img.setImageURI(queryAlbumUri(song.getAlbum()));
         String pathName = String.valueOf(queryAlbumUri(song.getAlbum()));
         imgBig.setBackground(setImgBig(pathName));
-        //      mSeekBar.setMax(serviceMediaPlay.getDuration());
+        mSeekBar.setMax(mediaPlaybackService.getDuration());
     }
 
     public void setText(Bundle bundle) {
-        if (mediaPlaybackService != null)
-            time1.setText(getDurationTime1(String.valueOf(mUpdateUI.getCurrentPossision())));
         mNameSong.setText(bundle.getString("song"));
+        mArtist.setText(bundle.getString("artist1"));
         time2.setText(bundle.getString("song1"));
         img.setImageURI(Uri.parse(bundle.getString("song2")));
-        this.song = (Song) bundle.getSerializable("audio");
+        //this.song = (Song) bundle.getSerializable("audio");
         String pathName = bundle.getString("song2");
         imgBig.setBackground(setImgBig(pathName));
     }
-
     public Drawable setImgBig(String pathName) {
         Uri uri = Uri.parse(pathName);
         Drawable yourDrawable = null;
@@ -248,7 +217,7 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
             InputStream inputStream = getContext().getContentResolver().openInputStream(uri);
             yourDrawable = Drawable.createFromStream(inputStream, pathName);
         } catch (IOException e) {
-            yourDrawable = getResources().getDrawable(R.drawable.ic_launcher_background);
+            yourDrawable = getResources().getDrawable(R.drawable.default_cover_art);
             e.printStackTrace();
         }
         return yourDrawable;
@@ -267,7 +236,6 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
     }
 
     public Uri queryAlbumUri(String imgUri) {
-
         final Uri artworkUri = Uri.parse("content://media/external/audio/albumart");
         return ContentUris.withAppendedId(artworkUri, Long.parseLong((imgUri)));//noi them imgUri vao artworkUri
     }
@@ -329,7 +297,6 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
                 }
                 break;
             }
-
             case R.id.play_next: {
                 mediaPlaybackService.nextMedia();
                 getText(mListSong.get(mediaPlaybackService.getPossision()));
@@ -341,7 +308,7 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
                 mDisLike.setImageResource(R.drawable.ic_thumbs_down_selected);
                 break;
             case R.id.shuffle: {
-                if (mediaPlaybackService.getShuffle() == false) {
+                if (!mediaPlaybackService.getShuffle()) {
                     mShuffle.setImageResource(R.drawable.ic_play_shuffle_orange);
                     mediaPlaybackService.setListSong(mListSong);
                     mediaPlaybackService.setShuffle(true);
@@ -369,29 +336,28 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
         }
     }
 
-    private Bitmap getAlbum(String path) {
+   /* private Bitmap getAlbum(String path) {
         MediaMetadataRetriever metadataRetriever = new MediaMetadataRetriever();
         metadataRetriever.setDataSource(path);
         byte[] data = metadataRetriever.getEmbeddedPicture();
         return data == null ? null : BitmapFactory.decodeByteArray(data, 0, data.length);
-    }
+    }*/
 
     public void updateUI() {
 
-        Log.d("okokokok", "updateUI");
+        Log.d("okokokok1", "updateUI");
         if (mediaPlaybackService != null && mSeekBar != null) {
             if (mediaPlaybackService.getmMediaPlayer() != null) {
                 mSeekBar.setMax(mediaPlaybackService.getDuration());
                 mNameSong.setText(mediaPlaybackService.getNameSong());
-//                mArtist.setText(mediaPlaybackService.getArtist());
-                Bitmap bitmap = getAlbum(mediaPlaybackService.getPotoMusic());
-                imgBig.setBackground(setImgBig(mediaPlaybackService.getPotoMusic()));
-                img.setImageBitmap(bitmap);
+                mArtist.setText(mediaPlaybackService.getArtist());
+                img.setImageURI(queryAlbumUri(mediaPlaybackService.getPotoMusic()));
+                String pathName = String.valueOf(queryAlbumUri(mediaPlaybackService.getPotoMusic()));
+                imgBig.setBackground(setImgBig(pathName));
                 SimpleDateFormat formmatTime = new SimpleDateFormat("mm:ss");
                 time2.setText(formmatTime.format(mediaPlaybackService.getDuration()));
                 if (mediaPlaybackService.isPlaying()) {
                     mPlayPauseMedia.setImageResource(R.drawable.ic_baseline_pause_circle_filled_24);
-
                 } else {
                     mPlayPauseMedia.setImageResource(R.drawable.ic_baseline_play_circle_filled_24);
                 }
@@ -412,11 +378,10 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
         }
     }
 
-
     public void updateTime() {
-        Log.d("okokokok", "updateTime");
+        Log.d("HoangCgV7e", "updateTime");
         final Handler handler = new Handler();
-        if (song != null)
+        if (song != null || mListSong!=null)
             handler.postDelayed(new Runnable() {
                 @RequiresApi(api = Build.VERSION_CODES.N)
                 @Override
@@ -424,13 +389,16 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
                     SimpleDateFormat formatTime = new SimpleDateFormat("mm:ss");
                     time1.setText(formatTime.format(mediaPlaybackService.getCurrentStreamPosition()));
                     mSeekBar.setProgress(mediaPlaybackService.getCurrentStreamPosition());
+                    Log.d("okokokok1", "run: " + mediaPlaybackService.getCurrentStreamPosition());
+
                     mediaPlaybackService.getmMediaPlayer().setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                         @Override
                         public void onCompletion(MediaPlayer mediaPlayer) {
                             try {
+                                Log.d("HoangCgV7e", "onCompletion: "+mediaPlaybackService);
                                 mediaPlaybackService.onCompletionSong();
                                 mSeekBar.setMax(mediaPlaybackService.getDuration());
-                                //  updateUI();
+                                  updateUI();
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }

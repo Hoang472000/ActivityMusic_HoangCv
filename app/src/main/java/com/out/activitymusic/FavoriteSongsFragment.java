@@ -33,29 +33,28 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        getLoaderManager().initLoader(LOADER_ID,null,this);
+        LoaderManager.getInstance(this).initLoader(LOADER_ID,null,this);
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
-        String URL = "content://com.bkav.provider";
+        String URL = "content://com.out.activitymusic.database.FavoriteSongsProvider";
         Uri uriSongs = Uri.parse(URL);
-        String selection= FavoriteSongsProvider.FAVORITE+"==2";
+        String selection= FavoriteSongsProvider.IS_FAVORITE +"==2";
         return new CursorLoader(getContext(),uriSongs, null, selection, null, null);
     }
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
         ArrayList<Song> mListFavoriteSongs = new ArrayList<>();
+
         Song song =null;
         int dem=0;
         if (data.moveToFirst()) {
             do {
-
                 for(int i=0;i<mListAllSong.size();i++){
-                    //   Log.d("SONG size ","//"+mListAllSong.size());
                     if(mListAllSong.get(i).getID()== data.getInt(data.getColumnIndex(FavoriteSongsProvider.ID_PROVIDER))){
                         Log.d("song F", data.getInt(data.getColumnIndex(FavoriteSongsProvider.ID_PROVIDER))+"//"+mListAllSong.get(i).getID());
                         song = new Song( dem, mListAllSong.get(i).getTitle(), mListAllSong.get(i).getFile(),mListAllSong.get(i).getAlbum(), mListAllSong.get(i).getArtist(), mListAllSong.get(i).getDuration());
@@ -64,6 +63,7 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
                         mListAdapter=new ListAdapter(getContext(),songs,this);
                         Log.d("favorite", "onLoadFinished: "+mListFavoriteSongs.size());
                         setListSongs(mListFavoriteSongs);
+                        setAdapter(mListAdapter);
                     }
                 }
             } while (data.moveToNext());

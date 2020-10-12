@@ -12,17 +12,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 
-
 import com.out.activitymusic.database.FavoriteSongsProvider;
 import com.out.activitymusic.interfaces.DataFragment;
 import com.out.activitymusic.interfaces.DisplayMediaFragment;
+
+import java.util.ArrayList;
 
 import Service.MediaPlaybackService;
 
@@ -132,8 +132,8 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
                 if (isCreate == true) {
                     ContentValues values = new ContentValues();
                     values.put(FavoriteSongsProvider.ID_PROVIDER, id);
-                    values.put(FavoriteSongsProvider.FAVORITE, 0);
-                    values.put(FavoriteSongsProvider.COUNT, 0);
+                    values.put(FavoriteSongsProvider.IS_FAVORITE, 0);
+                    values.put(FavoriteSongsProvider.COUNT_OF_PLAY, 0);
                     Uri uri = getActivity().getContentResolver().insert(FavoriteSongsProvider.CONTENT_URI, values);
                     mSharePreferences = getActivity().getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
                     SharedPreferences.Editor editor = mSharePreferences.edit();
@@ -144,7 +144,7 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
             } while (data.moveToNext());
         }
         setListSongs(songs);
-        Log.d("Hoang123gCV", "onLoadFinished: "+songs);
+        Log.d("Hoang123gCV", "onLoadFinished: "+mediaPlaybackFragment);
         LinearSmall(songs);
       if(mediaPlaybackService !=null)  mediaPlaybackService.setListSong(songs);
         mediaPlaybackFragment.setListSong(songs);
@@ -152,17 +152,11 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
         mListAdapter=new ListAdapter(getContext(),songs,this);
         setAdapter(mListAdapter);
         setListAdapter(mListAdapter);
+        mListAdapter.setService(mediaPlaybackService);
+        //mediaPlaybackFragment.updateTime();
         if (isPortraint()){
-          //  mediaPlaybackService.setListSong(songs);
-           // mediaPlaybackFragment.setListSong(songs);
             setListSongs(songs);
         }
-        Log.d("HoangCVfg", "onLoadFinished: "+mListAdapter);
-       // setService(serviceMediaPlay);
-
-        Log.d("HoangCV4444", "onLoadFinished:+ songs " + songs);
-
-
     }
 
     @Override
@@ -175,8 +169,7 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
         else return false;
     }
 
-
-   }
+}
 
 
 

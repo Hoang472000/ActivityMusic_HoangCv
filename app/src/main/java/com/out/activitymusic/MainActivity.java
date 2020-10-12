@@ -1,13 +1,5 @@
 package com.out.activitymusic;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.FragmentManager;
-import androidx.navigation.ui.AppBarConfiguration;
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -21,10 +13,22 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentManager;
+import androidx.navigation.ui.AppBarConfiguration;
+
 import com.google.android.material.navigation.NavigationView;
 import com.out.activitymusic.interfaces.DataFragment;
 import com.out.activitymusic.interfaces.DisplayMediaFragment;
+
 import java.util.ArrayList;
+
 import Service.MediaPlaybackService;
 
 public class MainActivity extends AppCompatActivity implements DisplayMediaFragment, DataFragment, NavigationView.OnNavigationItemSelectedListener {
@@ -54,19 +58,12 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
     private int possision;
 
 
-
-
-
-
-
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             MediaPlaybackService.LocalBinder binder = (MediaPlaybackService.LocalBinder) service;
             mediaPlaybackService = binder.getService();
-
-            Log.d("onServiceConnected", "onServiceConnected: "+ mediaPlaybackService);
             mediaPlaybackService.setListSong(mListSong);
             iConnectActivityAndBaseSong.connectActivityAndBaseSong();
             serviceBound = true;
@@ -80,25 +77,11 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
         }
     };
 
-  /*  @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        UpdateUI updateUI = new UpdateUI(getApplicationContext());
-        // updateUI.UpdateSeekbar();
-        super.onSaveInstanceState(savedInstanceState);
-    }
-
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        possision = savedInstanceState.getInt("possision");
-    }*/
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if (serviceBound) {
             unbindService(serviceConnection);
-
         }
     }
 
@@ -123,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open,
@@ -133,9 +117,6 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
         NavigationView navigationView = findViewById(R.id.nav_view);
         if (navigationView != null)
             navigationView.setNavigationItemSelectedListener(this);
-
-        //baseSongListFragment= new BaseSongListFragment(this,this.mediaPlaybackFragment);
-        Log.d("HoangCV12ff", "clickLinearLayout: ");
 
         mediaPlaybackFragment = new MediaPlaybackFragment();
         allSongsFragment = new AllSongsFragment(this,this,this.mediaPlaybackFragment);
@@ -221,7 +202,7 @@ public void startService(){
 
     @Override
     public void onclick(Song song) {
-        Log.d("HoangCV7", "onSaveInstanceState: " + mediaPlaybackService);
+        Log.d("HoangCgV7", "onSaveInstanceState: " + mediaPlaybackFragment);
         Log.d("HoangCV333", "onclick: "+(song.getID()-1));
         mediaPlaybackFragment = new MediaPlaybackFragment().newInstance(song);
         FragmentManager manager1 = this.getSupportFragmentManager();
@@ -231,13 +212,14 @@ public void startService(){
                 .commit();
         mediaPlaybackFragment.setListSong(mListSong);
         mediaPlaybackFragment.setService(mediaPlaybackService);
+        mediaPlaybackFragment.updateTime();
         mediaPlaybackService.setMediaPlaybackFragment(mediaPlaybackFragment);
+        getSupportActionBar().hide();
     }
 
     @Override
     public void onclickData(ArrayList ListSong) {
         this.mListSong = ListSong;
-
     }
 
     public void setService(MediaPlaybackService service) {
@@ -277,14 +259,12 @@ public void startService(){
 
     @Override
     protected void onResume() {
-        Log.d("HoangCV7", "onResume: " + getPlayer());
         super.onResume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d("HoangCV7", "onPause: " + mediaPlaybackService);
         setService(mediaPlaybackService);
     }
 

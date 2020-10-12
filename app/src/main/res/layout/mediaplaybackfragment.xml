@@ -25,7 +25,14 @@
         <TextView
             android:id="@+id/song1"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="35dp"
+            android:layout_toRightOf="@+id/picture_small"
+            android:text="TextView" />
+        <TextView
+            android:id="@+id/artist1"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_below="@+id/song1"
             android:layout_toRightOf="@+id/picture_small"
             android:text="TextView" />
 
@@ -73,7 +80,7 @@
             android:layout_width="30dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="15sp"
-            app:srcCompat="@drawable/ic_repeat_white" />
+            />
 
         <ImageView
             android:id="@+id/shuffle"
@@ -81,7 +88,7 @@
             android:layout_height="match_parent"
             android:layout_marginRight="15sp"
             android:layout_alignParentRight="true"
-            app:srcCompat="@drawable/ic_shuffle_white" />
+             />
 
     </RelativeLayout>
 
