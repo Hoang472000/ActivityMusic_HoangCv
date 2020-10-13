@@ -81,7 +81,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
         holder.mDuration.setText(getDurationTime(mCurrent.getDuration()));
         holder.image.setImageResource(R.drawable.ic_more_vert);
         Log.d("HoangCV555", "onBindViewHolder: "+mediaPlaybackService);
-        if (mediaPlaybackService!=null)
+        if (mediaPlaybackService!=null){
             if((mediaPlaybackService.getNameSong()).equals(mListSong.get(position).getTitle())==true){
             Log.d("HoangCV12345", "onBindViewHolder: holder: " + holder);
             holder.mId.setVisibility(View.INVISIBLE);
@@ -93,7 +93,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
             holder.mTitle.setTypeface(null, Typeface.NORMAL);
             //     holder.mEqualizer.animateBars();
             holder.mEqualizer.setVisibility(View.INVISIBLE);
-        }
+        }}
         holder.image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -108,6 +108,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
                                 values.put(FavoriteSongsProvider.IS_FAVORITE, 2);
                                 mContext.getContentResolver().update(FavoriteSongsProvider.CONTENT_URI, values, FavoriteSongsProvider.ID_PROVIDER + "= " + mListSong.get(mPosision).getID(), null);
                                 Toast.makeText(mContext, "addFavorite song //" + mListSong.get(mPosision).getTitle(), Toast.LENGTH_SHORT).show();
+                                Log.d("addFavorite", "onMenuItemClick: "+values);
                                 return true;
                             case R.id.remove_song_favorite:
                                 ContentValues values1 = new ContentValues();
@@ -174,7 +175,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
         return mListSong.size();
     }
 
-
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public EqualizerView mEqualizer;
@@ -187,7 +187,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
 
         public ViewHolder(@NonNull View itemView, ListAdapter adapter) {
             super(itemView);
-            Log.d("HoangCV6", "ViewHolder: ");
             this.mAdapter = adapter;
             mEqualizer = itemView.findViewById(R.id.equalizer);
             mId = itemView.findViewById(R.id.STT);
@@ -195,15 +194,12 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
             mDuration = itemView.findViewById(R.id.tvTime);
             image = itemView.findViewById(R.id.menu_pop);
             itemView.setOnClickListener(this);
-
         }
 
         @Override
         public void onClick(View view) {
-            Log.d("HoangCV62", "onClick: " + mListSong);
 
             mPosision = Integer.parseInt(String.valueOf(mId.getText())) - 1;
-            Log.d("HoangCV62", "onClick: " + mListSong.get(mPosision));
             itemClickListener.onClick(mListSong.get(mPosision));
             notifyDataSetChanged();
         }

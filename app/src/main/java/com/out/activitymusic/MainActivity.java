@@ -55,7 +55,6 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
     private DrawerLayout mDrawerLayout;
     private LinearLayout mLinearLayout;
     private ListAdapter listAdapter= new ListAdapter();
-    private int possision;
 
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
@@ -64,10 +63,13 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             MediaPlaybackService.LocalBinder binder = (MediaPlaybackService.LocalBinder) service;
             mediaPlaybackService = binder.getService();
-            mediaPlaybackService.setListSong(mListSong);
+            mediaPlaybackService.setmListSong(mListSong);
             iConnectActivityAndBaseSong.connectActivityAndBaseSong();
             serviceBound = true;
             allSongsFragment.setService(mediaPlaybackService);
+            if(isPortraint()){ allSongsFragment.setService(mediaPlaybackService);
+                Log.d("HoangCVgasfsdf5", "onServiceConnected: "+mediaPlaybackService);
+                mediaPlaybackService.setMediaPlaybackFragment(mediaPlaybackFragment);}
             Toast.makeText(MainActivity.this, "Service Bound", Toast.LENGTH_SHORT).show();
         }
 
@@ -120,8 +122,7 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
 
         mediaPlaybackFragment = new MediaPlaybackFragment();
         allSongsFragment = new AllSongsFragment(this,this,this.mediaPlaybackFragment);
-        int orientation = this.getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+        if(!isPortraint()) {
             FragmentManager manager = this.getSupportFragmentManager();
             allSongsFragment.setBoolean(true);
             manager.beginTransaction().replace(R.id.fragmentSongOne, allSongsFragment).commit();
@@ -249,6 +250,12 @@ public void startService(){
     //Bkav Nhungltk
     interface IConnectActivityAndBaseSong {
         void connectActivityAndBaseSong();
+    }
+    public boolean isPortraint() {
+        int orientation = this.getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE)
+            return true;
+        else return false;
     }
 
     private IConnectActivityAndBaseSong iConnectActivityAndBaseSong;

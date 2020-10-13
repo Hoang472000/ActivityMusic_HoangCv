@@ -60,7 +60,7 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
                         song = new Song( dem, mListAllSong.get(i).getTitle(), mListAllSong.get(i).getFile(),mListAllSong.get(i).getAlbum(), mListAllSong.get(i).getArtist(), mListAllSong.get(i).getDuration());
                         dem++;
                         mListFavoriteSongs.add(song);
-                        mListAdapter=new ListAdapter(getContext(),songs,this);
+                        mListAdapter=new ListAdapter(getContext(),mListFavoriteSongs,this);
                         Log.d("favorite", "onLoadFinished: "+mListFavoriteSongs.size());
                         setListSongs(mListFavoriteSongs);
                         setAdapter(mListAdapter);

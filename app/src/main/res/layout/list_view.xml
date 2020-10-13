@@ -26,36 +26,42 @@
         android:id="@+id/STT"
         android:layout_width="70sp"
         android:layout_height="70sp"
-        android:padding="20sp"
+        android:paddingTop="20sp"
+        android:paddingLeft="10dp"
         android:text="@string/STT"
         android:textAlignment="center"
         android:visibility="visible"
-        android:textSize="16sp"></TextView>
+        android:textSize="14sp"></TextView>
 
         <TextView
             android:id="@+id/music"
-            android:layout_width="wrap_content"
+            android:layout_width="280dp"
             android:layout_height="35sp"
-            android:padding="5sp"
+            android:paddingTop="10sp"
+            android:paddingLeft="5dp"
             android:text="@string/music"
             android:layout_toRightOf="@id/STT"
-            android:textSize="18sp"></TextView>
+            android:textSize="18sp"
+            android:textColor="#000000"
+            android:maxLines="1"
+            android:ellipsize="end"></TextView>
 
         <TextView
             android:id="@+id/tvTime"
             android:layout_width="wrap_content"
-            android:layout_height="35sp"
-            android:padding="5sp"
+            android:layout_height="20sp"
+            android:paddingLeft="5sp"
+            android:paddingRight="5dp"
             android:text="@string/time"
             android:layout_below="@id/music"
             android:layout_toRightOf="@id/STT"
-            android:textSize="18sp"></TextView>
+            android:textSize="14sp"></TextView>
 
 
 
     <ImageView
         android:id="@+id/menu_pop"
-        android:layout_width="40sp"
+        android:layout_width="30sp"
         android:layout_height="70sp"
         android:layout_alignParentRight="true"
         app:srcCompat="@drawable/ic_more_vert" />

@@ -128,8 +128,9 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
                 duration = song.getDuration();
                 songs.add(new Song(id, title, file, album, artist, duration));
 
+                Log.d("H1111oangCV", "onLoadFinished: "+isCreate);
 
-                if (isCreate == true) {
+                if (isCreate == false) {
                     ContentValues values = new ContentValues();
                     values.put(FavoriteSongsProvider.ID_PROVIDER, id);
                     values.put(FavoriteSongsProvider.IS_FAVORITE, 0);
@@ -137,25 +138,32 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
                     Uri uri = getActivity().getContentResolver().insert(FavoriteSongsProvider.CONTENT_URI, values);
                     mSharePreferences = getActivity().getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
                     SharedPreferences.Editor editor = mSharePreferences.edit();
-                    editor.putBoolean("create_db", false);
+                    editor.putBoolean("create_db", true);
                     editor.commit();
                 }
 
             } while (data.moveToNext());
         }
         setListSongs(songs);
-        Log.d("Hoang123gCV", "onLoadFinished: "+mediaPlaybackFragment);
         LinearSmall(songs);
-      if(mediaPlaybackService !=null)  mediaPlaybackService.setListSong(songs);
+        Log.d("HoangCVgasfsdf", "onLoadFinished: "+mediaPlaybackService);
+      if(mediaPlaybackService !=null)
         mediaPlaybackFragment.setListSong(songs);
         dataFragment.onclickData(songs);
+        mediaPlaybackFragment.setService(mediaPlaybackService);
         mListAdapter=new ListAdapter(getContext(),songs,this);
         setAdapter(mListAdapter);
         setListAdapter(mListAdapter);
         mListAdapter.setService(mediaPlaybackService);
-        //mediaPlaybackFragment.updateTime();
         if (isPortraint()){
+            Log.d("HoangCVgasfsdf", "onLoadFinished:songs "+songs);
+            Log.d("HoangCVgasfsdf", "onLoadFinished: "+mediaPlaybackService);
             setListSongs(songs);
+            mListAdapter.setService(mediaPlaybackService);
+            mediaPlaybackFragment.setService(mediaPlaybackService);
+            mediaPlaybackFragment.setListSong(songs);
+            mediaPlaybackFragment.updateTime();
+            mediaPlaybackService.setmListSong(songs);
         }
     }
 

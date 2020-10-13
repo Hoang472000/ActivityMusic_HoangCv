@@ -1,6 +1,7 @@
 package com.out.activitymusic;
 
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -26,6 +27,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+
+import com.out.activitymusic.database.FavoriteSongsProvider;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -149,7 +152,7 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
         if (isPortraint()) {
             if (mQueue.getVisibility() == View.VISIBLE)
                 mQueue.setVisibility(View.INVISIBLE);
-            updateUI();
+                updateUI();
         }
         SimpleDateFormat formatTime = new SimpleDateFormat("mm:ss");
         mUpdateUI = new UpdateUI(getContext());
@@ -170,7 +173,8 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
                 if (fromUser) {
                     mediaPlaybackService.seekToPos(progress);
                 }
-                time1.setText(getDurationTime1(String.valueOf(progress)));
+                SimpleDateFormat formatTime = new SimpleDateFormat("mm:ss");
+                time1.setText(formatTime.format(progress));
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
@@ -237,7 +241,7 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
 
     public Uri queryAlbumUri(String imgUri) {
         final Uri artworkUri = Uri.parse("content://media/external/audio/albumart");
-        return ContentUris.withAppendedId(artworkUri, Long.parseLong((imgUri)));//noi them imgUri vao artworkUri
+        return ContentUris.withAppendedId(artworkUri, Long.parseLong(imgUri));//noi them imgUri vao artworkUri
     }
 
     public void Popmenu() {
@@ -278,39 +282,46 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.like:
-                Toast.makeText(getActivity(), "liked", Toast.LENGTH_SHORT).show();
                 mLike.setImageResource(R.drawable.ic_thumbs_up_selected);
+                ContentValues values = new ContentValues();
+                values.put(FavoriteSongsProvider.IS_FAVORITE,2);
+                getActivity().getContentResolver().update(FavoriteSongsProvider.CONTENT_URI,values,FavoriteSongsProvider.ID_PROVIDER +"= "+ mediaPlaybackService.getPossision(),null);
+                Toast.makeText(getContext(),  "like song //"+ mediaPlaybackService.getNameSong(), Toast.LENGTH_SHORT).show();
                 break;
             case R.id.play_return: {
                 mediaPlaybackService.previousMedia();
                 getText(mListSong.get(mediaPlaybackService.getPossision()));
-                time1.setText(getDurationTime1("0"));
                 break;
             }
             case R.id.play_pause_media: {
-                if (mediaPlaybackService.isPlaying()) {
+                if (mediaPlaybackService.getPlaying()) {
                     mediaPlaybackService.pauseMedia();
                     mPlayPauseMedia.setImageResource(R.drawable.ic_baseline_play_circle_filled_24);
+                    mediaPlaybackService.setPlaying(false);
                 } else {
                     mediaPlaybackService.resumeMedia();
                     mPlayPauseMedia.setImageResource(R.drawable.ic_baseline_pause_circle_filled_24);
+                    mediaPlaybackService.setPlaying(true);
                 }
                 break;
             }
             case R.id.play_next: {
                 mediaPlaybackService.nextMedia();
                 getText(mListSong.get(mediaPlaybackService.getPossision()));
-                time1.setText(getDurationTime1("0"));
                 break;
             }
             case R.id.dislike:
-                Toast.makeText(getActivity(), "disliked", Toast.LENGTH_SHORT).show();
                 mDisLike.setImageResource(R.drawable.ic_thumbs_down_selected);
+                values = new ContentValues();
+                values.put(FavoriteSongsProvider.IS_FAVORITE,1);
+                getActivity().getContentResolver().update(FavoriteSongsProvider.CONTENT_URI,values,FavoriteSongsProvider.ID_PROVIDER +"= "+ mediaPlaybackService.getPossision(),null);
+                Log.d("H1111oangCV", "onClick: "+FavoriteSongsProvider.ID_PROVIDER +"= "+ mediaPlaybackService.getPossision() );
+                Toast.makeText(getContext(),  "dislike song //"+ mediaPlaybackService.getNameSong(), Toast.LENGTH_SHORT).show();
                 break;
             case R.id.shuffle: {
                 if (!mediaPlaybackService.getShuffle()) {
                     mShuffle.setImageResource(R.drawable.ic_play_shuffle_orange);
-                    mediaPlaybackService.setListSong(mListSong);
+                    mediaPlaybackService.setmListSong(mListSong);
                     mediaPlaybackService.setShuffle(true);
                 } else {
                     mShuffle.setImageResource(R.drawable.ic_shuffle_white);
@@ -345,18 +356,20 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
 
     public void updateUI() {
 
-        Log.d("okokokok1", "updateUI");
         if (mediaPlaybackService != null && mSeekBar != null) {
-            if (mediaPlaybackService.getmMediaPlayer() != null) {
+            if (mediaPlaybackService.getmMediaPlayer() != null)
+            {
+                Log.d("okokokok1", "updateUI"+mediaPlaybackService);
                 mSeekBar.setMax(mediaPlaybackService.getDuration());
                 mNameSong.setText(mediaPlaybackService.getNameSong());
                 mArtist.setText(mediaPlaybackService.getArtist());
+                Log.d("HoangCVgasfsdf", "updateUI: "+mListSong);
                 img.setImageURI(queryAlbumUri(mediaPlaybackService.getPotoMusic()));
                 String pathName = String.valueOf(queryAlbumUri(mediaPlaybackService.getPotoMusic()));
                 imgBig.setBackground(setImgBig(pathName));
                 SimpleDateFormat formmatTime = new SimpleDateFormat("mm:ss");
                 time2.setText(formmatTime.format(mediaPlaybackService.getDuration()));
-                if (mediaPlaybackService.isPlaying()) {
+                if (mediaPlaybackService.getPlaying()) {
                     mPlayPauseMedia.setImageResource(R.drawable.ic_baseline_pause_circle_filled_24);
                 } else {
                     mPlayPauseMedia.setImageResource(R.drawable.ic_baseline_play_circle_filled_24);
@@ -389,16 +402,16 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
                     SimpleDateFormat formatTime = new SimpleDateFormat("mm:ss");
                     time1.setText(formatTime.format(mediaPlaybackService.getCurrentStreamPosition()));
                     mSeekBar.setProgress(mediaPlaybackService.getCurrentStreamPosition());
-                    Log.d("okokokok1", "run: " + mediaPlaybackService.getCurrentStreamPosition());
-
                     mediaPlaybackService.getmMediaPlayer().setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                         @Override
                         public void onCompletion(MediaPlayer mediaPlayer) {
                             try {
-                                Log.d("HoangCgV7e", "onCompletion: "+mediaPlaybackService);
-                                mediaPlaybackService.onCompletionSong();
+                                if(!mediaPlaybackService.getPlaying()){
+                                    Log.d("HofffangCV", "onCompletion: "+mediaPlaybackService.getPlaying());
+                                    }
+                                else mediaPlaybackService.onCompletionSong();
                                 mSeekBar.setMax(mediaPlaybackService.getDuration());
-                                  updateUI();
+                                updateUI();
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }

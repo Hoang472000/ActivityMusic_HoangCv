@@ -34,6 +34,7 @@ import com.out.activitymusic.UpdateUI;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
+
 public class MediaPlaybackService extends Service implements
         MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener,
         MediaPlayer.OnInfoListener, MediaPlayer.OnBufferingUpdateListener,
@@ -58,32 +59,42 @@ public class MediaPlaybackService extends Service implements
     String mTitle = "";
     String mArtistt = "";
     String mPotoMusic = "";
-    String mFile="";
+    String mFile = "";
 
-    public void setListSong(ArrayList<Song> mListSong) {
-        this.ListSong = mListSong;
+    public void setmListSong(ArrayList<Song> mListSong) {
+        this.mListSong = mListSong;
     }
-    private ArrayList<Song> listsong = new ArrayList<>();
+
+    private ArrayList<Song> mListSong = new ArrayList<>();
+
     public ArrayList<Song> getListsong() {
-        return listsong;
+        return mListSong;
     }
-    private ArrayList<Song> ListSong;
-    public  void setSong(Song song){
-        this.song= song;
+
+    public void setSong(Song song) {
+        this.song = song;
     }
+
     public int getCurrentPlay() {
         return mCurrentPlay;
     }
+
     public void setMediaPlaybackFragment(MediaPlaybackFragment mediaPlaybackFragment) {
         this.mediaPlaybackFragment = mediaPlaybackFragment;
     }
-    public String getNameSong(){
+
+    public String getNameSong() {
         return mTitle;
     }
-    public String getArtist(){return mArtistt; }
-    public String getPotoMusic(){
+
+    public String getArtist() {
+        return mArtistt;
+    }
+
+    public String getPotoMusic() {
         return mPotoMusic;
     }
+
     public String getFile() {
         return mFile;
     }
@@ -125,7 +136,7 @@ public class MediaPlaybackService extends Service implements
                         pauseMedia();
                     else {
                         try {
-                            playMedia(ListSong.get(possition));
+                            playMedia(mListSong.get(possition));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -139,30 +150,33 @@ public class MediaPlaybackService extends Service implements
     public void onCompletionSong() throws IOException {
         mediaPlayer.pause();
         int rtpos = possition;
-        if (repeat != 1) possition++;
-        if (shuffle) {
-                possition= rand.nextInt(ListSong.size());
-        }
-        else if (repeat != 1) possition++;
-        else possition=rtpos;
-        if((possition>=listsong.size()) && (repeat==0)) possition=0;
-        try {
-            playMedia(ListSong.get(possition));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Log.d("HoangghCV", "onCompletionSong: "+ListSong.get(possition));
-        mediaPlaybackFragment.getText(ListSong.get(possition));
+        if (shuffle && repeat == -1) {
+            possition = rand.nextInt(mListSong.size());
+        } else if (shuffle && repeat == 0) possition++;
+        else if (!shuffle && repeat != 1) possition++;
+        else if (repeat == 1) possition = rtpos;
+        if ((possition >= mListSong.size()) && (repeat == 0)) possition = 0;
+        if ((possition > mListSong.size() - 1) && ((repeat == -1) || (!shuffle))) pauseMedia();
+        else
+            try {
+                playMedia(mListSong.get(possition));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        mediaPlaybackFragment.getText(mListSong.get(possition));
     }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return iBinder;
     }
+
     @Override
     public boolean onUnbind(Intent intent) {
         return super.onUnbind(intent);
     }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -172,6 +186,7 @@ public class MediaPlaybackService extends Service implements
         }
         removeAudioFocus();
     }
+
     @Override
     public void onAudioFocusChange(int focusState) {
         switch (focusState) {
@@ -193,6 +208,7 @@ public class MediaPlaybackService extends Service implements
                 break;
         }
     }
+
     private boolean requestAudioFocus() {
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         int result = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
@@ -201,16 +217,20 @@ public class MediaPlaybackService extends Service implements
         }
         return false;
     }
+
     private boolean removeAudioFocus() {
         return AudioManager.AUDIOFOCUS_REQUEST_GRANTED ==
                 audioManager.abandonAudioFocus(this);
     }
+
     @Override
     public void onBufferingUpdate(MediaPlayer mediaPlayer, int i) {
     }
+
     public MediaPlayer getmMediaPlayer() {
         return mediaPlayer;
     }
+
     @Override
     public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
         switch (i) {
@@ -226,30 +246,38 @@ public class MediaPlaybackService extends Service implements
         }
         return false;
     }
+
     @Override
     public boolean onInfo(MediaPlayer mediaPlayer, int i, int i1) {
         return false;
     }
+
     @Override
     public void onPrepared(MediaPlayer mediaPlayer) {
     }
+
     @Override
     public void onSeekComplete(MediaPlayer mediaPlayer) {
     }
+
     public int getCurrentStreamPosition() {
         return mediaPlayer.getCurrentPosition();
     }
+
     public int getDuration() {
         return mediaPlayer.getDuration();
     }
+
     public void seekToPos(int i) {
         mediaPlayer.seekTo(i);
     }
+
     public class LocalBinder extends Binder {
         public MediaPlaybackService getService() {
             return MediaPlaybackService.this;
         }
     }
+
     private void initMediaPlayer() {
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setOnErrorListener(this);
@@ -266,35 +294,28 @@ public class MediaPlaybackService extends Service implements
         }
         mediaPlayer.prepareAsync();
     }
+
     private int possition;
+
     public int getPossision() {
         return possition;
     }
+
     public void initSong(Song song) {
     }
 
     public void nextMedia() {
         int rtpos = possition;
-        if (repeat != -1) {
-            if (repeat == 1)
-                possition = rtpos;
-            else if (repeat == 0) {
-                rtpos++;
-                if (rtpos > ListSong.size() - 1)
-                    rtpos = 0;
-                possition = rtpos;
-            }
-        } else if (shuffle) {
-            int newSong = possition;
-            while (newSong == possition) {
-                newSong = rand.nextInt(ListSong.size());
-            }
-            possition = newSong;
-        } else possition++;
-        if ((possition > ListSong.size() - 1) && ((repeat == -1) || (!shuffle))) pauseMedia();
+        if (shuffle && repeat == -1) {
+            possition = rand.nextInt(mListSong.size());
+        } else if (shuffle && repeat == 0) possition++;
+        else if (!shuffle && repeat != 1) possition++;
+        else if (repeat == 1) possition = rtpos;
+        if ((possition >= mListSong.size()) && (repeat == 0)) possition = 0;
+        if ((possition >= mListSong.size() - 1) && ((repeat == -1) || (!shuffle))) pauseMedia();
         else
             try {
-                playMedia(ListSong.get(possition));
+                playMedia(mListSong.get(possition));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -303,27 +324,18 @@ public class MediaPlaybackService extends Service implements
     public MediaPlayer getPlayer() {
         return mPlayer;
     }
+
     public void previousMedia() {
         int rtpos = possition;
-        if (repeat != -1) {
-            if (repeat == 1)
-                possition = rtpos;
-            else if (repeat == 0) {
-                rtpos++;
-                if (rtpos > ListSong.size() - 1)
-                    rtpos = 0;
-                possition = rtpos;
-            }
-        } else if (shuffle) {
-            int newSong = possition;
-            while (newSong == possition) {
-                newSong = rand.nextInt(ListSong.size());
-            }
-            possition = newSong;
-        } else possition--;
+        if (shuffle && repeat == -1) {
+            possition = rand.nextInt(mListSong.size());
+        } else if (shuffle && repeat == 0) possition--;
+        else if (!shuffle && repeat != 1) possition--;
+        else if (repeat == 1) possition = rtpos;
+        if ((possition >= mListSong.size()) && (repeat == 0)) possition = 0;
         if ((possition < 0) && ((!shuffle) || (repeat != -1))) pauseMedia();
         else try {
-            playMedia(ListSong.get(possition));
+            playMedia(mListSong.get(possition));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -346,7 +358,7 @@ public class MediaPlaybackService extends Service implements
         mTitle = song.getTitle();
         mArtistt = song.getArtist();
         mPotoMusic = song.getAlbum();
-        mFile=song.getFile();
+        mFile = song.getFile();
         showNotification(mTitle, mArtistt, mFile);
         mUpdateUI = new UpdateUI(getApplicationContext());
         mUpdateUI.UpdateTitle(song.getTitle());
@@ -357,6 +369,7 @@ public class MediaPlaybackService extends Service implements
         mUpdateUI.UpdateDuration(mediaPlayer.getDuration());
         mUpdateUI.UpdateCurrentPossision(mediaPlayer.getCurrentPosition());
         mUpdateUI.UpdateIsPlaying(mediaPlayer.isPlaying());
+        isPlaying=mMediaPlayer.isPlaying();
     }
 
     public Uri queryAlbumUri(String imgUri) {
@@ -370,6 +383,7 @@ public class MediaPlaybackService extends Service implements
             mediaPlayer.stop();
         }
     }
+
     public void pauseMedia() {
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
@@ -377,29 +391,40 @@ public class MediaPlaybackService extends Service implements
         }
         showNotification(mTitle, mArtistt, mFile);
     }
+
     public void resumeMedia() {
         if (!mediaPlayer.isPlaying()) {
             mediaPlayer.seekTo(resumePosition);
             mediaPlayer.start();
         }
     }
+
     private boolean shuffle = false;
     private int repeat = -1;
     private Random rand;
-    public  boolean getShuffle(){
-    return shuffle;
-}
+
+    public boolean getShuffle() {
+        return shuffle;
+    }
+
     public void setShuffle(boolean shuffle) {
-        this.shuffle=shuffle;
+        this.shuffle = shuffle;
     }
-    public int getRepeat(){
-    return repeat;
-}
+
+    public int getRepeat() {
+        return repeat;
+    }
+
     public void setRepeat(int repeat) {
-        this.repeat=repeat;
+        this.repeat = repeat;
     }
-    public boolean isPlaying() {
-        return mediaPlayer.isPlaying();
+    public void setPlaying(boolean isplaysing){
+        this.isPlaying=isplaysing;
+    }
+    boolean isPlaying=false;
+
+    public boolean getPlaying() {
+        return isPlaying;
     }
 
     public void showNotification(String nameSong, String nameArtist, String path) {
@@ -437,12 +462,10 @@ public class MediaPlaybackService extends Service implements
         mNotification.setOnClickPendingIntent(R.id.play_ntf, playPendingIntent);
         mNotification.setImageViewResource(R.id.previous_ntf, R.drawable.ic_rew_dark);
         mNotification.setImageViewResource(R.id.next_ntf, R.drawable.ic_fwd_dark);
-        mNotification.setImageViewResource(R.id.play_ntf, isPlaying() ? R.drawable.ic_baseline_pause_circle_filled_24 : R.drawable.ic_baseline_play_circle_filled_24);
+        mNotification.setImageViewResource(R.id.play_ntf, getPlaying() ? R.drawable.ic_baseline_pause_circle_filled_24 : R.drawable.ic_baseline_play_circle_filled_24);
         if (getAlbumn(path) != null) {
-            Log.d("HoangggCV", "showNotification: "+getAlbumn(path));
             mNotification.setImageViewBitmap(R.id.img_ntf, getAlbumn(path));
         } else {
-            Log.d("HoangggCV", "showNotification:1 "+getAlbumn(path));
             mNotification.setImageViewResource(R.id.img_ntf, R.drawable.default_cover_art);
         }
         mSmallNotification.setOnClickPendingIntent(R.id.play_smallntf, playPendingIntent);
@@ -450,7 +473,7 @@ public class MediaPlaybackService extends Service implements
         mSmallNotification.setOnClickPendingIntent(R.id.next_smallntf, nextPendingIntent);
         mSmallNotification.setImageViewResource(R.id.previous_ntf, R.drawable.ic_rew_dark);
         mSmallNotification.setImageViewResource(R.id.next_ntf, R.drawable.ic_fwd_dark);
-        mSmallNotification.setImageViewResource(R.id.play_smallntf, isPlaying() ? R.drawable.ic_baseline_pause_circle_filled_24 : R.drawable.ic_baseline_play_circle_filled_24);
+        mSmallNotification.setImageViewResource(R.id.play_smallntf, getPlaying() ? R.drawable.ic_baseline_pause_circle_filled_24 : R.drawable.ic_baseline_play_circle_filled_24);
         if (getAlbumn(path) != null) {
             mSmallNotification.setImageViewBitmap(R.id.img_ntf_small, getAlbumn(path));
         } else {
@@ -469,7 +492,6 @@ public class MediaPlaybackService extends Service implements
             notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(notificationChannel);
-
         }
     }
 

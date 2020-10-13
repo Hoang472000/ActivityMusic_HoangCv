@@ -116,7 +116,7 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
                     mediaPlaybackService = ((MainActivity) getActivity()).mediaPlaybackService;
                     //           mListAdapter.setService(serviceMediaPlay);
                     mediaPlaybackFragment.setService(mediaPlaybackService);
-                    Log.d("HoangCffV", "connectActivityAndBaseSong: " + mediaPlaybackService);
+                    Log.d("HoangCff1V", "connectActivityAndBaseSong: " + mediaPlaybackService);
                 }
             }
         });
@@ -129,13 +129,16 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
         img.setImageURI(Uri.parse(UpdateUI.getAlbum()));
         if (isPortraint()) {
             mLinearLayout.setVisibility(View.GONE);
-            Log.d("HoangCgV7", "onCreateView: ");
+            if (mediaPlaybackService != null)
+                mediaPlaybackFragment.setService(mediaPlaybackService);
+            Log.d("HoanghdgfdsCasdV", "onCreateView: "+mediaPlaybackFragment);
+            //mediaPlaybackFragment.updateUI();
         } else {
             mLinearLayout.setVisibility(View.VISIBLE);
             mLinearLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mediaPlaybackService.setListSong(songs);
+                    mediaPlaybackService.setmListSong(songs);
                     mediaPlaybackFragment.setService(mediaPlaybackService);
                     displayMediaFragment.onclick(song);
                     mediaPlaybackFragment.updateTime();
@@ -143,15 +146,11 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
             });
         }
         onClickPause();
-        updateUI();
-        Log.d("HoangCffV", "onCreateView: " + mediaPlaybackService);
-      /*  if (mediaPlaybackService != null) {
-            if (mediaPlaybackService.isPlaying())
-                mPlayPause.setImageResource(R.drawable.ic_pause_black_large);
-            else
-                mPlayPause.setImageResource(R.drawable.ic_media_play_light);
-        }*/
-        // else   mPlayPause.setImageResource(R.drawable.ic_media_play_light);
+
+        if (mediaPlaybackService != null){
+            updateUI();
+        }
+        else mPlayPause.setImageResource(R.drawable.ic_media_play_light);
         return mInflater;
     }
 
@@ -177,7 +176,7 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
             mediaPlaybackFragment.getText(song);
             mediaPlaybackService.setMediaPlaybackFragment(mediaPlaybackFragment);
         }
-        if (mediaPlaybackService.isPlaying()) {
+        if (mediaPlaybackService.getPlaying()) {
             mediaPlaybackService.pauseMedia();
             try {
                 mediaPlaybackService.playMedia(song);
@@ -191,17 +190,12 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
                 e.printStackTrace();
             }
         }
-        /*byte[] songArt = getAlbumArt(song.getAlbum());
-        Glide.with(getContext()).asBitmap()
-                .load(songArt)
-                .error(R.drawable.default_cover_art)
-                .into(img);*/
         title.setText(song.getTitle());
         artist.setText(song.getArtist());
         img.setImageURI(queryAlbumUri(song.getAlbum()));
         Ischeck = true;
         try {
-            if (mediaPlaybackService.isPlaying()) {
+            if (mediaPlaybackService.getPlaying()) {
                 mediaPlaybackService.getmMediaPlayer().pause();
                 mediaPlaybackService.playMedia(song);
             } else
@@ -257,11 +251,12 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
             @Override
             public void onClick(View view) {
                 if (mediaPlaybackService != null) {
-                    Log.d("HoangCV2", "onClick: " + mediaPlaybackService.isPlaying());
+                    Log.d("HoangCV2", "onClick: " + mediaPlaybackService.getPlaying());
                 }
-                if (mediaPlaybackService.isPlaying()) {
+                if (mediaPlaybackService.getPlaying()) {
                     mediaPlaybackService.pauseMedia();
                     mPlayPause.setImageResource(R.drawable.ic_media_play_light);
+                    mediaPlaybackService.setPlaying(false);
                 } else {
                     if (!Ischeck) {
                         try {
@@ -277,6 +272,7 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
                         }
                     }
                     mPlayPause.setImageResource(R.drawable.ic_pause_black_large);
+                    mediaPlaybackService.setPlaying(true);
                 }
             }
         });
@@ -322,9 +318,9 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
             mLinearLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Log.d("HoangCgV7e", "onClick: "+mediaPlaybackService);
-                    Log.d("HoangCgV7eg", "onClick: "+arrayList);
-                    mediaPlaybackService.setListSong(songs);
+                    Log.d("HoangCgV7e", "onClick: " + mediaPlaybackService);
+                    Log.d("HoangCgV7eg", "onClick: " + arrayList);
+                    mediaPlaybackService.setmListSong(songs);
                     mediaPlaybackFragment.setService(mediaPlaybackService);
                     displayMediaFragment.onclick(arrayList.get(index));
 
@@ -333,17 +329,17 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
     }
 
     public void updateUI() {
-        Log.d("HoangCffV", "updateUI: " + mediaPlaybackService);
+        Log.d("HoangCff1V", "updateUI:330 " + mediaPlaybackService);
         if (mediaPlaybackService != null)
             if (mediaPlaybackService.getmMediaPlayer() != null) {
                 img.setImageURI(Uri.parse(UpdateUI.getAlbum()));
                 title.setText(mediaPlaybackService.getNameSong());
                 artist.setText(mediaPlaybackService.getArtist());
-                if (mediaPlaybackService.isPlaying()) {
+                if (mediaPlaybackService.getPlaying()) {
                     mPlayPause.setImageResource(R.drawable.ic_pause_black_large);
                 } else
                     mPlayPause.setImageResource(R.drawable.ic_media_play_light);
-                mListAdapter.notifyDataSetChanged();
+                //mListAdapter.notifyDataSetChanged();
 
             }
     }
