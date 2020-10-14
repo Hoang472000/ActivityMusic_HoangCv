@@ -2,7 +2,6 @@ package com.out.activitymusic;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.media.MediaPlayer;
 
 public class UpdateUI {
     private final String STORAGE = " com.valdioveliu.valdio.audioplayer.STORAGE";
@@ -77,31 +76,6 @@ public class UpdateUI {
         int index = preferences.getInt("possision", 0);
         return index;
     }
-
-/*    public void UpdateShuffle(Boolean shuffle){
-        preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor editor= preferences.edit();
-        editor.putBoolean("shuffle",shuffle);
-        editor.apply();
-    }
-    public Boolean getShuffle(){
-        preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
-        Boolean shuffle = preferences.getBoolean("shuffle", false);
-        return shuffle;
-    }
-    public void UpdateRepeat(int repeat){
-        preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor editor= preferences.edit();
-        editor.putInt("repeat",repeat);
-        editor.apply();
-    }
-    public int getRepeat(){
-        preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
-        int repeat = preferences.getInt("repeat", 2);
-        return repeat;
-    }*/
     public void UpdateIsPlaying(Boolean isplaying){
         preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor= preferences.edit();

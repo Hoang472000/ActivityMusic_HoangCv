@@ -52,6 +52,8 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
 
     public void setService(MediaPlaybackService service) {
         this.mediaPlaybackService = service;
+        super.mediaPlaybackService=service;
+        Log.d("HoangCVonCreateView", "setService: ");
     }
 
     public AllSongsFragment(DataFragment dataFragment, DisplayMediaFragment displayMediaFragment, MediaPlaybackFragment mediaPlaybackFragment) {
@@ -147,7 +149,6 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
         setListSongs(songs);
         LinearSmall(songs);
         Log.d("HoangCVgasfsdf", "onLoadFinished: "+mediaPlaybackService);
-      if(mediaPlaybackService !=null)
         mediaPlaybackFragment.setListSong(songs);
         dataFragment.onclickData(songs);
         mediaPlaybackFragment.setService(mediaPlaybackService);
@@ -155,22 +156,22 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
         setAdapter(mListAdapter);
         setListAdapter(mListAdapter);
         mListAdapter.setService(mediaPlaybackService);
-        if (isPortraint()){
-            Log.d("HoangCVgasfsdf", "onLoadFinished:songs "+songs);
-            Log.d("HoangCVgasfsdf", "onLoadFinished: "+mediaPlaybackService);
+        if (isLandscape()){
+            Log.d("H111oangCV", "onLoadFinished111: "+mediaPlaybackService);
             setListSongs(songs);
+           // mediaPlaybackService.setmListSong(songs);
             mListAdapter.setService(mediaPlaybackService);
             mediaPlaybackFragment.setService(mediaPlaybackService);
             mediaPlaybackFragment.setListSong(songs);
             mediaPlaybackFragment.updateTime();
-            mediaPlaybackService.setmListSong(songs);
+//            mediaPlaybackService.setmListSong(songs);
         }
     }
 
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
 
-    }public boolean isPortraint(){
+    }public boolean isLandscape(){
         int orientation = this.getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE)
             return true;

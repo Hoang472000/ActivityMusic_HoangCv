@@ -66,10 +66,14 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
             mediaPlaybackService.setmListSong(mListSong);
             iConnectActivityAndBaseSong.connectActivityAndBaseSong();
             serviceBound = true;
+            Log.d("Hoanafs1gCV", "onServiceConnected: "+mediaPlaybackService);
             allSongsFragment.setService(mediaPlaybackService);
-            if(isPortraint()){ allSongsFragment.setService(mediaPlaybackService);
-                Log.d("HoangCVgasfsdf5", "onServiceConnected: "+mediaPlaybackService);
-                mediaPlaybackService.setMediaPlaybackFragment(mediaPlaybackFragment);}
+            if(isPortraint()){
+                allSongsFragment.setService(mediaPlaybackService);
+                Log.d("Hoanafs1gCV", "onServiceConnected: "+mediaPlaybackService);
+                Log.d("Hoanafs1gCV", "onServiceConnected: "+mediaPlaybackFragment);
+                mediaPlaybackService.setMediaPlaybackFragment(mediaPlaybackFragment);
+            mediaPlaybackFragment.setService(mediaPlaybackService);}
             Toast.makeText(MainActivity.this, "Service Bound", Toast.LENGTH_SHORT).show();
         }
 
@@ -202,7 +206,7 @@ public void startService(){
     }
 
     @Override
-    public void onclick(Song song) {
+    public void onclickDisplay(Song song) {
         Log.d("HoangCgV7", "onSaveInstanceState: " + mediaPlaybackFragment);
         Log.d("HoangCV333", "onclick: "+(song.getID()-1));
         mediaPlaybackFragment = new MediaPlaybackFragment().newInstance(song);
@@ -216,6 +220,7 @@ public void startService(){
         mediaPlaybackFragment.updateTime();
         mediaPlaybackService.setMediaPlaybackFragment(mediaPlaybackFragment);
         getSupportActionBar().hide();
+
     }
 
     @Override

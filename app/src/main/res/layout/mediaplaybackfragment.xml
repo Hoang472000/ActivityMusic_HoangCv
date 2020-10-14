@@ -33,6 +33,7 @@
             android:layout_height="25dp"
             android:layout_toRightOf="@+id/picture_small"
             android:text="TextView"
+            android:textSize="18dp"
             android:layout_marginTop="10dp"
             android:paddingLeft="5dp"
             android:paddingTop="3dp"
@@ -94,7 +95,7 @@
             android:id="@+id/repeat"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_marginRight="160dp"
+            android:layout_marginRight="150dp"
             android:layout_toLeftOf="@+id/center1"
             app:srcCompat="@drawable/ic_repeat_white"
             />
@@ -110,7 +111,7 @@
             android:id="@+id/shuffle"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_marginLeft="160dp"
+            android:layout_marginLeft="150dp"
             android:layout_toRightOf="@+id/center1"
             app:srcCompat="@drawable/ic_shuffle_white"
              />
@@ -122,7 +123,7 @@
     <RelativeLayout
         android:id="@+id/ll_time"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="30dp"
         android:layout_above="@+id/ll_bottom"
         android:background="#BFFFFFFF"
         android:orientation="horizontal">
@@ -142,7 +143,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/seekBar"
-            android:layout_marginRight="170dp"
+            android:layout_marginRight="160dp"
+            android:maxLines="1"
             android:layout_toLeftOf="@+id/center"
             android:text="@string/time_1">
 
@@ -157,10 +159,11 @@
         <TextView
             android:id="@+id/Time2"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/seekBar"
-            android:layout_marginLeft="170dp"
+            android:layout_marginLeft="160dp"
             android:layout_toRightOf="@+id/center"
+            android:maxLines="1"
             android:text="@string/time_2">
         </TextView>
 
@@ -171,7 +174,7 @@
     <RelativeLayout
         android:id="@+id/ll_bottom"
         android:layout_width="match_parent"
-        android:layout_height="75dp"
+        android:layout_height="70dp"
         android:background="#BFFFFFFF"
         android:paddingLeft="15sp"
         android:paddingRight="15sp"
@@ -196,7 +199,7 @@
 
         <ImageView
             android:id="@+id/play_pause_media"
-            android:layout_width="60dp"
+            android:layout_width="70dp"
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
             app:srcCompat="@drawable/ic_baseline_pause_circle_filled_24" />

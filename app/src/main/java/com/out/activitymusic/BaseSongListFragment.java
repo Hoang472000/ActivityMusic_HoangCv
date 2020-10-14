@@ -56,6 +56,7 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
     private ImageView mMusicPop;
     UpdateUI UpdateUI;
     int index;
+    private View mInflater;
 
     public void setListAdapter(ListAdapter adapter) {
         this.mListAdapter = adapter;
@@ -93,7 +94,7 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d("nhungltk12", "onCreateView: ");
-        View mInflater = inflater.inflate(R.layout.allsongsfragment, container, false);
+        mInflater = inflater.inflate(R.layout.allsongsfragment, container, false);
         mRecyclerView = mInflater.findViewById(R.id.recycle_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mLinearLayout = mInflater.findViewById(R.id.bottom);
@@ -103,10 +104,9 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
         img = mInflater.findViewById(R.id.picture);
         mTitle = mInflater.findViewById(R.id.song1);
         mTime = mInflater.findViewById(R.id.Time2);
-        mImageSmall = mInflater.findViewById(R.id.picture_small);
+        //   mImageSmall = mInflater.findViewById(R.id.picture_small);
         mMusicPop = mInflater.findViewById(R.id.music_pop);
         mRecyclerView.setHasFixedSize(true);
-
         //Bkav Nhungltk: doan nay nghia la sao
         ((MainActivity) getActivity()).setiConnectActivityAndBaseSong(new MainActivity.IConnectActivityAndBaseSong() {
             @Override
@@ -116,7 +116,6 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
                     mediaPlaybackService = ((MainActivity) getActivity()).mediaPlaybackService;
                     //           mListAdapter.setService(serviceMediaPlay);
                     mediaPlaybackFragment.setService(mediaPlaybackService);
-                    Log.d("HoangCff1V", "connectActivityAndBaseSong: " + mediaPlaybackService);
                 }
             }
         });
@@ -127,30 +126,27 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
         title.setText(UpdateUI.getTitle());
         artist.setText(UpdateUI.getArtist());
         img.setImageURI(Uri.parse(UpdateUI.getAlbum()));
-        if (isPortraint()) {
+        if (isLandscape()) {
             mLinearLayout.setVisibility(View.GONE);
-            if (mediaPlaybackService != null)
-                mediaPlaybackFragment.setService(mediaPlaybackService);
-            Log.d("HoanghdgfdsCasdV", "onCreateView: "+mediaPlaybackFragment);
-            //mediaPlaybackFragment.updateUI();
+//            mediaPlaybackFragment.setService(mediaPlaybackService);
+         //khi xoay service null
         } else {
             mLinearLayout.setVisibility(View.VISIBLE);
             mLinearLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Log.d("HoanghdgfdsCasdV", "onClick: "+mediaPlaybackService);
                     mediaPlaybackService.setmListSong(songs);
-                    mediaPlaybackFragment.setService(mediaPlaybackService);
-                    displayMediaFragment.onclick(song);
+                    displayMediaFragment.onclickDisplay(song);
                     mediaPlaybackFragment.updateTime();
                 }
             });
         }
         onClickPause();
 
-        if (mediaPlaybackService != null){
+        if (mediaPlaybackService !=null) {
             updateUI();
         }
-        else mPlayPause.setImageResource(R.drawable.ic_media_play_light);
         return mInflater;
     }
 
@@ -170,7 +166,9 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
     @Override
     public void onClick(Song song) {
         this.song = song;
-        if (isPortraint()) {
+        if (isLandscape()) {
+            Log.d("H111oangCV", "onClick: "+mediaPlaybackFragment);
+            Log.d("H111oangCV", "onClick: "+mediaPlaybackService);
             mediaPlaybackFragment.setService(mediaPlaybackService);
             mediaPlaybackFragment.setListSong(songs);
             mediaPlaybackFragment.getText(song);
@@ -192,6 +190,18 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
         }
         title.setText(song.getTitle());
         artist.setText(song.getArtist());
+        Log.d("HoangCVhfghd", "onClick: " + queryAlbumUri(song.getAlbum()));
+/*try {
+            img.setImageURI(queryAlbumUri(song.getAlbum()));}
+catch (Exception e){
+    img.setImageDrawable(getResources().getDrawable(R.drawable.default_cover_art));
+    e.printStackTrace();
+}*/
+       /* byte[] songArt = getAlbumArt(song.getAlbum());
+        Glide.with(mInflater.getContext()).asBitmap()
+                .load(songArt)
+                .error(R.drawable.default_cover_art)
+                .into(img);*/
         img.setImageURI(queryAlbumUri(song.getAlbum()));
         Ischeck = true;
         try {
@@ -226,7 +236,7 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
         }
     }
 
-    public boolean isPortraint() {
+    public boolean isLandscape() {
         int orientation = this.getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE)
             return true;
@@ -318,12 +328,13 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
             mLinearLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Log.d("HoangCgV7e", "onClick: " + mediaPlaybackService);
+                    Log.d("HoangCgV7eg", "onClick:service " + mediaPlaybackService);
                     Log.d("HoangCgV7eg", "onClick: " + arrayList);
-                    mediaPlaybackService.setmListSong(songs);
+                    Log.d("HoangCgV7eg", "onClick: "+songs);
+                    Log.d("HoangCgV7eg", "onClick:media "+mediaPlaybackFragment);
+                    mediaPlaybackService.setmListSong(arrayList);
                     mediaPlaybackFragment.setService(mediaPlaybackService);
-                    displayMediaFragment.onclick(arrayList.get(index));
-
+                    displayMediaFragment.onclickDisplay(arrayList.get(index));
                 }
             });
     }
@@ -331,11 +342,12 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
     public void updateUI() {
         Log.d("HoangCff1V", "updateUI:330 " + mediaPlaybackService);
         if (mediaPlaybackService != null)
+            Log.d("HoangCff1V", "updateUI: "+mediaPlaybackService.isPlaying());
             if (mediaPlaybackService.getmMediaPlayer() != null) {
                 img.setImageURI(Uri.parse(UpdateUI.getAlbum()));
                 title.setText(mediaPlaybackService.getNameSong());
                 artist.setText(mediaPlaybackService.getArtist());
-                if (mediaPlaybackService.getPlaying()) {
+                if (mediaPlaybackService.isPlaying()) {
                     mPlayPause.setImageResource(R.drawable.ic_pause_black_large);
                 } else
                     mPlayPause.setImageResource(R.drawable.ic_media_play_light);

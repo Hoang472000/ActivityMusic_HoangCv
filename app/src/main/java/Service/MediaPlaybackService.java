@@ -393,6 +393,7 @@ public class MediaPlaybackService extends Service implements
     }
 
     public void resumeMedia() {
+        Log.d("mediaPlayer", "resumeMedia: "+getPlaying());
         if (!mediaPlayer.isPlaying()) {
             mediaPlayer.seekTo(resumePosition);
             mediaPlayer.start();
@@ -425,6 +426,9 @@ public class MediaPlaybackService extends Service implements
 
     public boolean getPlaying() {
         return isPlaying;
+    }
+    public boolean isPlaying(){
+        return mediaPlayer.isPlaying();
     }
 
     public void showNotification(String nameSong, String nameArtist, String path) {

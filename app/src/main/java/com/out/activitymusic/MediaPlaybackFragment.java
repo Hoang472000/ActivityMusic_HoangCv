@@ -53,7 +53,7 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
 
     MediaPlayer mediaPlayer;
     private ArrayList<Song> mListSong;
-    private int mSongCurrentDuration;
+    private boolean ischeck=false;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
     String TITLE_KEY = "title";
@@ -70,7 +70,6 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
         bundle.putString("artist1", song.getArtist());
         bundle.putString("song1", formatTime.format(Integer.valueOf(song.getDuration())));
         bundle.putString("song2", String.valueOf(queryAlbumUri(song.getAlbum())));
-        Log.d("HoangC1Vv", "newInstance: " + bundle);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -149,19 +148,25 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
         mShuffle.setOnClickListener(this);
         mRepeat.setOnClickListener(this);
 
-        if (isPortraint()) {
+        if (isLandscape()) {
             if (mQueue.getVisibility() == View.VISIBLE)
                 mQueue.setVisibility(View.INVISIBLE);
-                updateUI();
+            updateTime();
+            updateUI();
+         /*      if( mediaPlaybackService.getPlaying()) mPlayPauseMedia.setImageResource(R.drawable.ic_baseline_pause_circle_filled_24);
+               else mPlayPauseMedia.setImageResource(R.drawable.ic_baseline_play_circle_filled_24);*/
         }
+        mUpdateUI = new UpdateUI(getContext());
         SimpleDateFormat formatTime = new SimpleDateFormat("mm:ss");
         mUpdateUI = new UpdateUI(getContext());
         mNameSong.setText(mUpdateUI.getTitle());
         mArtist.setText(mUpdateUI.getArtist());
         img.setImageURI(Uri.parse(mUpdateUI.getAlbum()));
         imgBig.setBackground(setImgBig(mUpdateUI.getAlbum()));
+        if(ischeck==false){
         time2.setText(formatTime.format(mUpdateUI.getDuration()));
-
+            Log.d("HoangCVischeck", "onCreateView: "+formatTime.format(mUpdateUI.getDuration()));
+        }
         if (getArguments() != null) {
             setText(getArguments());
         }
@@ -187,7 +192,6 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
 
         if (mediaPlaybackService != null) {
             mSeekBar.setMax(mUpdateUI.getDuration());
-            updateUI();
             updateTime();
         }
         return view;
@@ -270,7 +274,7 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
         }
     }
 
-    public boolean isPortraint() {
+    public boolean isLandscape() {
         int orientation = this.getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE)
             return true;
@@ -288,8 +292,10 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
                 getActivity().getContentResolver().update(FavoriteSongsProvider.CONTENT_URI,values,FavoriteSongsProvider.ID_PROVIDER +"= "+ mediaPlaybackService.getPossision(),null);
                 Toast.makeText(getContext(),  "like song //"+ mediaPlaybackService.getNameSong(), Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.play_return: {
+            case R.id.play_return: { Log.d("HoangCVonClick1", "onClick: "+mediaPlaybackService);
                 mediaPlaybackService.previousMedia();
+                Log.d("HoangCVonClick1", "onClick: "+mediaPlaybackService);
+                mediaPlaybackService.setmListSong(mListSong);
                 getText(mListSong.get(mediaPlaybackService.getPossision()));
                 break;
             }
@@ -299,15 +305,17 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
                     mPlayPauseMedia.setImageResource(R.drawable.ic_baseline_play_circle_filled_24);
                     mediaPlaybackService.setPlaying(false);
                 } else {
+                    mediaPlaybackService.setPlaying(true);
                     mediaPlaybackService.resumeMedia();
                     mPlayPauseMedia.setImageResource(R.drawable.ic_baseline_pause_circle_filled_24);
-                    mediaPlaybackService.setPlaying(true);
                 }
                 break;
             }
             case R.id.play_next: {
                 mediaPlaybackService.nextMedia();
+                mediaPlaybackService.setmListSong(mListSong);
                 getText(mListSong.get(mediaPlaybackService.getPossision()));
+
                 break;
             }
             case R.id.dislike:
@@ -356,20 +364,34 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
 
     public void updateUI() {
 
+        Log.d("HoangCVmSeekBar", "updateUI: "+mediaPlaybackService);
+        Log.d("HoangCVmSeekBar", "updateUI: "+mSeekBar);
+       // Log.d("HoangCVmSeekBar", "updateUI: "+mediaPlaybackService.getmMediaPlayer() );
         if (mediaPlaybackService != null && mSeekBar != null) {
             if (mediaPlaybackService.getmMediaPlayer() != null)
             {
+                updateTime();
                 Log.d("okokokok1", "updateUI"+mediaPlaybackService);
                 mSeekBar.setMax(mediaPlaybackService.getDuration());
                 mNameSong.setText(mediaPlaybackService.getNameSong());
                 mArtist.setText(mediaPlaybackService.getArtist());
                 Log.d("HoangCVgasfsdf", "updateUI: "+mListSong);
-                img.setImageURI(queryAlbumUri(mediaPlaybackService.getPotoMusic()));
-                String pathName = String.valueOf(queryAlbumUri(mediaPlaybackService.getPotoMusic()));
-                imgBig.setBackground(setImgBig(pathName));
+                try {
+                    img.setImageURI(queryAlbumUri(mediaPlaybackService.getPotoMusic()));
+                    imgBig.setBackground(setImgBig(String.valueOf(queryAlbumUri(mediaPlaybackService.getPotoMusic()))));
+                }
+                catch (Exception e){
+                    //khong chạy vao day
+                    Uri uri= Uri.parse(mediaPlaybackService.getPotoMusic());
+                    img.setImageURI(uri);
+                    imgBig.setBackground(setImgBig(mediaPlaybackService.getPotoMusic()));
+                    e.printStackTrace();
+                }
                 SimpleDateFormat formmatTime = new SimpleDateFormat("mm:ss");
+                if(ischeck)
                 time2.setText(formmatTime.format(mediaPlaybackService.getDuration()));
-                if (mediaPlaybackService.getPlaying()) {
+                ischeck=true;
+                if (mediaPlaybackService.getPlaying()==true) {
                     mPlayPauseMedia.setImageResource(R.drawable.ic_baseline_pause_circle_filled_24);
                 } else {
                     mPlayPauseMedia.setImageResource(R.drawable.ic_baseline_play_circle_filled_24);
@@ -400,13 +422,14 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
                 @Override
                 public void run() {
                     SimpleDateFormat formatTime = new SimpleDateFormat("mm:ss");
+                    Log.d("HoangsdfCgV7e", "updateTime"+formatTime.format(mediaPlaybackService.getCurrentStreamPosition())+" "+mediaPlaybackService.getPossision());
                     time1.setText(formatTime.format(mediaPlaybackService.getCurrentStreamPosition()));
                     mSeekBar.setProgress(mediaPlaybackService.getCurrentStreamPosition());
                     mediaPlaybackService.getmMediaPlayer().setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                         @Override
                         public void onCompletion(MediaPlayer mediaPlayer) {
                             try {
-                                if(!mediaPlaybackService.getPlaying()){
+                                if(mediaPlaybackService.getPlaying()==false){
                                     Log.d("HofffangCV", "onCompletion: "+mediaPlaybackService.getPlaying());
                                     }
                                 else mediaPlaybackService.onCompletionSong();

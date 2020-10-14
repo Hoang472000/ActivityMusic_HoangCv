@@ -4,5 +4,5 @@ import com.out.activitymusic.Song;
 
 public interface DisplayMediaFragment {
 
-    void onclick(Song song);
+    void onclickDisplay(Song song);
 }

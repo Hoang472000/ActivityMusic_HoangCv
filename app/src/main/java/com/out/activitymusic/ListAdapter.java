@@ -198,7 +198,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
 
         @Override
         public void onClick(View view) {
-
             mPosision = Integer.parseInt(String.valueOf(mId.getText())) - 1;
             itemClickListener.onClick(mListSong.get(mPosision));
             notifyDataSetChanged();
