@@ -122,5 +122,28 @@ public class UpdateUI {
 
         return time1;
     }
+    public void UpdateStatus(boolean status){
+        preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("status", status);
+        editor.apply();
+    }
+    public  boolean getStatus(){
+        preferences=context.getSharedPreferences(STORAGE,Context.MODE_PRIVATE);
+        boolean status=preferences.getBoolean("status",false);
+        return status;
+    }
+    public void UpdateArray(String array){
+        preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("array", array);
+        editor.apply();
+    }
+    public  String getArray(){
+        preferences=context.getSharedPreferences(STORAGE,Context.MODE_PRIVATE);
+        String array=preferences.getString("array",null);
+        return array;
+    }
+
 
 }

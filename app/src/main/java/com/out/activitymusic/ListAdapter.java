@@ -87,6 +87,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
             holder.mId.setVisibility(View.INVISIBLE);
             holder.mTitle.setTypeface(null, Typeface.BOLD);
             holder.mEqualizer.animateBars();
+            if(!mediaPlaybackService.isPlaying()) holder.mEqualizer.stopBars();
+
             holder.mEqualizer.setVisibility(View.VISIBLE);
         } else {
             holder.mId.setVisibility(View.VISIBLE);

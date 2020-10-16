@@ -50,10 +50,10 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
     private ImageView mPlayReturn, mPlayNext, mShuffle, mRepeat;
     private SeekBar mSeekBar;
     private TextView mArtist;
-
+    BaseSongListFragment baseSongListFragment;
     MediaPlayer mediaPlayer;
     private ArrayList<Song> mListSong;
-    private boolean ischeck=false;
+    private boolean ischeck=false,isIscheck1=false,isLike=false;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
     String TITLE_KEY = "title";
@@ -73,6 +73,12 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
         fragment.setArguments(bundle);
         return fragment;
     }
+    public void setCheck(boolean check)
+    {
+        this.isIscheck1=check;
+    }
+
+    public boolean getcheck(){return isIscheck1;}
 
     public void setListSong(ArrayList mListSong) {
         this.mListSong = mListSong;
@@ -84,6 +90,9 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
 
     public void setMediaPlayer(MediaPlayer mediaPlayer) {
         this.mediaPlayer = mediaPlayer;
+    }
+    public  void setBaseSongListFragment(BaseSongListFragment baseSongListFragment){
+        this.baseSongListFragment=baseSongListFragment;
     }
 
     public MediaPlaybackFragment() {
@@ -148,14 +157,6 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
         mShuffle.setOnClickListener(this);
         mRepeat.setOnClickListener(this);
 
-        if (isLandscape()) {
-            if (mQueue.getVisibility() == View.VISIBLE)
-                mQueue.setVisibility(View.INVISIBLE);
-            updateTime();
-            updateUI();
-         /*      if( mediaPlaybackService.getPlaying()) mPlayPauseMedia.setImageResource(R.drawable.ic_baseline_pause_circle_filled_24);
-               else mPlayPauseMedia.setImageResource(R.drawable.ic_baseline_play_circle_filled_24);*/
-        }
         mUpdateUI = new UpdateUI(getContext());
         SimpleDateFormat formatTime = new SimpleDateFormat("mm:ss");
         mUpdateUI = new UpdateUI(getContext());
@@ -163,10 +164,8 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
         mArtist.setText(mUpdateUI.getArtist());
         img.setImageURI(Uri.parse(mUpdateUI.getAlbum()));
         imgBig.setBackground(setImgBig(mUpdateUI.getAlbum()));
-        if(ischeck==false){
         time2.setText(formatTime.format(mUpdateUI.getDuration()));
-            Log.d("HoangCVischeck", "onCreateView: "+formatTime.format(mUpdateUI.getDuration()));
-        }
+
         if (getArguments() != null) {
             setText(getArguments());
         }
@@ -192,8 +191,15 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
 
         if (mediaPlaybackService != null) {
             mSeekBar.setMax(mUpdateUI.getDuration());
+            updateUI();
             updateTime();
+            mediaPlaybackService.showNotification(mediaPlaybackService.getNameSong(),mediaPlaybackService.getArtist(),mediaPlaybackService.getFile());
         }
+        if (isLandscape()) {
+            if (mQueue.getVisibility() == View.VISIBLE)
+                mQueue.setVisibility(View.INVISIBLE);
+            updateTime();
+            updateUI();}
         return view;
     }
 
@@ -214,7 +220,6 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
         mArtist.setText(bundle.getString("artist1"));
         time2.setText(bundle.getString("song1"));
         img.setImageURI(Uri.parse(bundle.getString("song2")));
-        //this.song = (Song) bundle.getSerializable("audio");
         String pathName = bundle.getString("song2");
         imgBig.setBackground(setImgBig(pathName));
     }
@@ -284,18 +289,20 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
 
     @Override
     public void onClick(View view) {
+        mediaPlaybackService.setmListSong(mListSong);
+        mediaPlaybackService.setPossition(mUpdateUI.getIndex());
         switch (view.getId()) {
             case R.id.like:
+                isLike=true;
                 mLike.setImageResource(R.drawable.ic_thumbs_up_selected);
+                mDisLike.setImageResource(R.drawable.ic_thumbs_down_default);
                 ContentValues values = new ContentValues();
                 values.put(FavoriteSongsProvider.IS_FAVORITE,2);
                 getActivity().getContentResolver().update(FavoriteSongsProvider.CONTENT_URI,values,FavoriteSongsProvider.ID_PROVIDER +"= "+ mediaPlaybackService.getPossision(),null);
                 Toast.makeText(getContext(),  "like song //"+ mediaPlaybackService.getNameSong(), Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.play_return: { Log.d("HoangCVonClick1", "onClick: "+mediaPlaybackService);
+            case R.id.play_return: {
                 mediaPlaybackService.previousMedia();
-                Log.d("HoangCVonClick1", "onClick: "+mediaPlaybackService);
-                mediaPlaybackService.setmListSong(mListSong);
                 getText(mListSong.get(mediaPlaybackService.getPossision()));
                 break;
             }
@@ -306,20 +313,30 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
                     mediaPlaybackService.setPlaying(false);
                 } else {
                     mediaPlaybackService.setPlaying(true);
-                    mediaPlaybackService.resumeMedia();
+                    if ( (mediaPlaybackService.getCurrentPossion()==0)/*&& (!baseSongListFragment.getcheck())*/ ) {
+                        try {
+                            mediaPlaybackService.playMedia(mListSong.get(mUpdateUI.getIndex()));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    else if((mediaPlaybackService.getCurrentPossion()>0))
+                    { mediaPlaybackService.resumeMedia();}
                     mPlayPauseMedia.setImageResource(R.drawable.ic_baseline_pause_circle_filled_24);
+//                    baseSongListFragment.setCheck(true);
+                    setCheck(true);
                 }
                 break;
             }
             case R.id.play_next: {
                 mediaPlaybackService.nextMedia();
-                mediaPlaybackService.setmListSong(mListSong);
                 getText(mListSong.get(mediaPlaybackService.getPossision()));
-
                 break;
             }
             case R.id.dislike:
+                isLike=false;
                 mDisLike.setImageResource(R.drawable.ic_thumbs_down_selected);
+                mLike.setImageResource(R.drawable.ic_thumbs_up_default);
                 values = new ContentValues();
                 values.put(FavoriteSongsProvider.IS_FAVORITE,1);
                 getActivity().getContentResolver().update(FavoriteSongsProvider.CONTENT_URI,values,FavoriteSongsProvider.ID_PROVIDER +"= "+ mediaPlaybackService.getPossision(),null);
@@ -329,7 +346,6 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
             case R.id.shuffle: {
                 if (!mediaPlaybackService.getShuffle()) {
                     mShuffle.setImageResource(R.drawable.ic_play_shuffle_orange);
-                    mediaPlaybackService.setmListSong(mListSong);
                     mediaPlaybackService.setShuffle(true);
                 } else {
                     mShuffle.setImageResource(R.drawable.ic_shuffle_white);
@@ -353,6 +369,9 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
             default:
                 break;
         }
+        isIscheck1=true;
+        mediaPlaybackService.showNotification(mediaPlaybackService.getNameSong(),mediaPlaybackService.getArtist(),mediaPlaybackService.getFile());
+        updateUI();
     }
 
    /* private Bitmap getAlbum(String path) {
@@ -368,14 +387,14 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
         Log.d("HoangCVmSeekBar", "updateUI: "+mSeekBar);
        // Log.d("HoangCVmSeekBar", "updateUI: "+mediaPlaybackService.getmMediaPlayer() );
         if (mediaPlaybackService != null && mSeekBar != null) {
-            if (mediaPlaybackService.getmMediaPlayer() != null)
+          //  if (mediaPlaybackService.getmMediaPlayer() != null)
             {
                 updateTime();
                 Log.d("okokokok1", "updateUI"+mediaPlaybackService);
                 mSeekBar.setMax(mediaPlaybackService.getDuration());
                 mNameSong.setText(mediaPlaybackService.getNameSong());
                 mArtist.setText(mediaPlaybackService.getArtist());
-                Log.d("HoangCVgasfsdf", "updateUI: "+mListSong);
+                Log.d("HoangCVgasfsdf", "updateUI:List "+mListSong);
                 try {
                     img.setImageURI(queryAlbumUri(mediaPlaybackService.getPotoMusic()));
                     imgBig.setBackground(setImgBig(String.valueOf(queryAlbumUri(mediaPlaybackService.getPotoMusic()))));
@@ -391,7 +410,7 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
                 if(ischeck)
                 time2.setText(formmatTime.format(mediaPlaybackService.getDuration()));
                 ischeck=true;
-                if (mediaPlaybackService.getPlaying()==true) {
+                if (mediaPlaybackService.getPlaying()) {
                     mPlayPauseMedia.setImageResource(R.drawable.ic_baseline_pause_circle_filled_24);
                 } else {
                     mPlayPauseMedia.setImageResource(R.drawable.ic_baseline_play_circle_filled_24);
@@ -409,12 +428,17 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
                     } else
                         mRepeat.setBackgroundResource(R.drawable.ic_repeat_one_song_dark);
                 }
+                if(isLike) {mLike.setImageResource(R.drawable.ic_thumbs_up_selected);
+                mDisLike.setImageResource(R.drawable.ic_thumbs_down_default);}
+                else {mLike.setImageResource(R.drawable.ic_thumbs_up_default);
+                mDisLike.setImageResource(R.drawable.ic_thumbs_down_selected);}
             }
+
         }
     }
 
     public void updateTime() {
-        Log.d("HoangCgV7e", "updateTime");
+        Log.d("HoangCgV7e", "updateTime"+mediaPlaybackService);
         final Handler handler = new Handler();
         if (song != null || mListSong!=null)
             handler.postDelayed(new Runnable() {
@@ -422,7 +446,7 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
                 @Override
                 public void run() {
                     SimpleDateFormat formatTime = new SimpleDateFormat("mm:ss");
-                    Log.d("HoangsdfCgV7e", "updateTime"+formatTime.format(mediaPlaybackService.getCurrentStreamPosition())+" "+mediaPlaybackService.getPossision());
+                    Log.d("HoangsdfCgffV7e", "updateTime"+formatTime.format(mediaPlaybackService.getCurrentStreamPosition())+" "+mediaPlaybackService.getPossision());
                     time1.setText(formatTime.format(mediaPlaybackService.getCurrentStreamPosition()));
                     mSeekBar.setProgress(mediaPlaybackService.getCurrentStreamPosition());
                     mediaPlaybackService.getmMediaPlayer().setOnCompletionListener(new MediaPlayer.OnCompletionListener() {

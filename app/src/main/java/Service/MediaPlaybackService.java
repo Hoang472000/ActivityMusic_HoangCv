@@ -8,6 +8,7 @@ import android.app.Service;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
@@ -60,9 +61,13 @@ public class MediaPlaybackService extends Service implements
     String mArtistt = "";
     String mPotoMusic = "";
     String mFile = "";
+    int mCurrentPosission=0;
+    private SharedPreferences mSharePreferences;
+    private static final String SHARED_PREFERENCES_NAME="com.out.activitymusic";
 
     public void setmListSong(ArrayList<Song> mListSong) {
         this.mListSong = mListSong;
+        Log.d("HoangCVmListSong1", "setmListSong: "+mListSong);
     }
 
     private ArrayList<Song> mListSong = new ArrayList<>();
@@ -98,6 +103,9 @@ public class MediaPlaybackService extends Service implements
     public String getFile() {
         return mFile;
     }
+    public  int getCurrentPossion(){
+        return mCurrentPosission;
+    }
 
     @Override
     public void onCreate() {
@@ -107,8 +115,9 @@ public class MediaPlaybackService extends Service implements
         mTitle = mUpdateUI.getTitle();
         mArtistt = mUpdateUI.getArtist();
         mPotoMusic = mUpdateUI.getAlbum();
+        mSharePreferences=getSharedPreferences(SHARED_PREFERENCES_NAME,MODE_PRIVATE);
+        mCurrentPosission=mSharePreferences.getInt("currentPosision",0);
         rand = new Random();
-
         super.onCreate();
     }
 
@@ -295,8 +304,10 @@ public class MediaPlaybackService extends Service implements
         mediaPlayer.prepareAsync();
     }
 
-    private int possition;
-
+   int possition;
+public void setPossition(int possition){
+    this.possition=possition;
+}
     public int getPossision() {
         return possition;
     }
@@ -312,7 +323,7 @@ public class MediaPlaybackService extends Service implements
         else if (!shuffle && repeat != 1) possition++;
         else if (repeat == 1) possition = rtpos;
         if ((possition >= mListSong.size()) && (repeat == 0)) possition = 0;
-        if ((possition >= mListSong.size() - 1) && ((repeat == -1) || (!shuffle))) pauseMedia();
+        if ((possition > mListSong.size() - 1) && ((repeat == -1) || (!shuffle))) pauseMedia();
         else
             try {
                 playMedia(mListSong.get(possition));
@@ -332,7 +343,7 @@ public class MediaPlaybackService extends Service implements
         } else if (shuffle && repeat == 0) possition--;
         else if (!shuffle && repeat != 1) possition--;
         else if (repeat == 1) possition = rtpos;
-        if ((possition >= mListSong.size()) && (repeat == 0)) possition = 0;
+        if ((possition <0) && (repeat == 0)) possition = mListSong.size()-1;
         if ((possition < 0) && ((!shuffle) || (repeat != -1))) pauseMedia();
         else try {
             playMedia(mListSong.get(possition));
@@ -370,6 +381,11 @@ public class MediaPlaybackService extends Service implements
         mUpdateUI.UpdateCurrentPossision(mediaPlayer.getCurrentPosition());
         mUpdateUI.UpdateIsPlaying(mediaPlayer.isPlaying());
         isPlaying=mMediaPlayer.isPlaying();
+        mSharePreferences = getApplicationContext().getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = mSharePreferences.edit();
+        editor.putInt("currentPosision",mediaPlayer.getCurrentPosition());
+        editor.commit();
+
     }
 
     public Uri queryAlbumUri(String imgUri) {
@@ -385,11 +401,17 @@ public class MediaPlaybackService extends Service implements
     }
 
     public void pauseMedia() {
+
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
             resumePosition = mediaPlayer.getCurrentPosition();
         }
+        mSharePreferences = getApplicationContext().getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = mSharePreferences.edit();
+        editor.putInt("currentPosision",mediaPlayer.getCurrentPosition());
+        editor.commit();
         showNotification(mTitle, mArtistt, mFile);
+        this.stopForeground(STOP_FOREGROUND_DETACH);
     }
 
     public void resumeMedia() {
@@ -457,7 +479,10 @@ public class MediaPlaybackService extends Service implements
         builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
         builder.setCustomContentView(mSmallNotification);
         builder.setCustomBigContentView(mNotification);
+      //  builder.setAutoCancel(true);//chua duoc
         builder.setContentIntent(pendingIntent);
+    //    builder.setContentIntent(PendingIntent.getActivity(this, 0, new Intent(), 0));
+
 
         mNotification.setTextViewText(R.id.title_ntf, nameSong);
         mNotification.setTextViewText(R.id.artist_ntf, nameArtist);
@@ -483,6 +508,7 @@ public class MediaPlaybackService extends Service implements
         } else {
             mSmallNotification.setImageViewResource(R.id.img_ntf_small, R.drawable.default_cover_art);
         }
+
         startForeground(1, builder.build());
     }
 

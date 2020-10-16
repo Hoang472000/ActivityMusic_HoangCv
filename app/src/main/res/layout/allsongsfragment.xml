@@ -17,6 +17,8 @@
             android:layout_width="match_parent"
             android:layout_height="70sp"
             android:visibility="visible"
+            android:background="@drawable/test"
+            android:elevation="15dp"
             android:layout_alignParentBottom="true"
             android:onClick="onclickBottom">
                 <ImageView
