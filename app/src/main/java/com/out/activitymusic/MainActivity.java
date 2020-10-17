@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
                 mDrawerLayout.closeDrawer(GravityCompat.START);
                 FragmentManager manager = this.getSupportFragmentManager();
                 //  allSongsFragment.setBoolean(true);
-                manager.beginTransaction().replace(R.id.fragmentMediaTwo, mediaPlaybackFragment).commit();
+                manager.beginTransaction().addToBackStack(null).replace(R.id.fragmentMediaTwo, mediaPlaybackFragment).commit();
             }
         }
         sharedPreferences = getSharedPreferences("login", MODE_PRIVATE);
