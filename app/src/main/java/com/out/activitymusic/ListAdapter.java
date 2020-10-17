@@ -110,7 +110,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
                                 values.put(FavoriteSongsProvider.IS_FAVORITE, 2);
                                 mContext.getContentResolver().update(FavoriteSongsProvider.CONTENT_URI, values, FavoriteSongsProvider.ID_PROVIDER + "= " + mListSong.get(mPosision).getID(), null);
                                 Toast.makeText(mContext, "addFavorite song //" + mListSong.get(mPosision).getTitle(), Toast.LENGTH_SHORT).show();
-                                Log.d("addFavorite", "onMenuItemClick: "+values);
                                 return true;
                             case R.id.remove_song_favorite:
                                 ContentValues values1 = new ContentValues();

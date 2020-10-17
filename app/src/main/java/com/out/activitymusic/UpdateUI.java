@@ -40,6 +40,7 @@ public class UpdateUI {
         String artist = preferences.getString("artist", null);
         return artist;
     }
+
     public void UpdateAlbum(String album) {
         preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
@@ -58,6 +59,7 @@ public class UpdateUI {
         String file = preferences.getString("file", null);
         return file;
     }
+
     public void UpdateFile(String file) {
         preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
@@ -71,44 +73,52 @@ public class UpdateUI {
         editor.putInt("possision", index);
         editor.apply();
     }
+
     public int getIndex() {
         preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
         int index = preferences.getInt("possision", 0);
         return index;
     }
-    public void UpdateIsPlaying(Boolean isplaying){
+
+    public void UpdateIsPlaying(Boolean isplaying) {
         preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor= preferences.edit();
-        editor.putBoolean("isplaying",isplaying);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("isplaying", isplaying);
         editor.apply();
     }
-    public Boolean getIsPlaying(){
+
+    public Boolean getIsPlaying() {
         preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
         Boolean isplaying = preferences.getBoolean("isplaying", false);
         return isplaying;
     }
-    public void UpdateDuration(int Duration){
-        preferences= context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
+
+    public void UpdateDuration(int Duration) {
+        preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("Duration",Duration);
+        editor.putInt("Duration", Duration);
         editor.apply();
     }
-    public int getDuration(){
-        preferences= context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
-        int Duration=preferences.getInt("Duration",0);
+
+    public int getDuration() {
+        preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
+        int Duration = preferences.getInt("Duration", 0);
         return Duration;
     }
-    public void UpdateCurrentPossision(int possision){
-        preferences= context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
+
+    public void UpdateCurrentPossision(int possision) {
+        preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("current",possision);
+        editor.putInt("current", possision);
         editor.apply();
     }
-    public int getCurrentPossision(){
-        preferences= context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
-        int possision=preferences.getInt("current",0);
+
+    public int getCurrentPossision() {
+        preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
+        int possision = preferences.getInt("current", 0);
         return possision;
     }
+
     public void UpdateTime1(String time1) {
         preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
@@ -122,26 +132,30 @@ public class UpdateUI {
 
         return time1;
     }
-    public void UpdateStatus(boolean status){
+
+    public void UpdateStatus(boolean status) {
         preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("status", status);
         editor.apply();
     }
-    public  boolean getStatus(){
-        preferences=context.getSharedPreferences(STORAGE,Context.MODE_PRIVATE);
-        boolean status=preferences.getBoolean("status",false);
+
+    public boolean getStatus() {
+        preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
+        boolean status = preferences.getBoolean("status", false);
         return status;
     }
-    public void UpdateArray(String array){
+
+    public void UpdateArray(String array) {
         preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("array", array);
         editor.apply();
     }
-    public  String getArray(){
-        preferences=context.getSharedPreferences(STORAGE,Context.MODE_PRIVATE);
-        String array=preferences.getString("array",null);
+
+    public String getArray() {
+        preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
+        String array = preferences.getString("array", null);
         return array;
     }
 

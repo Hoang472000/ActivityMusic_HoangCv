@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.out.activitymusic.database.FavoriteSongsProvider;
 import com.out.activitymusic.interfaces.DisplayMediaFragment;
 import com.out.activitymusic.interfaces.ItemClickListener;
@@ -127,7 +128,11 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
         if (UpdateUI.getAlbum() != null) {
             title.setText(UpdateUI.getTitle());
             artist.setText(UpdateUI.getArtist());
-            img.setImageURI(Uri.parse(UpdateUI.getAlbum()));
+            byte[] songArt = getAlbumArt(UpdateUI.getFile());
+            Glide.with(mInflater.getContext()).asBitmap()
+                    .load(songArt)
+                    .error(R.drawable.default_cover_art)
+                    .into(img);
         }
 
         if (isLandscape()) {
@@ -142,7 +147,7 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
                 @Override
                 public void onClick(View v) {
                     Log.d("HoanghdgfdsCasdV", "onClick: "+mediaPlaybackService);
-                    mediaPlaybackService.setmListSong(songs);
+                    mediaPlaybackService.setListSong(songs);
                     mediaPlaybackFragment.setService(mediaPlaybackService);
                     displayMediaFragment.onclickDisplay(song);
                  //   mediaPlaybackFragment.updateTime();
@@ -184,7 +189,7 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
             mediaPlaybackFragment.setService(mediaPlaybackService);
             mediaPlaybackFragment.setListSong(songs);
             mediaPlaybackFragment.getText(song);
-            mediaPlaybackService.setMediaPlaybackFragment(mediaPlaybackFragment);
+            mediaPlaybackService.setmMediaPlaybackFragment(mediaPlaybackFragment);
  //           mediaPlaybackFragment.setBaseSongListFragment(this);
         }
         if (mediaPlaybackService.getPlaying()) {
@@ -203,19 +208,15 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
         }
         title.setText(song.getTitle());
         artist.setText(song.getArtist());
-        Log.d("HoangCVhfghd", "onClick: " + queryAlbumUri(song.getAlbum()));
-/*try {
-            img.setImageURI(queryAlbumUri(song.getAlbum()));}
-catch (Exception e){
-    img.setImageDrawable(getResources().getDrawable(R.drawable.default_cover_art));
-    e.printStackTrace();
-}*/
-       /* byte[] songArt = getAlbumArt(song.getAlbum());
+
+
+        byte[] songArt = getAlbumArt(song.getFile());
         Glide.with(mInflater.getContext()).asBitmap()
                 .load(songArt)
                 .error(R.drawable.default_cover_art)
-                .into(img);*/
-        img.setImageURI(queryAlbumUri(song.getAlbum()));
+                .into(img);
+
+        Log.d("HoangCV1", "onClick: "+songArt);
         Ischeck = true;
         check=true;
 //        mediaPlaybackFragment.setBaseSongListFragment(this);
@@ -249,6 +250,8 @@ catch (Exception e){
         } catch (IOException e) {
             e.printStackTrace();
         }
+        mediaPlaybackFragment.setIscheck2(true);
+        Log.d("HoupdateUIangCV", "onClick: "+mediaPlaybackFragment.isIscheck2());
     }
 
     public boolean isLandscape() {
@@ -258,12 +261,13 @@ catch (Exception e){
         else return false;
     }
 
-    public Uri queryAlbumUri(String imgUri) {
+    public Uri queryAlbumUri(String imgUri) {// dung album de load anh
         final Uri artworkUri = Uri.parse("content://media/external/audio/albumart");
         return ContentUris.withAppendedId(artworkUri, Long.parseLong(imgUri));//noi them mSrcImageSong vao artworkUri
     }
 
-    public static byte[] getAlbumArt(String uri) {
+
+    public static byte[] getAlbumArt(String uri) {// dung file de load anh
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
         mediaMetadataRetriever.setDataSource(uri);
         byte[] albumArt = mediaMetadataRetriever.getEmbeddedPicture();  // chuyển đổi đường dẫn file media thành đường dẫn file Ảnh
@@ -351,10 +355,8 @@ catch (Exception e){
                 public void onClick(View view) {
                     Log.d("HoangCgV7eg", "onClick:service " + mediaPlaybackService);
                     Log.d("HoangCgV7eg", "onClick: " + arrayList);
-                  //  Log.d("HoangCgV7eg", "onClick: "+songs);
-                    Log.d("HoangCgV7eg", "onClick: "+arrayList.get(index));
                     Log.d("HoangCgV7eg", "onClick:media "+mediaPlaybackFragment);
-                    mediaPlaybackService.setmListSong(arrayList);
+                    mediaPlaybackService.setListSong(arrayList);
                     mediaPlaybackFragment.setService(mediaPlaybackService);
                     mediaPlaybackFragment.setListSong(arrayList);
                     displayMediaFragment.onclickDisplay(arrayList.get(index));
@@ -363,11 +365,15 @@ catch (Exception e){
     }
 
     public void updateUI() {
-        Log.d("HoangCff1V", "updateUI:330 " + mediaPlaybackService);
+        Log.d("mListAdapter", "updateUI:330 " + mListAdapter);
         if (mediaPlaybackService != null)
             Log.d("HoangCff1V", "updateUI: "+mediaPlaybackService.isPlaying());
             if (mediaPlaybackService.getmMediaPlayer() != null) {
-                img.setImageURI(Uri.parse(UpdateUI.getAlbum()));
+                byte[] songArt = getAlbumArt(mediaPlaybackService.getFile());
+                Glide.with(mInflater.getContext()).asBitmap()
+                        .load(songArt)
+                        .error(R.drawable.default_cover_art)
+                        .into(img);
                 title.setText(mediaPlaybackService.getNameSong());
                 artist.setText(mediaPlaybackService.getArtist());
                 if (mediaPlaybackService.isPlaying()) {
@@ -377,7 +383,7 @@ catch (Exception e){
                 //mListAdapter.notifyDataSetChanged();
 
             }
-            mListAdapter.notifyDataSetChanged();
+      //      mListAdapter.notifyDataSetChanged();
     }
 }
 

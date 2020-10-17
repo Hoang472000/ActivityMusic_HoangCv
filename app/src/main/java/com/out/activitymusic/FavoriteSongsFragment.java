@@ -8,40 +8,47 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
+
 import com.out.activitymusic.database.FavoriteSongsProvider;
+import com.out.activitymusic.interfaces.DataFavoriteAndAllSong;
 import com.out.activitymusic.interfaces.DisplayMediaFragment;
 
 import java.util.ArrayList;
+
 import Service.MediaPlaybackService;
 
-public class FavoriteSongsFragment extends BaseSongListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
-    private static final int LOADER_ID=1;
+public class FavoriteSongsFragment extends BaseSongListFragment implements LoaderManager.LoaderCallbacks<Cursor>, DataFavoriteAndAllSong {
+    private static final int LOADER_ID = 1;
     private ArrayList<Song> mListAllSong;
     private ListAdapter mListAdapter;
     MediaPlaybackFragment mediaPlaybackFragment;
     DisplayMediaFragment displayMediaFragment;
+    AllSongsFragment allSongsFragment;
 
-    public FavoriteSongsFragment(ArrayList<Song> mListAllSong, MediaPlaybackService service, MediaPlaybackFragment mediaPlaybackFragment, DisplayMediaFragment displayMediaFragment){
-        super(displayMediaFragment,mediaPlaybackFragment);
-        this.mListAllSong=new ArrayList<>();
-        this.mListAllSong=mListAllSong;
-        this.mediaPlaybackService=service;
-        this.mediaPlaybackFragment=mediaPlaybackFragment;
+    public FavoriteSongsFragment(MediaPlaybackService service, MediaPlaybackFragment mediaPlaybackFragment, DisplayMediaFragment displayMediaFragment) {
+        super(displayMediaFragment, mediaPlaybackFragment);
+        this.mediaPlaybackService = service;
+        this.mediaPlaybackFragment = mediaPlaybackFragment;
     }
 
     public FavoriteSongsFragment() {
     }
 
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        LoaderManager.getInstance(this).initLoader(LOADER_ID,null,this);
+        LoaderManager.getInstance(this).initLoader(LOADER_ID, null, this);
         return super.onCreateView(inflater, container, savedInstanceState);
+    }
+    public void getData(){
+
     }
 
     @NonNull
@@ -49,14 +56,17 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
         String URL = "content://com.out.activitymusic.database.FavoriteSongsProvider";
         Uri uriSongs = Uri.parse(URL);
-        String selection= FavoriteSongsProvider.IS_FAVORITE +"==2";
-        return new CursorLoader(getContext(),uriSongs, null, selection, null, null);
+        String selection = FavoriteSongsProvider.IS_FAVORITE + "==2";
+        return new CursorLoader(getContext(), uriSongs, null, selection, null, null);
     }
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
         ArrayList<Song> mListFavoriteSongs = new ArrayList<>();
-
+        if (mediaPlaybackService != null) {
+            mListAllSong = mediaPlaybackService.getListSong();
+        }
+        Log.d("HoangCVgetListSong", "onLoadFinished: "+mediaPlaybackService.getListSong());
         Song song = null;
         int dem = 0;
         if (data.moveToFirst()) {
@@ -67,17 +77,18 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
                         song = new Song(dem, mListAllSong.get(i).getTitle(), mListAllSong.get(i).getFile(), mListAllSong.get(i).getAlbum(), mListAllSong.get(i).getArtist(), mListAllSong.get(i).getDuration());
                         dem++;
                         mListFavoriteSongs.add(song);
-                        mListAdapter = new ListAdapter(getContext(), mListFavoriteSongs, this);
+//                        setListSongs(mListFavoriteSongs);
+                       /* mListAdapter = new ListAdapter(getContext(), mListFavoriteSongs, this);
                         Log.d("favorite", "onLoadFinished: " + mListFavoriteSongs.size());
-                        setListSongs(mListFavoriteSongs);
-                        setAdapter(mListAdapter);
+                        setAdapter(mListAdapter);*/
                     }
                 }
             } while (data.moveToNext());
         }
+        mListAdapter = new ListAdapter(getContext(), mListFavoriteSongs, this);
         setListSongs(mListFavoriteSongs);
         LinearSmall(mListFavoriteSongs);
-        Log.d("HoangCVgasfsdf", "onLoadFinished: " + mediaPlaybackService);
+        Log.d("HoangCVgassdsfsdf", "onLoadFinished: " + mListAdapter);
         mediaPlaybackFragment.setListSong(mListFavoriteSongs);
         // dataFragment.onclickData(songs);
         mediaPlaybackFragment.setService(mediaPlaybackService);
@@ -92,7 +103,8 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
             mListAdapter.setService(mediaPlaybackService);
             mediaPlaybackFragment.setService(mediaPlaybackService);
             mediaPlaybackFragment.setListSong(mListFavoriteSongs);
-            mediaPlaybackFragment.updateTime();
+
+            if (mediaPlaybackService != null) mediaPlaybackFragment.updateTime();
         }
     }
 
@@ -100,6 +112,7 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
 
     }
+
     public boolean isLandscape() {
         int orientation = this.getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE)
@@ -107,4 +120,8 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
         else return false;
     }
 
+    @Override
+    public void onClickDataFaboriteAndAllSong(ArrayList mListSong) {
+        this.mListAllSong = mListSong;
+    }
 }

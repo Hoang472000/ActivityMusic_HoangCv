@@ -19,6 +19,7 @@ import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 
 import com.out.activitymusic.database.FavoriteSongsProvider;
+import com.out.activitymusic.interfaces.DataFavoriteAndAllSong;
 import com.out.activitymusic.interfaces.DataFragment;
 import com.out.activitymusic.interfaces.DisplayMediaFragment;
 
@@ -33,8 +34,9 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
     private static final String SHARED_PREFERENCES_NAME = "1";
     private ListAdapter mListAdapter;
     private SharedPreferences mSharePreferences;
-    ArrayList<Song> songs;
+    ArrayList<Song> mListSongs;
     DataFragment dataFragment;
+    DataFavoriteAndAllSong dataFavoriteAndAllSong;
     DisplayMediaFragment displayMediaFragment;
     MediaPlaybackFragment mediaPlaybackFragment;
     MediaPlaybackService mediaPlaybackService;
@@ -61,6 +63,9 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
         this.dataFragment = dataFragment;
         this.displayMediaFragment=displayMediaFragment;
         this.mediaPlaybackFragment=mediaPlaybackFragment;
+    }
+    public void setAllSong(DataFavoriteAndAllSong dataFavoriteAndAllSong){
+        this.dataFavoriteAndAllSong=dataFavoriteAndAllSong;
     }
 
     public AllSongsFragment() {
@@ -104,7 +109,7 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
         Log.d("HoangCVfg", "onLoadFinished: ");
         mSharePreferences = getActivity().getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
 
-        songs = new ArrayList<>();
+        mListSongs = new ArrayList<>();
         boolean isCreate = mSharePreferences.getBoolean("create_db", false);
         int id = 0;
         String title = "";
@@ -128,7 +133,7 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
                 album = song.getAlbum();
                 artist = song.getArtist();
                 duration = song.getDuration();
-                songs.add(new Song(id, title, file, album, artist, duration));
+                mListSongs.add(new Song(id, title, file, album, artist, duration));
 
                 Log.d("H1111oangCV", "onLoadFinished: "+isCreate);
 
@@ -146,36 +151,39 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
 
             } while (data.moveToNext());
         }
-        setListSongs(songs);
-        LinearSmall(songs);
-        mListAdapter=new ListAdapter(getContext(),songs,this);
+        setListSongs(mListSongs);
+        LinearSmall(mListSongs);
+        mListAdapter=new ListAdapter(getContext(), mListSongs,this);
         Log.d("HoangCVgasfsdf", "onLoadFinished: "+mediaPlaybackFragment);
-        mediaPlaybackFragment.setListSong(songs);
-        dataFragment.onclickData(songs);
+        mediaPlaybackFragment.setListSong(mListSongs);
+        dataFragment.onclickData(mListSongs);
+        dataFavoriteAndAllSong.onClickDataFaboriteAndAllSong(mListSongs);
         mediaPlaybackFragment.setService(mediaPlaybackService);
         setAdapter(mListAdapter);
         setListAdapter(mListAdapter);
         mListAdapter.setService(mediaPlaybackService);
-        if(mediaPlaybackService!=null) mediaPlaybackService.setmListSong(songs);
+        if(mediaPlaybackService!=null) mediaPlaybackService.setListSong(mListSongs);
         Log.d("H11311oangCV", "onLoadFinished111: "+mediaPlaybackService);
 //        mediaPlaybackService.setmListSong(songs);
         if(isLandscape()){
             Log.d("H111oangCV", "onLoadFinished111: "+mediaPlaybackService);
-            setListSongs(songs);
+            setListSongs(mListSongs);
            // mediaPlaybackService.setmListSong(songs);
             mListAdapter.setService(mediaPlaybackService);
             mediaPlaybackFragment.setService(mediaPlaybackService);
-            mediaPlaybackFragment.setListSong(songs);
+            mediaPlaybackFragment.setListSong(mListSongs);
             mediaPlaybackFragment.updateTime();
+            dataFavoriteAndAllSong.onClickDataFaboriteAndAllSong(mListSongs);
             if(mediaPlaybackService!=null)
-            mediaPlaybackService.setmListSong(songs);//khi xoay truyen duoc listsong sang service
+            mediaPlaybackService.setListSong(mListSongs);
+            //khi xoay truyen duoc listsong sang service
              /*        ((MainActivity) getActivity()).setiConnectActivityAndBaseSong(new MainActivity.IConnectActivityAndBaseSong() {
                 @Override
                 public void connectActivityAndBaseSong() {
                    ((MainActivity) getActivity()).setService(mediaPlaybackService);
                 }
     });*/
-            Log.d("HoangCVmediaPlaybackService", "onLoadFinished: "+songs);
+            Log.d("HoangCVmediaPlaybackService", "onLoadFinished: "+ mListSongs);
         }
     }
 
