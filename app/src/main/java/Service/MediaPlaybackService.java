@@ -63,9 +63,20 @@ public class MediaPlaybackService extends Service implements
     private String mFile = "";
     private int mCurrentPosition = 0;
 
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
+    }
+
+    private boolean isFavorite;
+
     public boolean isResume() {
         return isResume;
     }
+
 
     public void setResume(boolean resume) {
         isResume = resume;
@@ -76,9 +87,12 @@ public class MediaPlaybackService extends Service implements
     private static final String SHARED_PREFERENCES_NAME = "com.out.activitymusic";
 
     public void setListSong(ArrayList<Song> mListSong) {
+    //    if(!isFavorite)
         this.mListSong = mListSong;
-        if (isLandscape())
-            Log.d("HoangCVmListdfffSong1", "setmListSong: " + mListSong);
+    }
+    public void setListSongFavorite(ArrayList<Song> mListSong) {
+        /*if(isFavorite)
+        this.mListSong = mListSong;*/
     }
 
     public boolean isLandscape() {
@@ -409,8 +423,6 @@ public class MediaPlaybackService extends Service implements
         SharedPreferences.Editor editor = mSharePreferences.edit();
         editor.putInt("currentPosision", this.mMediaPlayer.getCurrentPosition());
         editor.commit();
-        showNotification(song.getTitle(),song.getArtist(),song.getFile());
-
     }
 
     public Uri queryAlbumUri(String imgUri) {

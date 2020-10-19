@@ -48,7 +48,7 @@
                 android:id="@+id/artist"
                 android:layout_width="230dp"
                 android:layout_height="25sp"
-                android:layout_below="@+id/name_song"
+                android:layout_below="@+id/item_name_song"
                 android:text="TextView"
                 android:maxLines="1"
                 android:ellipsize="end"/>

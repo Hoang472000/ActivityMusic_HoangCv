@@ -66,38 +66,40 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
         mLinearLayout = playMediaSong.findViewById(R.id.bottom);
         mPlayPause = playMediaSong.findViewById(R.id.play_pause);
         allSongsFragment = new AllSongsFragment();
-        image = (ImageView) mItemView.findViewById(R.id.menu_pop);
+        image = (ImageView) mItemView.findViewById(R.id.more_vert);
         mUpdateUI = new UpdateUI(mContext);
         mPos = mUpdateUI.getCurrentPossision();
         Log.d("HoangCV6", "onCreateViewHolder: ");
         return new ViewHolder(mItemView, this);
     }
 
+
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         final Song mCurrent = mListSong.get(position);
         holder.mId.setText((position + 1) + "");
-        holder.mTitle.setText(mCurrent.getTitle());
+        holder.mNameSong.setText(mCurrent.getTitle());
         holder.mDuration.setText(getDurationTime(mCurrent.getDuration()));
-        holder.image.setImageResource(R.drawable.ic_more_vert);
-        Log.d("HoangCV555", "onBindViewHolder: "+mediaPlaybackService);
-        if (mediaPlaybackService!=null){
-            if((mediaPlaybackService.getNameSong()).equals(mListSong.get(position).getTitle())==true){
-            Log.d("HoangCV12345", "onBindViewHolder: holder: " + holder);
-            holder.mId.setVisibility(View.INVISIBLE);
-            holder.mTitle.setTypeface(null, Typeface.BOLD);
-            holder.mEqualizer.animateBars();
-            if(!mediaPlaybackService.getPlaying()) holder.mEqualizer.stopBars();
-            holder.mEqualizer.setVisibility(View.VISIBLE);
-        } else {
-            holder.mId.setVisibility(View.VISIBLE);
-            holder.mTitle.setTypeface(null, Typeface.NORMAL);
-            holder.mEqualizer.setVisibility(View.INVISIBLE);
-        }}
-        holder.image.setOnClickListener(new View.OnClickListener() {
+        holder.mMore.setImageResource(R.drawable.ic_more_vert);
+        Log.d("HoangCV555", "onBindViewHolder: " + mediaPlaybackService);
+        if (mediaPlaybackService != null) {
+            if ((mediaPlaybackService.getNameSong()).equals(mListSong.get(position).getTitle()) == true) {
+                Log.d("HoangCV12345", "onBindViewHolder: holder: " + holder);
+                holder.mId.setVisibility(View.INVISIBLE);
+                holder.mNameSong.setTypeface(null, Typeface.BOLD);
+                holder.mEqualizer.animateBars();
+                if (!mediaPlaybackService.getPlaying()) holder.mEqualizer.stopBars();
+                holder.mEqualizer.setVisibility(View.VISIBLE);
+            } else {
+                holder.mId.setVisibility(View.VISIBLE);
+                holder.mNameSong.setTypeface(null, Typeface.NORMAL);
+                holder.mEqualizer.setVisibility(View.INVISIBLE);
+            }
+        }
+        holder.mMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PopupMenu popupMenu = new PopupMenu(mContext, holder.image);
+                PopupMenu popupMenu = new PopupMenu(mContext, holder.mMore);
                 popupMenu.inflate(R.menu.poupup_menu);
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
@@ -176,11 +178,11 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public EqualizerView mEqualizer;
-        public TextView mTitle;
+        public TextView mNameSong;
         public TextView mDuration;
         final ListAdapter mAdapter;
         public TextView mId;
-        public ImageView image;
+        public ImageView mMore;
         private UpdateUI mUpdateUI;
 
         public ViewHolder(@NonNull View itemView, ListAdapter adapter) {
@@ -188,9 +190,9 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
             this.mAdapter = adapter;
             mEqualizer = itemView.findViewById(R.id.equalizer);
             mId = itemView.findViewById(R.id.STT);
-            mTitle = itemView.findViewById(R.id.music);
-            mDuration = itemView.findViewById(R.id.tvTime);
-            image = itemView.findViewById(R.id.menu_pop);
+            mNameSong = itemView.findViewById(R.id.item_name_song);
+            mDuration = itemView.findViewById(R.id.item_time_song);
+            mMore = itemView.findViewById(R.id.item_more_vert);
             itemView.setOnClickListener(this);
         }
 

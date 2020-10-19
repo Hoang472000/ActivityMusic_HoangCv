@@ -28,7 +28,7 @@
 
 
         <TextView
-            android:id="@+id/song1"
+            android:id="@+id/media_name_song"
             android:layout_width="230dp"
             android:layout_height="25dp"
             android:layout_toRightOf="@+id/picture_small"
@@ -41,11 +41,11 @@
             android:ellipsize="end"
             android:textColor="#000000"/>
         <TextView
-            android:id="@+id/artist1"
+            android:id="@+id/media_artist"
             android:layout_width="230dp"
             android:layout_height="25dp"
             android:paddingLeft="5dp"
-            android:layout_below="@+id/song1"
+            android:layout_below="@+id/media_name_song"
             android:layout_toRightOf="@+id/picture_small"
             android:text="TextView"
             android:maxLines="1"
@@ -62,7 +62,7 @@
             android:layout_marginLeft="14dp"
             android:layout_marginEnd="5dp"
             android:layout_toStartOf="@+id/more_vert"
-            android:layout_toRightOf="@+id/song1"
+            android:layout_toRightOf="@+id/media_name_song"
             app:srcCompat="@drawable/ic_queue_dark" />
 
         <ImageView

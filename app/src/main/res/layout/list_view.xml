@@ -30,10 +30,10 @@
         android:text="@string/STT"
         android:textAlignment="center"
         android:textSize="14sp"
-        android:visibility="visible"></TextView>
+        android:visibility="visible"/>
 
     <TextView
-        android:id="@+id/music"
+        android:id="@+id/item_name_song"
         android:layout_width="match_parent"
         android:layout_height="35sp"
         android:layout_marginRight="40dp"
@@ -44,22 +44,22 @@
         android:paddingTop="10sp"
         android:text="@string/music"
         android:textColor="#000000"
-        android:textSize="18sp"></TextView>
+        android:textSize="18sp"/>
 
     <TextView
-        android:id="@+id/tvTime"
+        android:id="@+id/item_time_song"
         android:layout_width="wrap_content"
         android:layout_height="20sp"
-        android:layout_below="@id/music"
+        android:layout_below="@id/item_name_song"
         android:layout_toRightOf="@id/STT"
         android:paddingLeft="5sp"
         android:paddingRight="5dp"
         android:text="@string/time"
-        android:textSize="14sp"></TextView>
+        android:textSize="14sp"/>
 
 
     <ImageView
-        android:id="@+id/menu_pop"
+        android:id="@+id/item_more_vert"
         android:layout_width="30dp"
         android:layout_height="60dp"
         android:layout_alignParentRight="true"

@@ -183,39 +183,17 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
         int id = menuItem.getItemId();
         if (id == R.id.favorite) {
             isFavorite = true;
-/*
-            if (isLandScape()) {
-                Toast.makeText(this, "favorite", Toast.LENGTH_SHORT).show();
-                mStatus = true;
-                mFavoriteSongsFragment = new FavoriteSongsFragment(mediaPlaybackService.getListsong(), mediaPlaybackService, mediaPlaybackFragment, this);
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentSongOne, mFavoriteSongsFragment).commit();
-                mDrawerLayout = findViewById(R.id.drawer_layout);
-                mDrawerLayout.closeDrawer(GravityCompat.START);
-                FragmentManager manager1 = this.getSupportFragmentManager();
-                manager1.beginTransaction().replace(R.id.fragmentMediaTwo, mediaPlaybackFragment).commit();
-            } else */
-            {
-                //    mStatus = true;
-                Log.d("HoangCV", "onNavigationItemSelected: " + mediaPlaybackService);
-
                 mFavoriteSongsFragment = new FavoriteSongsFragment(mediaPlaybackService, mediaPlaybackFragment, this);
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragmentSongOne, mFavoriteSongsFragment).commit();
                 mDrawerLayout = findViewById(R.id.drawer_layout);
                 mDrawerLayout.closeDrawer(GravityCompat.START);
-            }
-
         } else if (id == R.id.List_music) {
             isFavorite = false;
-            Log.d("HoangCVmStatus", "onNavigationItemSelected:service " + mediaPlaybackService);
-            Log.d("HoangCVmStatus", "onNavigationItemSelected:listsong " + mediaPlaybackService.getListSong());
-            //        mStatus = false;
             getSupportFragmentManager().beginTransaction().replace(R.id.fragmentSongOne, allSongsFragment).commit();
             mDrawerLayout = findViewById(R.id.drawer_layout);
             mDrawerLayout.closeDrawer(GravityCompat.START);
         }
-        //     Log.d("HoangCVmStatus", "onNavigationItemSelected: " + mediaPlaybackService.getListsong());
-        //      mUpdateUI.UpdateStatus(mStatus);
-        //     mUpdateUI.UpdateArray(String.valueOf(mediaPlaybackService.getListsong()));
+        mediaPlaybackService.setFavorite(isFavorite);
         return true;
 
     }

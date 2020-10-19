@@ -43,7 +43,7 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
     private Uri mURISong = Uri.parse(mURL);
     private RecyclerView mRecyclerView;
     private Song song;
-    public RelativeLayout relativeLayout;
+    public RelativeLayout mRelativeLayout;
     TextView mNameSong;
     TextView mArtist;
     ImageView mPicture;
@@ -104,11 +104,11 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
         UpdateUI = new UpdateUI(getContext());
         firstUpdate();
         if (isLandscape()) {
-            relativeLayout.setVisibility(View.GONE);
+            mRelativeLayout.setVisibility(View.GONE);
             //khi xoay service null
         } else {
-            relativeLayout.setVisibility(View.VISIBLE);
-            relativeLayout.setOnClickListener(new View.OnClickListener() {
+            mRelativeLayout.setVisibility(View.VISIBLE);
+            mRelativeLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     mediaPlaybackService.setListSong(songs);
@@ -130,7 +130,7 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
     public void init(){
         mRecyclerView = mInflater.findViewById(R.id.recycle_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        relativeLayout = mInflater.findViewById(R.id.bottom);
+        mRelativeLayout = mInflater.findViewById(R.id.bottom);
         mPlayPause = mInflater.findViewById(R.id.play_pause);
         mNameSong = mInflater.findViewById(R.id.name_song);
         mArtist = mInflater.findViewById(R.id.artist);
@@ -217,7 +217,7 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
                         }
                 } while (c.moveToNext());
             }
-            mediaPlaybackService.showNotification(song.getTitle(), song.getArtist(), song.getFile());
+//            mediaPlaybackService.showNotification(song.getTitle(), song.getArtist(), song.getFile());
             updateUI();
         } catch (IOException e) {
             e.printStackTrace();
@@ -318,7 +318,7 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
 
     public void LinearSmall(final ArrayList<Song> arrayList) {
         if (!Ischeck)
-            relativeLayout.setOnClickListener(new View.OnClickListener() {
+            mRelativeLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Log.d("HoaarrayListngCV", "onClick: ");

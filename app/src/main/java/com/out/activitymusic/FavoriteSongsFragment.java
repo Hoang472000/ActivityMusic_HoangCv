@@ -65,7 +65,7 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
         if (mediaPlaybackService != null) {
             mListAllSong = mediaPlaybackService.getListSong();
         }
-        int [] arr = new int[0];
+        ArrayList<Integer> arrayList = new ArrayList<>();
         Song song = null;
         int dem = 0;
         if (data.moveToFirst()) {
@@ -74,12 +74,10 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
                     if (mListAllSong.get(i).getID() == data.getInt(data.getColumnIndex(FavoriteSongsProvider.ID_PROVIDER))) {
                         Log.d("song F", data.getInt(data.getColumnIndex(FavoriteSongsProvider.ID_PROVIDER)) + "//" + mListAllSong.get(i).getID());
                         song = new Song(dem, mListAllSong.get(i).getTitle(), mListAllSong.get(i).getFile(), mListAllSong.get(i).getAlbum(), mListAllSong.get(i).getArtist(), mListAllSong.get(i).getDuration());
-                     //   arr[dem]=i;
                         dem++;
                         mListFavoriteSongs.add(song);
                     }
                 }
-             //   mediaPlaybackFragment.setFavoriteID(arr);
             } while (data.moveToNext());
         }
         mListAdapter = new ListAdapter(getContext(), mListFavoriteSongs, this);
@@ -90,10 +88,12 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
         mediaPlaybackFragment.setService(mediaPlaybackService);
         mListAdapter = new ListAdapter(getContext(), mListFavoriteSongs, this);
         setAdapter(mListAdapter);
+        mediaPlaybackService.setListSongFavorite(mListFavoriteSongs);
         setListAdapter(mListAdapter);
         mListAdapter.setService(mediaPlaybackService);
         if (isLandscape()) {
             setListSongs(mListFavoriteSongs);
+            mediaPlaybackService.setListSongFavorite(mListFavoriteSongs);
             mListAdapter.setService(mediaPlaybackService);
             mediaPlaybackFragment.setService(mediaPlaybackService);
             mediaPlaybackFragment.setListSong(mListFavoriteSongs);
