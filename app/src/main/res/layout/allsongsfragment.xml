@@ -37,7 +37,7 @@
                     android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/title"
+                            android:id="@+id/name_song"
                             android:textSize="18dp"
                             android:layout_width="230dp"
                             android:layout_height="35sp"
@@ -52,7 +52,7 @@
                             android:id="@+id/artist"
                             android:layout_width="230dp"
                             android:layout_height="25sp"
-                            android:layout_below="@+id/title"
+                            android:layout_below="@+id/name_song"
                             android:text="TextView"
                             android:textSize="14dp"
                             android:paddingLeft="5dp"

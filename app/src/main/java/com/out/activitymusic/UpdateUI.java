@@ -119,20 +119,6 @@ public class UpdateUI {
         return possision;
     }
 
-    public void UpdateTime1(String time1) {
-        preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("time1", time1);
-        editor.apply();
-    }
-
-    public String getTime1() {
-        preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
-        String time1 = preferences.getString("time1", null);
-
-        return time1;
-    }
-
     public void UpdateStatus(boolean status) {
         preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
@@ -145,18 +131,29 @@ public class UpdateUI {
         boolean status = preferences.getBoolean("status", false);
         return status;
     }
-
-    public void UpdateArray(String array) {
+    public void UpdateRepeat(int repeat) {
         preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("array", array);
+        editor.putInt("repeat", repeat);
         editor.apply();
     }
 
-    public String getArray() {
+    public Integer getRepeat() {
         preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
-        String array = preferences.getString("array", null);
-        return array;
+        int repeat = preferences.getInt("repeat", -2);
+        return repeat;
+    }
+    public void UpdateShuffler(Boolean shuffler) {
+        preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("shuffler", shuffler);
+        editor.apply();
+    }
+
+    public Boolean getShuffler() {
+        preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
+        Boolean shuffler = preferences.getBoolean("shuffler", false);
+        return shuffler;
     }
 
 

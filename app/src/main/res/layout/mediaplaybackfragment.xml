@@ -3,14 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/picture_big"
-    android:background="#FFFF">
+   >
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/image_changer"
-        android:visibility="gone"></ImageView>
+        android:scaleType="fitXY"
+        android:id="@+id/image_big"
+        android:visibility="visible" />
     <RelativeLayout
         android:id="@+id/op"
         android:layout_width="match_parent"
@@ -61,7 +61,7 @@
             android:layout_marginVertical="20sp"
             android:layout_marginLeft="14dp"
             android:layout_marginEnd="5dp"
-            android:layout_toStartOf="@+id/mnMedia"
+            android:layout_toStartOf="@+id/more_vert"
             android:layout_toRightOf="@+id/song1"
             app:srcCompat="@drawable/ic_queue_dark" />
 
@@ -71,12 +71,11 @@
             android:layout_height="40sp"
             android:layout_marginVertical="15sp"
             android:layout_marginEnd="2dp"
-
-            android:layout_toLeftOf="@+id/mnMedia"
+            android:layout_toLeftOf="@+id/more_vert"
             android:visibility="visible"
             app:srcCompat="@drawable/ic_queue_dark" />
         <ImageView
-            android:id="@+id/mnMedia"
+            android:id="@+id/more_vert"
             android:layout_width="40sp"
             android:layout_height="40sp"
             android:layout_alignParentEnd="true"
@@ -97,15 +96,13 @@
             android:layout_height="30dp"
             android:layout_marginRight="150dp"
             android:layout_toLeftOf="@+id/center1"
-            app:srcCompat="@drawable/ic_repeat_white"
             />
+
         <TextView
             android:id="@+id/center1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            ></TextView>
-
+            android:layout_centerInParent="true" />
 
         <ImageView
             android:id="@+id/shuffle"
@@ -113,7 +110,6 @@
             android:layout_height="30dp"
             android:layout_marginLeft="150dp"
             android:layout_toRightOf="@+id/center1"
-            app:srcCompat="@drawable/ic_shuffle_white"
              />
 
     </RelativeLayout>
@@ -139,7 +135,7 @@
             />
 
         <TextView
-            android:id="@+id/Time1"
+            android:id="@+id/TimeSong1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/seekBar"
@@ -149,15 +145,15 @@
             android:text="@string/time_1">
 
         </TextView>
+
         <TextView
             android:id="@+id/center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            ></TextView>
+            android:layout_centerInParent="true" />
 
         <TextView
-            android:id="@+id/Time2"
+            android:id="@+id/TimeSong2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/seekBar"
@@ -186,11 +182,11 @@
             android:layout_width="30dp"
             android:layout_height="match_parent"
             app:srcCompat="@drawable/ic_thumbs_up_default"
-            android:layout_toLeftOf="@+id/play_return"
+            android:layout_toLeftOf="@+id/play_previous"
             android:layout_marginRight="50dp" />
 
         <ImageView
-            android:id="@+id/play_return"
+            android:id="@+id/play_previous"
             android:layout_width="30dp"
             android:layout_height="match_parent"
             android:layout_toLeftOf="@+id/play_pause_media"
@@ -202,7 +198,7 @@
             android:layout_width="70dp"
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
-            app:srcCompat="@drawable/ic_baseline_pause_circle_filled_24" />
+           />
 
         <ImageView
             android:id="@+id/play_next"

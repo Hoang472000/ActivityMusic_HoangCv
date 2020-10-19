@@ -409,6 +409,7 @@ public class MediaPlaybackService extends Service implements
         SharedPreferences.Editor editor = mSharePreferences.edit();
         editor.putInt("currentPosision", this.mMediaPlayer.getCurrentPosition());
         editor.commit();
+        showNotification(song.getTitle(),song.getArtist(),song.getFile());
 
     }
 
@@ -431,6 +432,7 @@ public class MediaPlaybackService extends Service implements
             mResumePosition = mMediaPlayer.getCurrentPosition();
             isResume = true;
         }
+        mUpdateUI.UpdateIsPlaying(this.mMediaPlayer.isPlaying());
         mSharePreferences = getApplicationContext().getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = mSharePreferences.edit();
         editor.putInt("currentPosision", mMediaPlayer.getCurrentPosition());

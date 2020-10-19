@@ -87,13 +87,11 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
             holder.mId.setVisibility(View.INVISIBLE);
             holder.mTitle.setTypeface(null, Typeface.BOLD);
             holder.mEqualizer.animateBars();
-            if(!mediaPlaybackService.isPlaying()) holder.mEqualizer.stopBars();
-
+            if(!mediaPlaybackService.getPlaying()) holder.mEqualizer.stopBars();
             holder.mEqualizer.setVisibility(View.VISIBLE);
         } else {
             holder.mId.setVisibility(View.VISIBLE);
             holder.mTitle.setTypeface(null, Typeface.NORMAL);
-            //     holder.mEqualizer.animateBars();
             holder.mEqualizer.setVisibility(View.INVISIBLE);
         }}
         holder.image.setOnClickListener(new View.OnClickListener() {
@@ -122,7 +120,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
                                 return false;
                         }
                     }
-
                 });
                 popupMenu.show();
             }

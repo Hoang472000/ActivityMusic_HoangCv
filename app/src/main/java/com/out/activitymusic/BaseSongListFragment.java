@@ -43,17 +43,16 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
     private Uri mURISong = Uri.parse(mURL);
     private RecyclerView mRecyclerView;
     private Song song;
-    public RelativeLayout mLinearLayout, mBottom;
-    TextView title, mTitle, mTime;
-    TextView artist;
-    ImageView img, mImageSmall;
+    public RelativeLayout relativeLayout;
+    TextView mNameSong;
+    TextView mArtist;
+    ImageView mPicture;
     ArrayList<Song> songs;
     MediaPlaybackService mediaPlaybackService;
     MediaPlaybackFragment mediaPlaybackFragment;
     private boolean Ischeck = false;
     private DisplayMediaFragment displayMediaFragment;
     private ImageView mPlayPause;
-    private Boolean IsBoolean = false;
     private ImageView mMusicPop;
     UpdateUI UpdateUI;
     int index;
@@ -67,13 +66,6 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
         this.songs = listSongs;
     }
 
-    public void setBoolean(Boolean aBoolean) {
-        IsBoolean = aBoolean;
-    }
-
-    public Boolean getIsBoolean() {
-        return IsBoolean;
-    }
 
     public void setService(MediaPlaybackService service) {
         this.mediaPlaybackService = service;
@@ -96,18 +88,7 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
     public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d("nhungltk12", "onCreateView: ");
         mInflater = inflater.inflate(R.layout.allsongsfragment, container, false);
-        mRecyclerView = mInflater.findViewById(R.id.recycle_view);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mLinearLayout = mInflater.findViewById(R.id.bottom);
-        mPlayPause = mInflater.findViewById(R.id.play_pause);
-        title = mInflater.findViewById(R.id.title);
-        artist = mInflater.findViewById(R.id.artist);
-        img = mInflater.findViewById(R.id.picture);
-        mTitle = mInflater.findViewById(R.id.song1);
-        mTime = mInflater.findViewById(R.id.Time2);
-        //   mImageSmall = mInflater.findViewById(R.id.picture_small);
-        mMusicPop = mInflater.findViewById(R.id.music_pop);
-        mRecyclerView.setHasFixedSize(true);
+        init();
         //Bkav Nhungltk: doan nay nghia la sao
         ((MainActivity) getActivity()).setiConnectActivityAndBaseSong(new MainActivity.IConnectActivityAndBaseSong() {
             @Override
@@ -115,82 +96,79 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
                 if (((MainActivity) getActivity()).mediaPlaybackService != null) {
                     Log.d("nhungltkk", "onCreateView: " + "not null");
                     mediaPlaybackService = ((MainActivity) getActivity()).mediaPlaybackService;
-                    //           mListAdapter.setService(serviceMediaPlay);
                     mediaPlaybackFragment.setService(mediaPlaybackService);
                 }
             }
         });
 
         UpdateUI = new UpdateUI(getContext());
-        index = UpdateUI.getIndex();
-        Log.d("HoangCV333", "onCreateView: index=" + index);
-        Log.d("HoangCVUpdateUI", "onCreateView: "+UpdateUI.getAlbum());
-        if (UpdateUI.getAlbum() != null) {
-            title.setText(UpdateUI.getTitle());
-            artist.setText(UpdateUI.getArtist());
-            byte[] songArt = getAlbumArt(UpdateUI.getFile());
-            Glide.with(mInflater.getContext()).asBitmap()
-                    .load(songArt)
-                    .error(R.drawable.default_cover_art)
-                    .into(img);
-        }
-
+        firstUpdate();
         if (isLandscape()) {
-            mLinearLayout.setVisibility(View.GONE);
-//            mediaPlaybackFragment.setBaseSongListFragment(this);
-//            mediaPlaybackService.setmListSong(songs);
-//            mediaPlaybackFragment.setService(mediaPlaybackService);
-         //khi xoay service null
+            relativeLayout.setVisibility(View.GONE);
+            //khi xoay service null
         } else {
-            mLinearLayout.setVisibility(View.VISIBLE);
-            mLinearLayout.setOnClickListener(new View.OnClickListener() {
+            relativeLayout.setVisibility(View.VISIBLE);
+            relativeLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d("HoanghdgfdsCasdV", "onClick: "+mediaPlaybackService);
                     mediaPlaybackService.setListSong(songs);
                     mediaPlaybackFragment.setService(mediaPlaybackService);
                     displayMediaFragment.onclickDisplay(song);
-                 //   mediaPlaybackFragment.updateTime();
                 }
             });
         }
         onClickPause();
 
-        if (mediaPlaybackService !=null) {
-            updateUI();
+        if (mediaPlaybackService != null) {
+            if (isLandscape()) {
+                mediaPlaybackFragment.setService(mediaPlaybackService);
+            }
         }
+        updateUI();
         return mInflater;
     }
-
+    public void init(){
+        mRecyclerView = mInflater.findViewById(R.id.recycle_view);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        relativeLayout = mInflater.findViewById(R.id.bottom);
+        mPlayPause = mInflater.findViewById(R.id.play_pause);
+        mNameSong = mInflater.findViewById(R.id.name_song);
+        mArtist = mInflater.findViewById(R.id.artist);
+        mPicture = mInflater.findViewById(R.id.picture);
+        mMusicPop = mInflater.findViewById(R.id.music_pop);
+        mRecyclerView.setHasFixedSize(true);
+    }
+    public void firstUpdate(){
+        index = UpdateUI.getIndex();
+        if (UpdateUI.getAlbum() != null) {
+            mNameSong.setText(UpdateUI.getTitle());
+            mArtist.setText(UpdateUI.getArtist());
+            byte[] songArt = getAlbumArt(UpdateUI.getFile());
+            Glide.with(mInflater.getContext()).asBitmap()
+                    .load(songArt)
+                    .error(R.drawable.default_cover_art)
+                    .into(mPicture);
+        }
+    }
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        Log.d("nhungltk12", "onActivityCreated: ");
         super.onActivityCreated(savedInstanceState);
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("nhungltk12", "onCreate: ");
         setHasOptionsMenu(true);
     }
-    public void setCheck(boolean check)
-    {
-        this.check=check;
-    }
-    boolean check=false;
-    public boolean getcheck(){return check;}
+
     @Override
     public void onClick(Song song) {
         this.song = song;
         if (isLandscape()) {
-            Log.d("H111oangCV", "onClick: "+mediaPlaybackFragment);
-            Log.d("H111oangCV", "onClick: "+mediaPlaybackService);
             mediaPlaybackFragment.setService(mediaPlaybackService);
             mediaPlaybackFragment.setListSong(songs);
             mediaPlaybackFragment.getText(song);
             mediaPlaybackService.setmMediaPlaybackFragment(mediaPlaybackFragment);
- //           mediaPlaybackFragment.setBaseSongListFragment(this);
         }
         if (mediaPlaybackService.getPlaying()) {
             mediaPlaybackService.pauseMedia();
@@ -206,20 +184,14 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
                 e.printStackTrace();
             }
         }
-        title.setText(song.getTitle());
-        artist.setText(song.getArtist());
-
-
+        mNameSong.setText(song.getTitle());
+        mArtist.setText(song.getArtist());
         byte[] songArt = getAlbumArt(song.getFile());
         Glide.with(mInflater.getContext()).asBitmap()
                 .load(songArt)
                 .error(R.drawable.default_cover_art)
-                .into(img);
-
-        Log.d("HoangCV1", "onClick: "+songArt);
+                .into(mPicture);
         Ischeck = true;
-        check=true;
-//        mediaPlaybackFragment.setBaseSongListFragment(this);
         try {
             if (mediaPlaybackService.getPlaying()) {
                 mediaPlaybackService.getmMediaPlayer().pause();
@@ -250,8 +222,7 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
         } catch (IOException e) {
             e.printStackTrace();
         }
-        mediaPlaybackFragment.setIscheck2(true);
-        Log.d("HoupdateUIangCV", "onClick: "+mediaPlaybackFragment.isIscheck2());
+        if(mListAdapter!=null) mListAdapter.notifyDataSetChanged();
     }
 
     public boolean isLandscape() {
@@ -266,7 +237,6 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
         return ContentUris.withAppendedId(artworkUri, Long.parseLong(imgUri));//noi them mSrcImageSong vao artworkUri
     }
 
-
     public static byte[] getAlbumArt(String uri) {// dung file de load anh
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
         mediaMetadataRetriever.setDataSource(uri);
@@ -280,37 +250,35 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
             @Override
             public void onClick(View view) {
                 if (mediaPlaybackService != null) {
-
-
-                if (mediaPlaybackService.getPlaying()) {
-                    mediaPlaybackService.pauseMedia();
-                    mPlayPause.setImageResource(R.drawable.ic_media_play_light);
-                    mediaPlaybackService.setPlaying(false);
-                   // mediaPlaybackFragment.setCheck(false);
-                } else {
-                    if (!Ischeck) {
-                        try {
-                            mediaPlaybackService.playMedia(songs.get(index));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                    if (mediaPlaybackService.getPlaying()) {
+                        mediaPlaybackService.pauseMedia();
+                        mPlayPause.setImageResource(R.drawable.ic_media_play_light);
+                        mediaPlaybackService.setPlaying(false);
+                        // mediaPlaybackFragment.setCheck(false);
                     } else {
-                        try {
-                            mediaPlaybackService.playMedia(song);
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        if (!Ischeck) {
+                            try {
+                                mediaPlaybackService.playMedia(songs.get(index));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            try {
+                                mediaPlaybackService.playMedia(song);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
+                        mPlayPause.setImageResource(R.drawable.ic_pause_black_large);
+                        mediaPlaybackService.setPlaying(true);
                     }
-                    mPlayPause.setImageResource(R.drawable.ic_pause_black_large);
-                    mediaPlaybackService.setPlaying(true);
-                 //   mediaPlaybackFragment.setCheck(true);
+                    mediaPlaybackService.showNotification(mediaPlaybackService.getNameSong(), mediaPlaybackService.getArtist(), mediaPlaybackService.getFile());
                 }
-                mediaPlaybackService.showNotification(mediaPlaybackService.getNameSong(),mediaPlaybackService.getArtist(),mediaPlaybackService.getFile());
-            }
                 updateUI();
             }
         });
-
+        if(mListAdapter!=null)
+        mListAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -350,40 +318,41 @@ public class BaseSongListFragment extends Fragment implements ItemClickListener,
 
     public void LinearSmall(final ArrayList<Song> arrayList) {
         if (!Ischeck)
-            mLinearLayout.setOnClickListener(new View.OnClickListener() {
+            relativeLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Log.d("HoangCgV7eg", "onClick:service " + mediaPlaybackService);
-                    Log.d("HoangCgV7eg", "onClick: " + arrayList);
-                    Log.d("HoangCgV7eg", "onClick:media "+mediaPlaybackFragment);
+                    Log.d("HoaarrayListngCV", "onClick: ");
                     mediaPlaybackService.setListSong(arrayList);
                     mediaPlaybackFragment.setService(mediaPlaybackService);
                     mediaPlaybackFragment.setListSong(arrayList);
                     displayMediaFragment.onclickDisplay(arrayList.get(index));
+                    mediaPlaybackFragment.updateUI();
                 }
             });
     }
 
     public void updateUI() {
         Log.d("mListAdapter", "updateUI:330 " + mListAdapter);
-        if (mediaPlaybackService != null)
-            Log.d("HoangCff1V", "updateUI: "+mediaPlaybackService.isPlaying());
+        if (mediaPlaybackService != null) {
             if (mediaPlaybackService.getmMediaPlayer() != null) {
                 byte[] songArt = getAlbumArt(mediaPlaybackService.getFile());
                 Glide.with(mInflater.getContext()).asBitmap()
                         .load(songArt)
                         .error(R.drawable.default_cover_art)
-                        .into(img);
-                title.setText(mediaPlaybackService.getNameSong());
-                artist.setText(mediaPlaybackService.getArtist());
+                        .into(mPicture);
+                mNameSong.setText(mediaPlaybackService.getNameSong());
+                mArtist.setText(mediaPlaybackService.getArtist());
                 if (mediaPlaybackService.isPlaying()) {
                     mPlayPause.setImageResource(R.drawable.ic_pause_black_large);
                 } else
                     mPlayPause.setImageResource(R.drawable.ic_media_play_light);
-                //mListAdapter.notifyDataSetChanged();
-
             }
-      //      mListAdapter.notifyDataSetChanged();
+        } else {
+            if (UpdateUI.getIsPlaying() == true)
+                mPlayPause.setImageResource(R.drawable.ic_pause_black_large);
+            else mPlayPause.setImageResource(R.drawable.ic_media_play_light);
+        }
+        if(mListAdapter!=null) mListAdapter.notifyDataSetChanged();
     }
 }
 

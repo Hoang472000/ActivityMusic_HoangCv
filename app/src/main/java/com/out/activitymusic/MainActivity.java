@@ -39,84 +39,18 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
     BaseSongListFragment baseSongListFragment;
     MediaPlaybackFragment mediaPlaybackFragment;
     private FavoriteSongsFragment mFavoriteSongsFragment;
-    private boolean mStatus = false;
-
-    public MediaPlaybackService getPlayer() {
-        return mediaPlaybackService;
-    }
-
-    public MediaPlaybackService getMediaPlaybackService() {
-        return mediaPlaybackService;
-    }
-
     public MediaPlaybackService mediaPlaybackService;
     boolean serviceBound = false;
-    private Song song;
     private ArrayList<Song> mListSong;
     SharedPreferences sharedPreferences;
     private DrawerLayout mDrawerLayout;
     private UpdateUI mUpdateUI;
 
-    public boolean isFavorite() {
-        return isFavorite;
-    }
 
-    public void setFavorite(boolean favorite) {
-        isFavorite = favorite;
+    public MediaPlaybackService getMediaPlaybackService() {
+        return mediaPlaybackService;
     }
-
     private boolean isFavorite = false;
-    private ListAdapter listAdapter = new ListAdapter();
-
-
-    private ServiceConnection serviceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            MediaPlaybackService.LocalBinder binder = (MediaPlaybackService.LocalBinder) service;
-            mediaPlaybackService = binder.getService();
-           if(mListSong!=null) mediaPlaybackService.setListSong(mListSong);
-            Log.d("HoangCV", "onServiceConnected: "+mediaPlaybackService.getMediaPlayer().getCurrentPosition());
-            iConnectActivityAndBaseSong.connectActivityAndBaseSong();
-            serviceBound = true;
-            Log.d("Hoanafs1gCV", "onServiceConnected: " + mediaPlaybackService);
-            allSongsFragment.setService(mediaPlaybackService);
-            if (isLandScape()) {
-                allSongsFragment.setService(mediaPlaybackService);
-
-                Log.d("Hoanafs1gCV", "onServiceConnected: " + mediaPlaybackService);
-                Log.d("Hoanafs1gCV", "onServiceConnected: " + mediaPlaybackFragment);
-                mediaPlaybackService.setmMediaPlaybackFragment(mediaPlaybackFragment);
-                mediaPlaybackFragment.setService(mediaPlaybackService);
-            }
-            Toast.makeText(MainActivity.this, "Service Bound", Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            serviceBound = false;
-        }
-    };
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (serviceBound) {
-            unbindService(serviceConnection);
-        }
-    }
-
-
-    public void FileSong(Song song) {
-        song.getFile();
-    }
-
-    @Override
-    protected void onStart() {
-        Log.d("HoangCVonStart", "onStart:111 ");
-        startService();
-        super.onStart();
-    }
 
     @SuppressLint("WrongConstant")
     @Override
@@ -149,99 +83,73 @@ public class MainActivity extends AppCompatActivity implements DisplayMediaFragm
         allSongsFragment.setAllSong(mFavoriteSongsFragment);
         if (!isLandScape()) {
             if (isFavorite) {
-                //    mFavoriteSongsFragment = new FavoriteSongsFragment(mediaPlaybackService, mediaPlaybackFragment, this);
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragmentSongOne, mFavoriteSongsFragment).commit();
                 mDrawerLayout = findViewById(R.id.drawer_layout);
                 mDrawerLayout.closeDrawer(GravityCompat.START);
             } else {
                 FragmentManager manager = this.getSupportFragmentManager();
-                //allSongsFragment.setBoolean(true);
                 manager.beginTransaction().replace(R.id.fragmentSongOne, allSongsFragment).commit();
             }
         } else {
             if (!isFavorite) {
-                //  allSongsFragment.setBoolean(false);
                 FragmentManager manager = this.getSupportFragmentManager();
                 manager.beginTransaction().replace(R.id.fragmentSongOne, allSongsFragment).commit();
                 FragmentManager manager1 = this.getSupportFragmentManager();
                 manager1.beginTransaction().replace(R.id.fragmentMediaTwo, mediaPlaybackFragment).commit();
             } else {
-                // mFavoriteSongsFragment = new FavoriteSongsFragment( mediaPlaybackService, mediaPlaybackFragment, this);
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragmentSongOne, mFavoriteSongsFragment).commit();
                 mDrawerLayout = findViewById(R.id.drawer_layout);
                 mDrawerLayout.closeDrawer(GravityCompat.START);
                 FragmentManager manager = this.getSupportFragmentManager();
-                //  allSongsFragment.setBoolean(true);
                 manager.beginTransaction().addToBackStack(null).replace(R.id.fragmentMediaTwo, mediaPlaybackFragment).commit();
             }
         }
         sharedPreferences = getSharedPreferences("login", MODE_PRIVATE);
-        /*Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow)
-                .setDrawerLayout(drawer)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.fragmentSongOne);
-        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
-        NavigationUI.setupWithNavController(navigationView, navController);
+    }
+
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            MediaPlaybackService.LocalBinder binder = (MediaPlaybackService.LocalBinder) service;
+            mediaPlaybackService = binder.getService();
+            if(mListSong!=null) mediaPlaybackService.setListSong(mListSong);
+            iConnectActivityAndBaseSong.connectActivityAndBaseSong();
+            serviceBound = true;
+            allSongsFragment.setService(mediaPlaybackService);
+            mediaPlaybackFragment.setService(mediaPlaybackService);
+            if (isLandScape()) {
+                allSongsFragment.setService(mediaPlaybackService);
+                mediaPlaybackService.setmMediaPlaybackFragment(mediaPlaybackFragment);
+                mediaPlaybackFragment.setService(mediaPlaybackService);
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            serviceBound = false;
+        }
+    };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (serviceBound) {
+            unbindService(serviceConnection);
+        }
     }
 
     @Override
-    public boolean onSupportNavigateUp() {
-        NavController navController = Navigation.findNavController(this, R.id.fragmentSongOne);
-        return NavigationUI.navigateUp(navController, mAppBarConfiguration)
-                || super.onSupportNavigateUp();
-    }
-*/
-    }
-/*    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer != null) {
-            if (drawer.isDrawerOpen(GravityCompat.START)) {
-                drawer.closeDrawer(GravityCompat.START);
-            } else {
-                super.onBackPressed();
-            }
-        }
-    }*/
-
-    @SuppressWarnings("StatementWithEmptyBody")
- /*   @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        // Handle navigation view item clicks here.
-        switch (item.getItemId()) {
-            case R.id.nav_home:
-                drawer.closeDrawer(GravityCompat.START);
-                displayToast(getString(R.string.listnow));
-                return true;
-            case R.id.nav_gallery:
-                drawer.closeDrawer(GravityCompat.START);
-                return true;
-            case R.id.nav_slideshow:
-                drawer.closeDrawer(GravityCompat.START);
-                return true;
-
-            default:
-                return false;
-        }
+    protected void onStart() {
+        startService();
+        super.onStart();
     }
 
-    public void displayToast(String message) {
-        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-    }*/
     public void startService() {
         Intent intent = new Intent(this, MediaPlaybackService.class);
         startService(intent);
         bindService(intent, serviceConnection, BIND_AUTO_CREATE);
     }
-
 
     @Override
     public void onclickDisplay(Song song) {

@@ -67,10 +67,8 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
     public void setAllSong(DataFavoriteAndAllSong dataFavoriteAndAllSong){
         this.dataFavoriteAndAllSong=dataFavoriteAndAllSong;
     }
-
     public AllSongsFragment() {
     }
-
 
     @Nullable
     @Override
@@ -154,7 +152,6 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
         setListSongs(mListSongs);
         LinearSmall(mListSongs);
         mListAdapter=new ListAdapter(getContext(), mListSongs,this);
-        Log.d("HoangCVgasfsdf", "onLoadFinished: "+mediaPlaybackFragment);
         mediaPlaybackFragment.setListSong(mListSongs);
         dataFragment.onclickData(mListSongs);
         dataFavoriteAndAllSong.onClickDataFaboriteAndAllSong(mListSongs);
@@ -163,12 +160,8 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
         setListAdapter(mListAdapter);
         mListAdapter.setService(mediaPlaybackService);
         if(mediaPlaybackService!=null) mediaPlaybackService.setListSong(mListSongs);
-        Log.d("H11311oangCV", "onLoadFinished111: "+mediaPlaybackService);
-//        mediaPlaybackService.setmListSong(songs);
         if(isLandscape()){
-            Log.d("H111oangCV", "onLoadFinished111: "+mediaPlaybackService);
             setListSongs(mListSongs);
-           // mediaPlaybackService.setmListSong(songs);
             mListAdapter.setService(mediaPlaybackService);
             mediaPlaybackFragment.setService(mediaPlaybackService);
             mediaPlaybackFragment.setListSong(mListSongs);
@@ -177,13 +170,6 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
             if(mediaPlaybackService!=null)
             mediaPlaybackService.setListSong(mListSongs);
             //khi xoay truyen duoc listsong sang service
-             /*        ((MainActivity) getActivity()).setiConnectActivityAndBaseSong(new MainActivity.IConnectActivityAndBaseSong() {
-                @Override
-                public void connectActivityAndBaseSong() {
-                   ((MainActivity) getActivity()).setService(mediaPlaybackService);
-                }
-    });*/
-            Log.d("HoangCVmediaPlaybackService", "onLoadFinished: "+ mListSongs);
         }
     }
 

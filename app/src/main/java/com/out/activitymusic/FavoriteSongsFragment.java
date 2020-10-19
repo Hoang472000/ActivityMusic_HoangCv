@@ -28,8 +28,7 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
     private ArrayList<Song> mListAllSong;
     private ListAdapter mListAdapter;
     MediaPlaybackFragment mediaPlaybackFragment;
-    DisplayMediaFragment displayMediaFragment;
-    AllSongsFragment allSongsFragment;
+    private int id,id_provider;
 
     public FavoriteSongsFragment(MediaPlaybackService service, MediaPlaybackFragment mediaPlaybackFragment, DisplayMediaFragment displayMediaFragment) {
         super(displayMediaFragment, mediaPlaybackFragment);
@@ -66,7 +65,7 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
         if (mediaPlaybackService != null) {
             mListAllSong = mediaPlaybackService.getListSong();
         }
-        Log.d("HoangCVgetListSong", "onLoadFinished: "+mediaPlaybackService.getListSong());
+        int [] arr = new int[0];
         Song song = null;
         int dem = 0;
         if (data.moveToFirst()) {
@@ -75,14 +74,12 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
                     if (mListAllSong.get(i).getID() == data.getInt(data.getColumnIndex(FavoriteSongsProvider.ID_PROVIDER))) {
                         Log.d("song F", data.getInt(data.getColumnIndex(FavoriteSongsProvider.ID_PROVIDER)) + "//" + mListAllSong.get(i).getID());
                         song = new Song(dem, mListAllSong.get(i).getTitle(), mListAllSong.get(i).getFile(), mListAllSong.get(i).getAlbum(), mListAllSong.get(i).getArtist(), mListAllSong.get(i).getDuration());
+                     //   arr[dem]=i;
                         dem++;
                         mListFavoriteSongs.add(song);
-//                        setListSongs(mListFavoriteSongs);
-                       /* mListAdapter = new ListAdapter(getContext(), mListFavoriteSongs, this);
-                        Log.d("favorite", "onLoadFinished: " + mListFavoriteSongs.size());
-                        setAdapter(mListAdapter);*/
                     }
                 }
+             //   mediaPlaybackFragment.setFavoriteID(arr);
             } while (data.moveToNext());
         }
         mListAdapter = new ListAdapter(getContext(), mListFavoriteSongs, this);
@@ -90,20 +87,16 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
         LinearSmall(mListFavoriteSongs);
         Log.d("HoangCVgassdsfsdf", "onLoadFinished: " + mListAdapter);
         mediaPlaybackFragment.setListSong(mListFavoriteSongs);
-        // dataFragment.onclickData(songs);
         mediaPlaybackFragment.setService(mediaPlaybackService);
         mListAdapter = new ListAdapter(getContext(), mListFavoriteSongs, this);
         setAdapter(mListAdapter);
         setListAdapter(mListAdapter);
         mListAdapter.setService(mediaPlaybackService);
         if (isLandscape()) {
-            Log.d("H111oangCV", "onLoadFinished111: " + mediaPlaybackService);
             setListSongs(mListFavoriteSongs);
-            // mediaPlaybackService.setmListSong(songs);
             mListAdapter.setService(mediaPlaybackService);
             mediaPlaybackFragment.setService(mediaPlaybackService);
             mediaPlaybackFragment.setListSong(mListFavoriteSongs);
-
             if (mediaPlaybackService != null) mediaPlaybackFragment.updateTime();
         }
     }
