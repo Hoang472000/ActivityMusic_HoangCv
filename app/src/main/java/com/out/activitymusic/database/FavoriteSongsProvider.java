@@ -12,6 +12,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
+
 import androidx.annotation.Nullable;
 
 import java.util.HashMap;
@@ -151,14 +153,17 @@ public class FavoriteSongsProvider extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues contentValues, String selection, String[] selectionArg) {
         //  return mFavoriteSongsDatabase.update(contentValues, selection, selectionArg);
+        Log.d("ID_PROVIDER", "update: ");
         int count =0;
         switch (sUriMatcher.match(uri)){
             case URI_ALL_ITEM_CODE:
                 count= database.update(TABLE_FAVORITESONGS, contentValues, selection,selectionArg);
+                Log.d("ID_PROVIDER", "update:URI_ALL_ITEM_CODE "+count);
                 break;
             case URI_ONE_ITEM_CODE:
                 count= database.update(TABLE_FAVORITESONGS,contentValues,
                         ID +" = "+uri.getPathSegments().get(1)+(!TextUtils.isEmpty(selection)?"AND ("+selection +')':""),selectionArg);
+                Log.d("ID_PROVIDER", "update:URI_ONE_ITEM_CODE "+count);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri );

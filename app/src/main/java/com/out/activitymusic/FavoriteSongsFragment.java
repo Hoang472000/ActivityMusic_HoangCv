@@ -88,6 +88,7 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
         mediaPlaybackFragment.setService(mediaPlaybackService);
         mListAdapter = new ListAdapter(getContext(), mListFavoriteSongs, this);
         setAdapter(mListAdapter);
+        mediaPlaybackService.setListSong(mListAllSong);
         mediaPlaybackService.setListSongFavorite(mListFavoriteSongs);
         setListAdapter(mListAdapter);
         mListAdapter.setService(mediaPlaybackService);

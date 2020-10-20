@@ -323,8 +323,15 @@ public class MediaPlaybackFragment extends Fragment implements PopupMenu.OnMenuI
                 mDisLike.setImageResource(R.drawable.ic_thumbs_down_default);
                 ContentValues values = new ContentValues();
                 values.put(FavoriteSongsProvider.IS_FAVORITE, 2);
-                getActivity().getContentResolver().update(FavoriteSongsProvider.CONTENT_URI, values, FavoriteSongsProvider.ID_PROVIDER + "= " + mediaPlaybackService.getPossision(), null);
+                Log.d("ID_PROVIDER", "onClick: "+FavoriteSongsProvider.ID_PROVIDER  + "     "+ mUpdateUI.getIndex());
+                getActivity().getContentResolver().update(FavoriteSongsProvider.CONTENT_URI, values, FavoriteSongsProvider.ID_PROVIDER + "= " + mUpdateUI.getIndex()+1, null);
                 Toast.makeText(getContext(), "like song //" + mediaPlaybackService.getNameSong(), Toast.LENGTH_SHORT).show();
+                /*        ContentValues values = new ContentValues();
+                values.put(FavoriteSongsProvider.FAVORITE,2);
+                getActivity().getContentResolver().update(FavoriteSongsProvider.CONTENT_URI,values,FavoriteSongsProvider.ID_PROVIDER +"= "+ mMediaPlaybackService.getMinIndex(),null);
+                Toast.makeText(getContext(),  "like song //"+ mMediaPlaybackService.getNameSong(), Toast.LENGTH_SHORT).show();
+            }
+        });*/
                 break;
             case R.id.play_previous: {
                 mediaPlaybackService.previousMedia();
